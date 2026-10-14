@@ -1,0 +1,49 @@
+---
+import { SKILL_CATALOG } from '../../site.config.ts';
+
+// one plan-to-push run, shown with the Claude Code prefix; plain messages are not skills
+const WORKFLOW_STEPS = [
+  {
+    input: `/${SKILL_CATALOG['jg-plan'].example.invocation}`,
+    result: 'Saves plan.md under coding-agent-planning/ and waits for your approval.',
+  },
+  {
+    input: '/jg-challenge-plan',
+    result: 'Returns a verdict, the corrections the plan needs, and numbered decisions.',
+  },
+  {
+    input: '/jg-plan Use Redis for the limit store and apply the corrections',
+    result: 'Revises the same plan in place instead of starting over.',
+  },
+  {
+    input: '/jg-breakdown',
+    result: 'Writes milestones.md with a review checkpoint for each milestone.',
+  },
+  {
+    input: 'Approved, implement milestone 1',
+    result: 'A plain message. The agent builds one milestone and stops at its checkpoint.',
+  },
+  {
+    input: '/jg-review',
+    result: 'Reports findings first and answers Ready to commit, Not ready, or Review incomplete.',
+  },
+  {
+    input: '/jg-push',
+    result: 'Creates one signed-off, signed commit and pushes only the current branch.',
+  },
+] as const;
+---
+
+<ol class="grid gap-px overflow-hidden rounded-xl border border-border bg-border">
+  {
+    WORKFLOW_STEPS.map(({ input, result }, index) => (
+      <li class="grid gap-3 bg-surface p-5 sm:grid-cols-[3rem_minmax(0,1fr)_minmax(0,1fr)] sm:items-baseline sm:gap-6">
+        <span class="font-mono text-xs font-bold text-muted">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <code class="font-mono text-sm font-semibold wrap-anywhere">{input}</code>
+        <p class="text-sm leading-6 text-muted">{result}</p>
+      </li>
+    ))
+  }
+</ol>

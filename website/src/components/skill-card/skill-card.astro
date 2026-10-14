@@ -1,0 +1,55 @@
+---
+import { ArrowUpRight, Eye, FilePenLine, GitCommitHorizontal } from '@lucide/astro';
+
+import { SKILL_ACCESS_LABELS, type ISkill } from '../../utilities/skill-catalog/index.ts';
+
+interface Props {
+  skill: ISkill;
+}
+
+// icon that signals what each kind of skill may change
+const ACCESS_ICONS = {
+  'commits-and-pushes': GitCommitHorizontal,
+  'planning-files': FilePenLine,
+  'read-only': Eye,
+} as const;
+
+const { skill } = Astro.props;
+const AccessIcon = ACCESS_ICONS[skill.access];
+---
+
+{/* the whole card is the link target, so the card draws the keyboard focus ring for it */}
+<article
+  class="group relative flex h-full flex-col rounded-xl border border-border bg-surface p-5 shadow-surface transition-colors hover:border-border-strong has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-focus"
+  data-skill-card
+>
+  <h4 class="flex items-start justify-between gap-3 font-mono text-base font-bold">
+    <a
+      href={`/skills/${skill.name}/`}
+      class="no-underline outline-none after:absolute after:inset-0 after:rounded-xl"
+    >
+      {skill.name}
+    </a>
+    <ArrowUpRight
+      class="mt-0.5 size-4 shrink-0 text-muted transition-colors group-hover:text-foreground"
+      aria-hidden="true"
+    />
+  </h4>
+  <p class="mt-3 flex-1 text-sm leading-6 text-muted">{skill.description}</p>
+  <div class="mt-5 flex flex-wrap items-center gap-2 text-xs">
+    <span
+      class="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 font-semibold"
+    >
+      <AccessIcon
+        class="size-3.5"
+        aria-hidden="true"
+      />
+      {SKILL_ACCESS_LABELS[skill.access]}
+    </span>
+    {
+      skill.argumentHint && (
+        <code class="rounded-full bg-code px-2.5 py-1 font-mono">{skill.argumentHint}</code>
+      )
+    }
+  </div>
+</article>

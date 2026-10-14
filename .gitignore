@@ -147,3 +147,12 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# browser test output
+playwright-report/
+test-results/
+
+# local coding instructions and planning files, never published
+AGENTS.md
+CANDIDATE.md
+coding-agent-planning/

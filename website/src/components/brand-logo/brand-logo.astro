@@ -1,0 +1,36 @@
+---
+import { SITE_CONFIG } from '../../site.config.ts';
+---
+
+<span class="inline-flex min-w-0 items-center gap-2.5 font-semibold tracking-tight">
+  <svg
+    class="size-8 shrink-0"
+    viewBox="0 0 64 64"
+    fill="none"
+    aria-hidden="true"
+  >
+    <rect
+      x="2"
+      y="2"
+      width="60"
+      height="60"
+      rx="12"
+      class="fill-primary stroke-border-strong"
+      stroke-width="1"
+    ></rect>
+    <text
+      x="32"
+      y="42"
+      text-anchor="middle"
+      font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace"
+      font-size="28"
+      font-weight="800"
+      letter-spacing="-2"
+    >
+      <tspan class="fill-primary-foreground">JG</tspan><tspan class="fill-accent-on-primary"
+        >/</tspan
+      >
+    </text>
+  </svg>
+  <span class="truncate text-base">{SITE_CONFIG.name}</span>
+</span>

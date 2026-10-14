@@ -1,0 +1,34 @@
+---
+import { ArrowLeft } from '@lucide/astro';
+
+import BaseLayout from '../layouts/base-layout.astro';
+import { SITE_CONFIG } from '../site.config.ts';
+---
+
+<BaseLayout
+  canonicalPath="/404.html"
+  description={`The requested ${SITE_CONFIG.name} page could not be found.`}
+  title={`Page not found | ${SITE_CONFIG.name}`}
+  noIndex
+>
+  <section class="section-space">
+    <div class="prose-shell">
+      <p class="eyebrow">404, page not found</p>
+      <h1 class="display-title mt-6">No skill lives at this path.</h1>
+      <p class="lede mt-8">
+        The page may have moved, or the link may be incomplete. Every skill is listed on the home
+        page.
+      </p>
+      <a
+        class="action-primary mt-9"
+        href="/#skills"
+      >
+        <ArrowLeft
+          class="size-4"
+          aria-hidden="true"
+        />
+        Browse the skills
+      </a>
+    </div>
+  </section>
+</BaseLayout>

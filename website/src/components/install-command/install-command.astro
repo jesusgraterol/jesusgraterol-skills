@@ -1,0 +1,28 @@
+---
+import CopyControl from '../copy-control/copy-control.astro';
+
+interface Props {
+  command: string;
+  id: string;
+  label: string;
+}
+
+// tokens longer than this may break mid-token on narrow screens; shorter ones such as flags stay whole
+const MAX_UNBROKEN_TOKEN_LENGTH = 16;
+
+const { command, id, label } = Astro.props;
+const tokens = command.split(' ');
+---
+
+<div class="overflow-hidden rounded-xl border border-border bg-surface shadow-surface">
+  <div class="flex items-center justify-between gap-3 border-b border-border py-2 pr-2 pl-4">
+    <span class="font-mono text-xs font-semibold text-muted">{label}</span>
+    <CopyControl
+      context={`${label.toLowerCase()} command`}
+      label="Copy"
+      sourceId={id}
+    />
+  </div>
+  <pre
+    class="px-4 py-4 font-mono text-sm leading-6 whitespace-pre-wrap"><code id={id}>{tokens.map((token, index) => (<>{index > 0 && ' '}<span class:list={[token.length > MAX_UNBROKEN_TOKEN_LENGTH ? 'wrap-anywhere' : 'whitespace-nowrap']}>{token}</span></>))}</code></pre>
+</div>

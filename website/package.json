@@ -1,0 +1,64 @@
+{
+  "name": "jesusgraterol-skills-website",
+  "version": "1.0.0",
+  "description": "Install, browse, and learn the explicit-only jg skills for Claude Code and Codex.",
+  "author": "Jesus Graterol",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "homepage": "https://skills.jesusgraterol.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jesusgraterol/jesusgraterol-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jesusgraterol/jesusgraterol-skills/issues"
+  },
+  "engines": {
+    "node": "^24.15.0",
+    "npm": ">=11.12.0 <12.0.0"
+  },
+  "packageManager": "npm@11.12.1",
+  "scripts": {
+    "assets:generate": "node scripts/generate-open-graph.ts",
+    "build": "astro build && node scripts/verify-build.ts",
+    "check": "npm run test:unit && npm run typecheck && npm run lint && npm run format:check && npm run build && npm run test:integration:artifact && npm run test:e2e:artifact",
+    "dev": "astro dev",
+    "format": "prettier --write --config .prettierrc .",
+    "format:check": "prettier --check --config .prettierrc .",
+    "lint": "eslint astro.config.ts eslint.config.js playwright.config.ts scripts src vitest",
+    "preview": "vite preview",
+    "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test:e2e": "npm run build && npm run test:e2e:artifact",
+    "test:e2e:artifact": "playwright test",
+    "test:integration": "npm run build && npm run test:integration:artifact",
+    "test:integration:artifact": "vitest run --config vitest/test-integration.config.ts",
+    "test:unit": "vitest run --config vitest/test-unit.config.ts",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@fontsource-variable/ubuntu-sans": "5.2.10"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@astrojs/sitemap": "3.7.3",
+    "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "10.0.1",
+    "@lucide/astro": "1.31.0",
+    "@playwright/test": "1.62.1",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "24.12.0",
+    "astro": "7.2.2",
+    "eslint": "10.8.1",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.9.0",
+    "prettier": "3.9.6",
+    "prettier-plugin-astro": "0.14.1",
+    "prettier-plugin-tailwindcss": "0.7.2",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.66.0",
+    "vite": "8.2.1",
+    "vitest": "4.1.10"
+  }
+}

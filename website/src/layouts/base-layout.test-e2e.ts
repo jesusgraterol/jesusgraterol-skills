@@ -1,0 +1,165 @@
+import AxeBuilder from '@axe-core/playwright';
+import { expect, test } from '@playwright/test';
+
+import { SKILL_CATALOG } from '../site.config.ts';
+
+const SKILL_ROUTES = Object.keys(SKILL_CATALOG).map((name) => `/skills/${name}/`);
+const PUBLIC_ROUTES = ['/', ...SKILL_ROUTES] as const;
+const ACCESSIBILITY_ROUTES = ['/', '/skills/jg-plan/', '/skills/jg-push/', '/404.html'] as const;
+
+test.describe('production website', () => {
+  for (const route of PUBLIC_ROUTES) {
+    test(`${route} returns a complete HTML document`, async ({ page }) => {
+      const response = await page.goto(route);
+
+      expect(response?.status()).toBe(200);
+      await expect(page.locator('main h1')).toHaveCount(1);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+        'href',
+        `https://skills.jesusgraterol.dev${route}`,
+      );
+      await expect(page.locator('link[rel="describedby"]')).toHaveAttribute(
+        'href',
+        'https://skills.jesusgraterol.dev/llms.txt',
+      );
+      await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+        'content',
+        'https://skills.jesusgraterol.dev/og/jg-skills.png',
+      );
+      await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
+
+      if (route !== '/') {
+        const breadcrumb = page.getByRole('navigation', { name: 'Breadcrumb' });
+
+        await expect(breadcrumb).toBeVisible();
+        await expect(breadcrumb.locator('[aria-current="page"]')).toHaveCount(1);
+      }
+    });
+  }
+
+  for (const route of ACCESSIBILITY_ROUTES) {
+    test(`${route} has no automatically detectable accessibility violations`, async ({ page }) => {
+      await page.goto(route);
+
+      const results = await new AxeBuilder({ page }).analyze();
+
+      expect(results.violations).toStrictEqual([]);
+    });
+
+    test(`${route} has no automatically detectable dark-theme accessibility violations`, async ({
+      page,
+    }) => {
+      await page.goto(route);
+      await page.getByRole('button', { name: 'Use dark theme' }).first().click();
+      await expect(page.locator('html')).toHaveClass(/dark/u);
+
+      const results = await new AxeBuilder({ page }).analyze();
+
+      expect(results.violations).toStrictEqual([]);
+    });
+  }
+
+  test('home page lists every skill grouped by stage and links to its page', async ({ page }) => {
+    await page.goto('/');
+
+    for (const stage of ['Plan', 'Ship', 'Context']) {
+      await expect(page.getByRole('heading', { level: 3, name: stage })).toBeVisible();
+    }
+
+    for (const name of Object.keys(SKILL_CATALOG)) {
+      await expect(page.getByRole('link', { name, exact: true })).toHaveAttribute(
+        'href',
+        `/skills/${name}/`,
+      );
+    }
+  });
+
+  test('theme preference persists across reloads', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Use dark theme' }).first().click();
+    await expect(page.locator('html')).toHaveClass(/dark/u);
+    await expect(page.locator('html')).toHaveAttribute('data-theme-preference', 'dark');
+
+    await page.reload();
+
+    await expect(page.locator('html')).toHaveClass(/dark/u);
+    await expect(page.getByRole('button', { name: 'Use light theme' }).first()).toBeVisible();
+
+    await page.getByRole('button', { name: 'Use light theme' }).first().click();
+    await expect(page.locator('html')).not.toHaveClass(/dark/u);
+    await expect(page.locator('html')).toHaveAttribute('data-theme-preference', 'light');
+  });
+
+  test('skip link moves keyboard focus to the main content', async ({ page }) => {
+    await page.goto('/');
+    await page.keyboard.press('Tab');
+
+    const skipLink = page.getByRole('link', { name: 'Skip to main content' });
+
+    await expect(skipLink).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(/#main-content$/u);
+  });
+
+  for (const route of PUBLIC_ROUTES) {
+    test(`${route} does not overflow horizontally at 320 pixels`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 720 });
+      await page.goto(route);
+
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      ).toBe(true);
+    });
+  }
+
+  test('mobile navigation is keyboard accessible at 320 pixels', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 720 });
+    await page.goto('/skills/jg-review/');
+
+    await expect(page.getByRole('link', { name: 'JG Skills home' })).toContainText('JG Skills');
+
+    const menu = page.getByLabel('Open navigation menu');
+    await menu.focus();
+    await page.keyboard.press('Enter');
+
+    const mobileNavigation = page.getByRole('navigation', { name: 'Mobile navigation' });
+
+    await expect(mobileNavigation).toBeVisible();
+    await expect(
+      mobileNavigation.getByRole('link', { name: 'Install', exact: true }),
+    ).toHaveAttribute('href', '/#install');
+  });
+
+  test('reduced-motion users do not receive animated scrolling or transitions', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+
+    const behavior = await page.evaluate(() => {
+      const root = getComputedStyle(document.documentElement);
+      const link = getComputedStyle(document.querySelector('a[href="/#skills"]') as HTMLElement);
+
+      return {
+        scrollBehavior: root.scrollBehavior,
+        transitionDuration: link.transitionDuration,
+      };
+    });
+
+    expect(behavior.scrollBehavior).toBe('auto');
+    expect(Number.parseFloat(behavior.transitionDuration)).toBeLessThanOrEqual(0.001);
+  });
+
+  test('publishes the LLM index with every skill page', async ({ request }) => {
+    const response = await request.get('/llms.txt');
+    const text = await response.text();
+
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('text/plain');
+
+    for (const route of SKILL_ROUTES) {
+      expect(text).toContain(`https://skills.jesusgraterol.dev${route}`);
+    }
+  });
+});

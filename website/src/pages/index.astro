@@ -1,0 +1,210 @@
+---
+import { ArrowRight } from '@lucide/astro';
+
+import InstallCommand from '../components/install-command/install-command.astro';
+import SessionDemo from '../components/session-demo/session-demo.astro';
+import SkillCard from '../components/skill-card/skill-card.astro';
+import WorkflowRun from '../components/workflow-run/workflow-run.astro';
+import BaseLayout from '../layouts/base-layout.astro';
+import { SITE_CONFIG } from '../site.config.ts';
+import { loadSkills, SKILL_STAGES, type ISkillStage } from '../utilities/skill-catalog/index.ts';
+
+// coding agents the skills are verified with; the Codex mark is black and inverts in dark mode
+const HOSTS = [
+  { invertsInDark: false, name: 'Claude Code', path: '/coding-agents/claude-code.svg' },
+  { invertsInDark: true, name: 'Codex', path: '/coding-agents/codex.svg' },
+] as const;
+
+const skills = await loadSkills();
+const stages = (Object.keys(SKILL_STAGES) as ISkillStage[]).map((stage) => ({
+  ...SKILL_STAGES[stage],
+  skills: skills.filter((skill) => skill.stage === stage),
+  stage,
+}));
+---
+
+<BaseLayout
+  canonicalPath="/"
+  description={SITE_CONFIG.defaultDescription}
+  title={`${SITE_CONFIG.name} | Explicit-only skills for Claude Code and Codex`}
+  structuredDataType="website"
+>
+  <section class="border-b border-border pt-14 pb-16 sm:pt-20 sm:pb-20">
+    <div
+      class="page-shell grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14"
+    >
+      <div>
+        <p class="eyebrow">Agent Skills for Claude Code and Codex</p>
+        <h1 class="display-title mt-6 text-4xl sm:text-5xl xl:text-6xl">
+          Seven skills that run
+          <span class="block text-accent">only on command.</span>
+        </h1>
+        <p class="lede mt-7">
+          Plan a change, challenge the plan, split it into milestones, review the work, and push it.
+          One command installs all seven, and none of them loads until you type its name.
+        </p>
+        <div class="mt-8">
+          <InstallCommand
+            command={SITE_CONFIG.commands.install}
+            id="hero-install-command"
+            label="Install all seven"
+          />
+        </div>
+        <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
+          <span class="text-muted">Works with</span>
+          <ul class="flex flex-wrap items-center gap-x-5 gap-y-2">
+            {
+              HOSTS.map(({ invertsInDark, name, path }) => (
+                <li class="flex items-center gap-2 font-semibold">
+                  <img
+                    class:list={['size-5 object-contain', invertsInDark && 'dark:invert']}
+                    src={path}
+                    width="20"
+                    height="20"
+                    alt=""
+                  />
+                  {name}
+                </li>
+              ))
+            }
+          </ul>
+          <a
+            class="inline-flex items-center gap-1.5 font-semibold underline-offset-4 hover:underline"
+            href="#skills"
+          >
+            Browse the skills
+            <ArrowRight
+              class="size-4"
+              aria-hidden="true"
+            />
+          </a>
+        </div>
+      </div>
+      <SessionDemo />
+    </div>
+  </section>
+
+  <section
+    id="skills"
+    class="section-space scroll-mt-16 border-b border-border"
+    aria-labelledby="skills-title"
+  >
+    <div class="page-shell">
+      <p class="eyebrow">The skills</p>
+      <h2
+        id="skills-title"
+        class="section-title mt-4"
+      >
+        One skill for each step you control.
+      </h2>
+      <p class="lede mt-5">
+        Each skill states exactly what it may change and defers general engineering standards to
+        your repository's coding instructions.
+      </p>
+      <div class="mt-12 grid gap-12">
+        {
+          stages.map(({ label, skills: stageSkills, stage, summary }) => (
+            <section aria-labelledby={`stage-${stage}`}>
+              <div class="flex flex-col gap-1 border-b border-border pb-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+                <h3
+                  id={`stage-${stage}`}
+                  class="text-xl font-semibold tracking-tight"
+                >
+                  {label}
+                </h3>
+                <p class="text-sm text-muted">{summary}</p>
+              </div>
+              <ul class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {stageSkills.map((skill) => (
+                  <li>
+                    <SkillCard skill={skill} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="workflow"
+    class="section-space scroll-mt-16 border-b border-border"
+    aria-labelledby="workflow-title"
+  >
+    <div class="page-shell grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-14">
+      <div>
+        <p class="eyebrow">A typical run</p>
+        <h2
+          id="workflow-title"
+          class="section-title mt-4"
+        >
+          From a request to a pushed commit.
+        </h2>
+        <p class="lede mt-5">
+          You approve the plan and each milestone. The skills do the planning, the checking, and the
+          publishing in between.
+        </p>
+        <p class="mt-5 text-sm leading-6 text-muted">
+          Commands use the Claude Code prefix. In Codex, start each one with <code
+            class="rounded bg-code px-1 font-mono">$</code
+          > instead of <code class="rounded bg-code px-1 font-mono">/</code>.
+        </p>
+      </div>
+      <WorkflowRun />
+    </div>
+  </section>
+
+  <section
+    id="install"
+    class="section-space scroll-mt-16"
+    aria-labelledby="install-title"
+  >
+    <div class="page-shell grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-14">
+      <div>
+        <p class="eyebrow">Install</p>
+        <h2
+          id="install-title"
+          class="section-title mt-4"
+        >
+          One command for both agents.
+        </h2>
+        <p class="lede mt-5">
+          The skills CLI runs through npx, so all you need is Node.js. It installs the skills
+          globally for Claude Code and Codex.
+        </p>
+        <p class="mt-5 text-sm leading-6 text-muted">
+          Claude Code reads <code class="rounded bg-code px-1 font-mono"
+            >disable-model-invocation: true</code
+          > and Codex reads <code class="rounded bg-code px-1 font-mono"
+            >allow_implicit_invocation: false</code
+          >, so a skill enters the conversation only when you invoke it.
+        </p>
+      </div>
+      <div class="grid gap-5">
+        <InstallCommand
+          command={SITE_CONFIG.commands.install}
+          id="install-command"
+          label="Install"
+        />
+        <InstallCommand
+          command={SITE_CONFIG.commands.update}
+          id="update-command"
+          label="Update"
+        />
+        <div>
+          <InstallCommand
+            command={SITE_CONFIG.commands.remove}
+            id="remove-command"
+            label="Remove"
+          />
+          <p class="mt-3 text-sm leading-6 text-muted">
+            Remove the skills by name. A wildcard remove would also delete every other global skill
+            you have installed.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

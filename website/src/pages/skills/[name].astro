@@ -1,0 +1,35 @@
+---
+import type { GetStaticPaths } from 'astro';
+
+import SkillDocument from '../../components/skill-document/skill-document.astro';
+import BaseLayout from '../../layouts/base-layout.astro';
+import { SITE_CONFIG } from '../../site.config.ts';
+import { loadSkills, type ISkill } from '../../utilities/skill-catalog/index.ts';
+
+export const getStaticPaths = (async () => {
+  const skills = await loadSkills();
+
+  return skills.map((skill) => ({ params: { name: skill.name }, props: { skill } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  skill: ISkill;
+}
+
+const { skill } = Astro.props;
+const canonicalPath = `/skills/${skill.name}/`;
+---
+
+<BaseLayout
+  breadcrumbs={[
+    { name: SITE_CONFIG.name, path: '/' },
+    { name: skill.name, path: canonicalPath },
+  ]}
+  canonicalPath={canonicalPath}
+  description={skill.description}
+  structuredDataTitle={skill.name}
+  structuredDataType="webpage"
+  title={`${skill.name} | ${SITE_CONFIG.name}`}
+>
+  <SkillDocument skill={skill} />
+</BaseLayout>

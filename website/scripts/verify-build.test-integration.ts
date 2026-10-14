@@ -1,0 +1,250 @@
+// @vitest-environment node
+import { strict as assert } from 'node:assert';
+import { appendFile, cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+
+import { verifyBuild } from './verify-build.ts';
+
+const websiteRoot = resolve(import.meta.dirname, '..');
+const BUILD_DIRECTORY = resolve(websiteRoot, 'dist');
+const TEMPORARY_ROOT_PREFIX = 'jg-skills-verify-build-';
+const STRUCTURED_DATA_PATTERN = /<script type="application\/ld\+json">[^<]+<\/script>/u;
+const SKILL_PAGE = 'skills/jg-plan/index.html';
+
+// contracts for minimally corrupted build fixtures
+type IBuildMutation = (buildDirectory: string) => Promise<void>;
+type IBuildFailureCase = [caseName: string, expectedMessage: string, mutation: IBuildMutation];
+
+let temporaryRoot: string | undefined;
+let fixtureIndex = 0;
+
+/** Resolves one fixture artifact while enforcing the disposable build boundary. */
+const resolveBuildFile = (buildDirectory: string, relativePath: string): string => {
+  const filePath = resolve(buildDirectory, relativePath);
+  const pathFromBuildDirectory = relative(buildDirectory, filePath);
+
+  assert.ok(
+    pathFromBuildDirectory !== '..' &&
+      !pathFromBuildDirectory.startsWith(`..${sep}`) &&
+      !isAbsolute(pathFromBuildDirectory),
+  );
+
+  return filePath;
+};
+
+/** Replaces one required fragment in a disposable build artifact. */
+const replaceBuildFileText = async (
+  buildDirectory: string,
+  relativePath: string,
+  searchValue: string | RegExp,
+  replacement: string,
+): Promise<void> => {
+  const filePath = resolveBuildFile(buildDirectory, relativePath);
+  const sourceText = await readFile(filePath, 'utf8');
+  const mutatedText = sourceText.replace(searchValue, replacement);
+
+  assert.notEqual(mutatedText, sourceText);
+  await writeFile(filePath, mutatedText, 'utf8');
+};
+
+/** Checks that a temporary root is the exact disposable directory shape this suite creates. */
+const isDisposableTemporaryRoot = (directoryPath: string): boolean =>
+  dirname(resolve(directoryPath)) === resolve(tmpdir()) &&
+  basename(directoryPath).startsWith(TEMPORARY_ROOT_PREFIX);
+
+/** Copies the successful production artifact into one isolated corruption fixture. */
+const createBuildFixture = async (): Promise<string> => {
+  assert.ok(temporaryRoot);
+
+  const fixtureDirectory = resolve(temporaryRoot, `case-${String(fixtureIndex).padStart(2, '0')}`);
+  fixtureIndex += 1;
+
+  await cp(BUILD_DIRECTORY, fixtureDirectory, {
+    errorOnExist: true,
+    force: false,
+    recursive: true,
+  });
+
+  return fixtureDirectory;
+};
+
+describe('static build artifact', () => {
+  beforeAll(async () => {
+    temporaryRoot = await mkdtemp(join(tmpdir(), TEMPORARY_ROOT_PREFIX));
+    assert.ok(isDisposableTemporaryRoot(temporaryRoot));
+  });
+
+  afterAll(async () => {
+    if (!temporaryRoot) return;
+
+    assert.ok(isDisposableTemporaryRoot(temporaryRoot));
+    await rm(temporaryRoot, { force: true, recursive: true });
+  });
+
+  test('contains every skill page, required metadata, valid links, and no test files', async () => {
+    await expect(verifyBuild()).resolves.toBeUndefined();
+  });
+
+  test.each<IBuildFailureCase>([
+    [
+      'missing structured data',
+      'Missing structured data in index.html',
+      async (buildDirectory) =>
+        replaceBuildFileText(buildDirectory, 'index.html', STRUCTURED_DATA_PATTERN, ''),
+    ],
+    [
+      'invalid structured data',
+      'Invalid structured data in index.html',
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          'index.html',
+          STRUCTURED_DATA_PATTERN,
+          '<script type="application/ld+json">{invalid</script>',
+        ),
+    ],
+    [
+      'invalid structured data graph',
+      `Structured data graph is invalid in ${SKILL_PAGE}`,
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          SKILL_PAGE,
+          STRUCTURED_DATA_PATTERN,
+          '<script type="application/ld+json">{"@graph":[null]}</script>',
+        ),
+    ],
+    [
+      'emitted test file',
+      'Production build contains a test file: emitted.test-unit.ts',
+      async (buildDirectory) =>
+        writeFile(
+          resolveBuildFile(buildDirectory, 'emitted.test-unit.ts'),
+          '// disposable emitted test fixture\n',
+          'utf8',
+        ),
+    ],
+    [
+      'missing skill page',
+      'Missing skill page: skills/jg-push/index.html',
+      async (buildDirectory) => rm(resolveBuildFile(buildDirectory, 'skills/jg-push/index.html')),
+    ],
+    [
+      'missing required metadata',
+      'Missing required metadata in index.html: <meta name="description" content="[^"]+"',
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          'index.html',
+          /<meta name="description" content="[^"]+">/u,
+          '',
+        ),
+    ],
+    [
+      'duplicate page title',
+      'Missing or duplicate page title in skills/jg-review/index.html',
+      async (buildDirectory) => {
+        const planHtml = await readFile(resolveBuildFile(buildDirectory, SKILL_PAGE), 'utf8');
+        const planTitle = planHtml.match(/<title>[^<]+<\/title>/u)?.[0];
+
+        assert.ok(planTitle);
+        await replaceBuildFileText(
+          buildDirectory,
+          'skills/jg-review/index.html',
+          /<title>[^<]+<\/title>/u,
+          planTitle,
+        );
+      },
+    ],
+    [
+      'canonical URL missing from the sitemap',
+      'Canonical URL is missing from the sitemap: https://skills.jesusgraterol.dev/skills/jg-plan/',
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          'sitemap-0.xml',
+          '<loc>https://skills.jesusgraterol.dev/skills/jg-plan/</loc>',
+          '',
+        ),
+    ],
+    [
+      'structured data for another page',
+      `Structured data does not match the canonical page in ${SKILL_PAGE}`,
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          SKILL_PAGE,
+          '"url":"https://skills.jesusgraterol.dev/skills/jg-plan/"',
+          '"url":"https://skills.jesusgraterol.dev/skills/jg-push/"',
+        ),
+    ],
+    [
+      'missing visible breadcrumb',
+      `Breadcrumb hierarchy is incomplete in ${SKILL_PAGE}`,
+      async (buildDirectory) =>
+        replaceBuildFileText(buildDirectory, SKILL_PAGE, 'aria-label="Breadcrumb"', ''),
+    ],
+    [
+      'broken internal link',
+      'Broken internal link in index.html: /skills/jg-missing/ -> skills/jg-missing/index.html',
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          'index.html',
+          '</main>',
+          '<a href="/skills/jg-missing/">missing</a></main>',
+        ),
+    ],
+    [
+      'indexable 404 page',
+      'The custom 404 page must remain excluded from search indexes',
+      async (buildDirectory) =>
+        replaceBuildFileText(buildDirectory, '404.html', 'noindex, follow', 'index, follow'),
+    ],
+    [
+      'llms.txt without the install command',
+      'llms.txt does not follow the required project index structure',
+      async (buildDirectory) => replaceBuildFileText(buildDirectory, 'llms.txt', '## Install', ''),
+    ],
+    [
+      'llms.txt missing a skill',
+      'llms.txt does not follow the required project index structure',
+      async (buildDirectory) =>
+        replaceBuildFileText(buildDirectory, 'llms.txt', /- \[jg-session\][^\n]+\n/u, ''),
+    ],
+    [
+      'broken llms.txt link',
+      'Broken internal llms.txt link: https://skills.jesusgraterol.dev/skills/jg-missing/ -> skills/jg-missing/index.html',
+      async (buildDirectory) =>
+        appendFile(
+          resolveBuildFile(buildDirectory, 'llms.txt'),
+          '- [jg-missing](https://skills.jesusgraterol.dev/skills/jg-missing/): Missing.\n',
+          'utf8',
+        ),
+    ],
+  ])('rejects a build with %s', async (_caseName, expectedMessage, mutation) => {
+    const buildDirectory = await createBuildFixture();
+
+    await mutation(buildDirectory);
+    await expect(verifyBuild(buildDirectory)).rejects.toThrow(expectedMessage);
+  });
+
+  test('rejects a build missing the page of a newly added skill folder', async () => {
+    assert.ok(temporaryRoot);
+
+    const buildDirectory = await createBuildFixture();
+    const skillsDirectory = resolve(temporaryRoot, 'skills-with-extra');
+
+    await cp(resolve(websiteRoot, '..', 'skills'), skillsDirectory, { recursive: true });
+    await cp(resolve(skillsDirectory, 'jg-plan'), resolve(skillsDirectory, 'jg-extra'), {
+      recursive: true,
+    });
+
+    await expect(verifyBuild(buildDirectory, skillsDirectory)).rejects.toThrow(
+      'Missing skill page: skills/jg-extra/index.html',
+    );
+  });
+});

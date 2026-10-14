@@ -1,0 +1,51 @@
+---
+import {
+  formatInvocation,
+  SKILL_HOSTS,
+  type ISkillHost,
+} from '../../utilities/skill-catalog/index.ts';
+import CopyControl from '../copy-control/copy-control.astro';
+
+interface Props {
+  id: string;
+  invocation: string;
+}
+
+// coding agents in display order with their marks; the Codex mark is black and inverts in dark mode
+const HOST_MARKS = [
+  { host: 'claude-code', invertsInDark: false, path: '/coding-agents/claude-code.svg' },
+  { host: 'codex', invertsInDark: true, path: '/coding-agents/codex.svg' },
+] as const satisfies readonly { host: ISkillHost; invertsInDark: boolean; path: string }[];
+
+const { id, invocation } = Astro.props;
+---
+
+<ul class="grid gap-3">
+  {
+    HOST_MARKS.map(({ host, invertsInDark, path }) => (
+      <li class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-border bg-surface p-3 sm:grid-cols-[8rem_minmax(0,1fr)_auto]">
+        <span class="flex items-center gap-2 text-sm font-semibold">
+          <img
+            class:list={['size-5 object-contain', invertsInDark && 'dark:invert']}
+            src={path}
+            width="20"
+            height="20"
+            alt=""
+          />
+          {SKILL_HOSTS[host].label}
+        </span>
+        <code
+          id={`${id}-${host}`}
+          class="order-last col-span-2 min-w-0 rounded-md bg-code px-3 py-2 font-mono text-sm wrap-anywhere sm:order-none sm:col-span-1"
+        >
+          {formatInvocation(host, invocation)}
+        </code>
+        <CopyControl
+          context={`${SKILL_HOSTS[host].label} invocation`}
+          label="Copy"
+          sourceId={`${id}-${host}`}
+        />
+      </li>
+    ))
+  }
+</ul>

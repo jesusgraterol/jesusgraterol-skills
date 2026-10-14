@@ -1,0 +1,165 @@
+---
+import { SKILL_CATALOG } from '../../site.config.ts';
+import { SKILL_HOSTS } from '../../utilities/skill-catalog/index.ts';
+
+// visual tone of one agent reply line on the dark session panel
+type IReplyTone = 'path' | 'plain' | 'verdict';
+
+/*
+ * A faithful, static session that follows the skills' real output contracts. Invocations come
+ * from the catalog examples so the demo and the skill pages cannot drift apart.
+ */
+const DEMO_TURNS = [
+  {
+    invocation: SKILL_CATALOG['jg-plan'].example.invocation,
+    reply: [
+      { text: 'Inspected README.md, the API middleware, and the request tests.', tone: 'plain' },
+      { text: 'Saved coding-agent-planning/1792000000_rate-limiting/plan.md', tone: 'path' },
+      {
+        text: 'Approval required: per-account sliding-window limits on public routes, a 429 response contract, and focused tests.',
+        tone: 'plain',
+      },
+    ],
+  },
+  {
+    invocation: SKILL_CATALOG['jg-challenge-plan'].example.invocation,
+    reply: [
+      { text: 'Plan revision required before proceeding', tone: 'verdict' },
+      {
+        text: '1. Choose the limit store: Redis (recommended) or in-process memory.',
+        tone: 'plain',
+      },
+      {
+        text: 'Next step: answer decision 1, invoke jg-plan with it, then challenge the revised plan.',
+        tone: 'plain',
+      },
+    ],
+  },
+] as const satisfies readonly {
+  invocation: string;
+  reply: readonly { text: string; tone: IReplyTone }[];
+}[];
+
+// text classes for each reply tone, all readable on the primary surface in both themes
+const REPLY_TONE_CLASSES = {
+  path: 'text-accent-on-primary',
+  plain: 'text-primary-foreground/80',
+  verdict: 'font-bold text-warning',
+} as const satisfies Record<IReplyTone, string>;
+
+/** Splits an invocation into the skill name and the text supplied with it. */
+const splitInvocation = (invocation: string): { name: string; text: string } => {
+  const separatorIndex = invocation.indexOf(' ');
+
+  return separatorIndex < 0
+    ? { name: invocation, text: '' }
+    : { name: invocation.slice(0, separatorIndex), text: invocation.slice(separatorIndex) };
+};
+
+const turns = DEMO_TURNS.map(({ invocation, reply }) => ({
+  ...splitInvocation(invocation),
+  reply,
+}));
+---
+
+<figure
+  class="group/demo overflow-hidden rounded-2xl border border-border-strong bg-primary text-primary-foreground shadow-raised"
+  data-session-demo
+>
+  <div
+    class="flex flex-wrap items-center justify-between gap-3 border-b border-primary-foreground/15 px-4 py-3 sm:px-5"
+  >
+    <p
+      class="flex items-center gap-2 font-mono text-xs font-semibold text-primary-foreground/80"
+      data-session-demo-title
+    >
+      <img
+        class="size-4 object-contain group-has-[[data-demo-host=codex]:checked]/demo:hidden"
+        src="/coding-agents/claude-code.svg"
+        width="16"
+        height="16"
+        alt=""
+      />
+      <img
+        class="hidden size-4 object-contain invert group-has-[[data-demo-host=codex]:checked]/demo:block"
+        src="/coding-agents/codex.svg"
+        width="16"
+        height="16"
+        alt=""
+      />
+      <span class="group-has-[[data-demo-host=codex]:checked]/demo:hidden">Claude Code</span>
+      <span class="hidden group-has-[[data-demo-host=codex]:checked]/demo:inline">Codex</span>
+    </p>
+    <fieldset class="flex items-center gap-1 rounded-full border border-primary-foreground/20 p-1">
+      <legend class="sr-only">Agent shown in the example session</legend>
+      <label
+        class="cursor-pointer rounded-full px-3 py-1 text-xs font-semibold text-primary-foreground/80 has-checked:bg-primary-foreground has-checked:text-primary has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent-on-primary"
+      >
+        <input
+          class="sr-only"
+          type="radio"
+          name="session-demo-host"
+          value="claude-code"
+          data-demo-host="claude-code"
+          checked
+        />
+        Claude Code
+      </label>
+      <label
+        class="cursor-pointer rounded-full px-3 py-1 text-xs font-semibold text-primary-foreground/80 has-checked:bg-primary-foreground has-checked:text-primary has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent-on-primary"
+      >
+        <input
+          class="sr-only"
+          type="radio"
+          name="session-demo-host"
+          value="codex"
+          data-demo-host="codex"
+        />
+        Codex
+      </label>
+    </fieldset>
+  </div>
+
+  <ol class="grid gap-7 px-4 py-6 font-mono text-sm leading-6 sm:px-5">
+    {
+      turns.map(({ name, reply, text }) => (
+        <li class="grid gap-3">
+          <div>
+            <p class="text-xs font-bold tracking-wider text-primary-foreground/60 uppercase">You</p>
+            <p
+              class="mt-1 wrap-anywhere"
+              data-session-demo-invocation
+            >
+              <span class="font-bold text-accent-on-primary">
+                <span class="group-has-[[data-demo-host=codex]:checked]/demo:hidden">
+                  {SKILL_HOSTS['claude-code'].prefix}
+                </span>
+                <span class="hidden group-has-[[data-demo-host=codex]:checked]/demo:inline">
+                  {SKILL_HOSTS.codex.prefix}
+                </span>
+                {name}
+              </span>
+              {text}
+            </p>
+          </div>
+          <div class="border-l-2 border-primary-foreground/15 pl-4">
+            <p class="text-xs font-bold tracking-wider text-primary-foreground/60 uppercase">
+              Agent
+            </p>
+            <ul class="mt-1 grid gap-1.5">
+              {reply.map(({ text: line, tone }) => (
+                <li class:list={['wrap-anywhere', REPLY_TONE_CLASSES[tone]]}>{line}</li>
+              ))}
+            </ul>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <figcaption
+    class="border-t border-primary-foreground/15 px-4 py-3 text-xs leading-5 text-primary-foreground/70 sm:px-5"
+  >
+    An example session. Switch the agent to see how each one invokes a skill.
+  </figcaption>
+</figure>

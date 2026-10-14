@@ -1,0 +1,143 @@
+---
+import { ArrowLeft, ArrowUpRight } from '@lucide/astro';
+import { render } from 'astro:content';
+
+import {
+  SKILL_ACCESS_LABELS,
+  SKILL_STAGES,
+  type ISkill,
+} from '../../utilities/skill-catalog/index.ts';
+import HostInvocations from '../host-invocations/host-invocations.astro';
+
+interface Props {
+  skill: ISkill;
+}
+
+const { skill } = Astro.props;
+const { Content } = await render(skill.entry);
+---
+
+<article class="prose-shell py-12 sm:py-16">
+  <nav
+    aria-label="Breadcrumb"
+    class="text-sm text-muted"
+  >
+    <ol class="flex flex-wrap items-center gap-2">
+      <li class="flex items-center gap-2">
+        <a
+          class="underline-offset-4 hover:text-foreground hover:underline"
+          href="/"
+          >JG Skills</a
+        >
+        <span aria-hidden="true">/</span>
+      </li>
+      <li>
+        <span
+          class="font-mono text-foreground"
+          aria-current="page"
+          >{skill.name}</span
+        >
+      </li>
+    </ol>
+  </nav>
+
+  <header class="mt-10">
+    <p class="eyebrow">{SKILL_STAGES[skill.stage].label}</p>
+    <h1 class="mt-4 font-mono text-4xl font-bold tracking-tight wrap-anywhere sm:text-5xl">
+      {skill.name}
+    </h1>
+    <p class="lede mt-5">{skill.description}</p>
+    <dl class="mt-6 flex flex-wrap gap-x-8 gap-y-3 text-sm">
+      <div>
+        <dt class="font-mono text-xs font-bold text-muted uppercase">May change</dt>
+        <dd class="mt-1 font-semibold">{SKILL_ACCESS_LABELS[skill.access]}</dd>
+      </div>
+      <div>
+        <dt class="font-mono text-xs font-bold text-muted uppercase">Arguments</dt>
+        <dd class="mt-1">
+          {
+            skill.argumentHint ? (
+              <code class="rounded-md bg-code px-1.5 py-0.5 font-mono">{skill.argumentHint}</code>
+            ) : (
+              <span class="font-semibold">None</span>
+            )
+          }
+        </dd>
+      </div>
+    </dl>
+  </header>
+
+  <section
+    class="mt-12"
+    aria-labelledby="example-heading"
+  >
+    <h2
+      id="example-heading"
+      class="text-2xl font-semibold tracking-tight"
+    >
+      Example
+    </h2>
+    <p class="mt-2 text-sm leading-6 text-muted">
+      Type the skill name with your agent's prefix, followed by any text it should consider.
+    </p>
+    <div class="mt-5">
+      <HostInvocations
+        id={`${skill.name}-example`}
+        invocation={skill.example.invocation}
+      />
+    </div>
+    <p class="mt-4 text-sm leading-6">
+      <span class="font-semibold">Result:</span>{' '}{skill.example.outcome}
+    </p>
+  </section>
+
+  <section
+    class="mt-14 border-t border-border pt-10"
+    aria-labelledby="instructions-label"
+  >
+    <p class="eyebrow">SKILL.md</p>
+    {
+      /* a label, not a heading, so the SKILL.md sections keep their own h2 level beneath the page h1 */
+    }
+    <p
+      id="instructions-label"
+      class="mt-3 text-2xl font-semibold tracking-tight"
+    >
+      What the agent reads
+    </p>
+    <p class="mt-2 text-sm leading-6 text-muted">
+      The complete instructions your agent loads when you invoke {skill.name}.
+    </p>
+    <div
+      class="article-content mt-6 rounded-xl border border-border bg-surface px-5 py-6 text-base shadow-surface sm:px-8 sm:py-8 [&_h2]:mt-10 [&_h2]:pt-6 [&_h2]:text-xl [&_h2:first-child]:mt-0 [&_h2:first-child]:border-t-0 [&_h2:first-child]:pt-0"
+      data-skill-instructions
+    >
+      <Content />
+    </div>
+  </section>
+
+  <footer class="mt-14 flex flex-wrap gap-3 border-t border-border pt-8">
+    <a
+      class="action-secondary"
+      href="/#skills"
+    >
+      <ArrowLeft
+        class="size-4"
+        aria-hidden="true"
+      />
+      All skills
+    </a>
+    <a
+      class="action-secondary"
+      href={skill.sourceUrl}
+      target="_blank"
+      rel="noreferrer"
+    >
+      View SKILL.md on GitHub
+      <ArrowUpRight
+        class="size-4"
+        aria-hidden="true"
+      />
+    </a>
+  </footer>
+</article>

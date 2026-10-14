@@ -1,0 +1,84 @@
+---
+import { Check, Copy, TriangleAlert } from '@lucide/astro';
+
+interface Props {
+  // what the control copies, appended to the accessible name only, e.g. "install command"
+  context: string;
+  label: string;
+  sourceId: string;
+}
+
+const { context, label, sourceId } = Astro.props;
+const statusId = `${sourceId}-copy-status`;
+---
+
+<div class="inline-flex shrink-0 items-center">
+  <button
+    type="button"
+    class="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border-strong px-3 text-xs font-semibold transition-colors hover:bg-secondary"
+    data-copy-control
+    data-copy-source={sourceId}
+    aria-describedby={statusId}
+  >
+    <Copy
+      class="size-3.5 [[data-copy-state]_&]:hidden"
+      aria-hidden="true"
+    />
+    <Check
+      class="hidden size-3.5 [[data-copy-state=success]_&]:block"
+      aria-hidden="true"
+    />
+    <TriangleAlert
+      class="hidden size-3.5 [[data-copy-state=error]_&]:block"
+      aria-hidden="true"
+    />
+    <span data-copy-label>{label}</span>
+    <span class="sr-only">{` ${context}`}</span>
+  </button>
+  <span
+    id={statusId}
+    class="sr-only"
+    data-copy-status
+    aria-live="polite"
+  ></span>
+</div>
+
+<script>
+  const RESET_DELAY_MS = 2_000;
+
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-control]').forEach((control) => {
+    const defaultLabel =
+      control.querySelector<HTMLElement>('[data-copy-label]')?.textContent ?? 'Copy';
+
+    control.addEventListener('click', async () => {
+      const sourceId = control.dataset['copySource'];
+      const source = sourceId ? document.getElementById(sourceId) : null;
+      const label = control.querySelector<HTMLElement>('[data-copy-label]');
+      const status = document.getElementById(`${sourceId ?? ''}-copy-status`);
+
+      try {
+        if (!source || !navigator.clipboard) {
+          throw new Error('Clipboard writing is unavailable.');
+        }
+
+        await navigator.clipboard.writeText(source.textContent ?? '');
+        control.dataset['copyState'] = 'success';
+
+        if (label) label.textContent = 'Copied';
+        if (status) status.textContent = 'Copied to clipboard.';
+      } catch {
+        control.dataset['copyState'] = 'error';
+
+        if (label) label.textContent = 'Copy failed';
+        if (status) status.textContent = 'Copy failed. Select the command and copy it manually.';
+      }
+
+      window.setTimeout(() => {
+        delete control.dataset['copyState'];
+
+        if (label) label.textContent = defaultLabel;
+        if (status) status.textContent = '';
+      }, RESET_DELAY_MS);
+    });
+  });
+</script>
