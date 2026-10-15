@@ -21,7 +21,8 @@ export const SKILL_STAGES = {
 
 // display labels for what a skill may change
 export const SKILL_ACCESS_LABELS = {
-  'changes-code': 'Changes code, pushes when autonomous',
+  'changes-code': 'Changes code',
+  'changes-code-and-pushes': 'Changes code, pushes when autonomous',
   'commits-and-pushes': 'Commits and pushes',
   'planning-files': 'Writes planning files',
   'read-only': 'Read-only',

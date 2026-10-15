@@ -4,7 +4,12 @@ import type { CollectionEntry } from 'astro:content';
 export type ISkillStage = 'plan' | 'build' | 'ship' | 'context';
 
 // what a skill may change when it runs
-export type ISkillAccess = 'read-only' | 'planning-files' | 'changes-code' | 'commits-and-pushes';
+export type ISkillAccess =
+  | 'read-only'
+  | 'planning-files'
+  | 'changes-code'
+  | 'changes-code-and-pushes'
+  | 'commits-and-pushes';
 
 // a realistic invocation, written without a host prefix, and what it produces
 export interface ISkillExample {

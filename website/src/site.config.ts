@@ -66,7 +66,7 @@ export const SKILL_CATALOG = {
     whenToUse: 'Use it when a plan is too large to build and review as one change.',
   },
   'jg-execute': {
-    access: 'changes-code',
+    access: 'changes-code-and-pushes',
     example: {
       invocation: 'jg-execute autonomous',
       outcome:
@@ -80,6 +80,20 @@ export const SKILL_CATALOG = {
     whenToUse:
       'Use it once a plan is approved: on its own to build the next milestone and stop, or with autonomous to build, review, and push every remaining milestone.',
   },
+  'jg-debug': {
+    access: 'changes-code',
+    example: {
+      invocation: 'jg-debug Checkout totals are off by one cent for some carts.',
+      outcome:
+        'Reproduces the bug, narrows it to one cause, and fixes it with a regression test that failed first.',
+    },
+    order: 6,
+    searchDescription:
+      'An explicit-only agent skill for Claude Code and Codex that reproduces a bug, finds its cause, and fixes it with a test that fails first.',
+    searchTitle: "jg-debug: Find a bug's cause before fixing it",
+    stage: 'build',
+    whenToUse: "Use it when something is broken and the cause isn't obvious yet.",
+  },
   'jg-pause': {
     access: 'read-only',
     example: {
@@ -87,7 +101,7 @@ export const SKILL_CATALOG = {
       outcome:
         'Stops at the next safe point, lists what is done and what is half-finished, and waits until you say continue.',
     },
-    order: 6,
+    order: 7,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that stops the agent at the nearest safe point, reports where things stand, and waits.',
     searchTitle: 'jg-pause: Pause a coding agent at a safe point',
@@ -102,7 +116,7 @@ export const SKILL_CATALOG = {
       outcome:
         'Reports findings first, then the checks it ran, and answers Ready to commit, Not ready, or Review incomplete.',
     },
-    order: 7,
+    order: 8,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that reviews the current task's changes or a branch and issues a readiness verdict.",
     searchTitle: 'jg-review: Code review for Claude Code and Codex',
@@ -117,7 +131,7 @@ export const SKILL_CATALOG = {
       outcome:
         "Commits only this task's files with a signed-off, signed commit and pushes the current branch.",
     },
-    order: 8,
+    order: 9,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that commits only the current task's files with a signed-off, signed commit and pushes.",
     searchTitle: 'jg-push: Signed commits and pushes for coding agents',
@@ -132,7 +146,7 @@ export const SKILL_CATALOG = {
       outcome:
         'Checks each claim against the code and recommends what to adopt, reject, or adjust.',
     },
-    order: 9,
+    order: 10,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that checks feedback against the evidence and recommends what to adopt, reject, or adjust.',
     searchTitle: 'jg-feedback: Assess review feedback with evidence',
@@ -147,7 +161,7 @@ export const SKILL_CATALOG = {
       outcome:
         'Finds the named Codex or Claude Code session and answers from its latest decisions.',
     },
-    order: 10,
+    order: 11,
     searchDescription:
       'An explicit-only agent skill that finds a named Claude Code or Codex session and answers questions from its latest decisions and state.',
     searchTitle: 'jg-session: Read past Claude Code and Codex sessions',

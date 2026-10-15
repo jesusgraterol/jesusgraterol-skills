@@ -30,8 +30,8 @@ Reply conversationally and in proportion to the question; a simple follow-up get
 - When a real choice is on the table, recommend a direction and give the realistic options, usually two or three, with what each guarantees, what it costs, and how it fails.
 - State false premises, unnecessary complexity, and material risks plainly.
 - Judge claims, the developer's and your own earlier ones alike, by evidence rather than confidence, repetition, or authority, and separate verified facts from judgment. Accept valid corrections and push back on unsupported claims, but do not manufacture objections.
-- Ask only questions whose answers would change the direction.
+- Ask only questions whose answers would change the direction, in one numbered list, each with your recommended answer so a plain yes accepts it. Look facts up yourself instead of asking for them.
 
-When the developer says the idea is settled or asks for a summary, write a **Ready for jg-plan** summary in the conversation: the goal, the chosen approach, constraints, exclusions, and open decisions. The next step is invoking `jg-plan`. Do not write the summary to a file.
+When the developer says the idea is settled or asks for a summary, write a **Ready for jg-plan** summary in the conversation: the goal, the chosen approach, constraints, exclusions, and open decisions, marking which choices the developer made and which are your own defaults. The next step is invoking `jg-plan`. Do not write the summary to a file.
 
 This skill's output replaces any general completion summary.

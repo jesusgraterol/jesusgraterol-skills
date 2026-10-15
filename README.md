@@ -33,7 +33,7 @@ npx skills update -p
 ```
 
 ```bash
-npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-pause jg-review jg-push jg-feedback jg-session
+npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session
 ```
 
 Remove the skills by name so other skills in the project stay installed.
@@ -47,6 +47,7 @@ Remove the skills by name so other skills in the project stay installed.
 | `jg-challenge-plan` | Challenges a plan before approval and surfaces material risks, gaps, and decisions.           | Nothing.                                                                                               |
 | `jg-breakdown`      | Splits a plan into ordered, reviewable milestones when it has real implementation boundaries. | Writes or removes `milestones.md` next to the plan.                                                    |
 | `jg-execute`        | Builds an agreed task, a plan, or its milestones; supervised by default, or `autonomous`.     | Code and milestone status lines. In autonomous mode it also commits and pushes each milestone's files. |
+| `jg-debug`          | Reproduces a bug, finds its cause, and fixes it with a regression test that fails first.      | Code, a regression test, and temporary logging it removes. Never commits.                              |
 | `jg-pause`          | Stops at the nearest safe point, reports where things stand, and waits until you continue.    | Nothing.                                                                                               |
 | `jg-review`         | Reviews the current task's uncommitted changes, or the branch against a target.               | No files. With a target branch, it may refresh that branch's remote-tracking ref.                      |
 | `jg-push`           | Commits the current task's files with a signed-off, signed commit and pushes the branch.      | Stages and commits the task's files (or every change without a task) and pushes the current branch.    |
@@ -61,7 +62,7 @@ Remove the skills by name so other skills in the project stay installed.
 4. Optionally, `jg-breakdown` writes `milestones.md` when the plan has real milestone boundaries.
 5. `jg-execute` builds the next milestone, runs its checks, and stops so you can run `jg-review` and `jg-push` yourself. `jg-execute autonomous` builds every remaining milestone instead, reviewing and pushing each one before starting the next.
 
-Use `jg-pause` at any point to stop the agent at a safe point and pick up later.
+Use `jg-pause` at any point to stop the agent at a safe point and pick up later. Use `jg-debug` when something breaks and the cause isn't obvious.
 
 ## Website
 
@@ -131,6 +132,15 @@ Until then, the deploy job fails, or the site is served under a path where its r
 - The website shares its design tokens, Ubuntu Sans typography, and tooling with Agentic Coding and jesusgraterol.dev. [`docs/asset-attribution.md`](docs/asset-attribution.md) records where its brand marks come from.
 - Local coding instructions (`AGENTS.md`, `CANDIDATE.md`) and `coding-agent-planning/` are git-ignored and never published.
 - `/docs` is reserved for concise, quickly scannable documentation of essential, durable project concepts and processes. API and HTTP endpoint documentation, if the project ever needs it, belongs outside `/docs`.
+
+## Credits
+
+A few ideas in these skills are adapted from other open-source skill collections and rewritten in our own words:
+
+- [superpowers](https://github.com/obra/superpowers) by Jesse Vincent (MIT): fixing only blocking review findings, checking acceptance criteria before calling work done, a three-attempt stop rule, reporting the decisions an agent made, and a plan self-check.
+- [agent-skills](https://github.com/addyosmani/agent-skills) by Addy Osmani (MIT): labeling findings by severity, and listing what was noticed but left alone.
+- [pstack](https://github.com/poteto/plugins/tree/main/pstack) by Lauren Tan (MIT): proving a change works on the real path, never weakening a check to get it through, and checking for the same pattern after a fix.
+- [skills](https://github.com/mattpocock/skills) by Matt Pocock (MIT): milestones that fit one context window, batched questions with recommended answers, and the debugging loop behind `jg-debug`.
 
 ## License
 
