@@ -1,7 +1,7 @@
 ---
 name: jg-execute
 description: Execute an agreed task, a plan, or its milestones. Supervised by default; autonomous adds a review and push after each milestone.
-argument-hint: '[autonomous] [plan-path] [milestone N]'
+argument-hint: '[auto] [plan-path] [milestone N]'
 disable-model-invocation: true
 ---
 
@@ -21,7 +21,7 @@ This skill's own rules about supplied material take precedence over this section
 
 Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode builds one unit, runs its checks, and stops so the developer can review and publish it. Autonomous mode also reviews and pushes each unit, then continues with the next one.
 
-1. **Mode.** Use autonomous mode when the first word of the supplied text is `autonomous`. Otherwise use supervised mode, including when that word is missing or misspelled.
+1. **Mode.** Use autonomous mode when the first word of the supplied text is `auto`. Otherwise use supervised mode, including when that word is missing or misspelled.
 2. **Target.** Never pick a plan by recency or search other planning directories.
    - The plan is the one named in the invocation, otherwise the current plan in this conversation. If its directory contains `milestones.md`, the units are its milestones; otherwise the whole plan is one unit.
    - Without a plan file, a task agreed in this conversation is one unit. Restate its scope in a few lines before starting.

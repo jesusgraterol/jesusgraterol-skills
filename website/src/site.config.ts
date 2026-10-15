@@ -104,7 +104,7 @@ export const SKILL_CATALOG = {
           'Builds the next unfinished milestone of the current plan, runs its checks, and stops so you can review and push it.',
       },
       {
-        invocation: 'jg-execute autonomous',
+        invocation: 'jg-execute auto',
         label: 'Autonomous',
         outcome:
           'Builds each remaining milestone, reviews it until clean, and pushes it before starting the next.',
@@ -122,7 +122,7 @@ export const SKILL_CATALOG = {
           'Builds only milestone 2, runs its checks, and stops so you can review and push it.',
       },
       {
-        invocation: `jg-execute autonomous ${EXAMPLE_PLAN_PATH} milestone 3`,
+        invocation: `jg-execute auto ${EXAMPLE_PLAN_PATH} milestone 3`,
         label: 'All options',
         outcome:
           'Builds milestone 3 of the plan at that path, reviews it until clean, pushes it, and stops.',
@@ -135,7 +135,7 @@ export const SKILL_CATALOG = {
     searchTitle: 'jg-execute: Build plans supervised or autonomously',
     stage: 'build',
     whenToUse:
-      'Use it once a plan is approved: on its own to build the next milestone and stop, or with autonomous to build, review, and push every remaining milestone.',
+      'Use it once a plan is approved: on its own to build the next milestone and stop, or with auto to build, review, and push every remaining milestone.',
   },
   'jg-debug': {
     access: 'changes-code',

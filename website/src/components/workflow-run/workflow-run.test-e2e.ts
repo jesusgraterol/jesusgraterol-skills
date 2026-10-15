@@ -11,7 +11,7 @@ test.describe('workflow section', () => {
 
     await expect(supervised).toBeChecked();
     await expect(workflow.getByText('/jg-execute', { exact: true })).toBeVisible();
-    await expect(workflow.getByText('/jg-execute autonomous', { exact: true })).toBeHidden();
+    await expect(workflow.getByText('/jg-execute auto', { exact: true })).toBeHidden();
     await expect(cycle).toBeHidden();
     await expect(workflow.getByText('You run these when you are ready.')).toBeVisible();
     await expect(workflow.getByText('/jg-debug', { exact: true })).toBeVisible();
@@ -20,7 +20,7 @@ test.describe('workflow section', () => {
     await page.keyboard.press('ArrowRight');
 
     await expect(autonomous).toBeChecked();
-    await expect(workflow.getByText('/jg-execute autonomous', { exact: true })).toBeVisible();
+    await expect(workflow.getByText('/jg-execute auto', { exact: true })).toBeVisible();
     await expect(workflow.getByText('/jg-execute', { exact: true })).toBeHidden();
     await expect(cycle.getByRole('listitem')).toHaveText([
       'Implement',
@@ -41,14 +41,14 @@ test.describe('workflow section', () => {
     const supervisedSnapshot = await page.locator('[data-workflow-run]').ariaSnapshot();
 
     expect(supervisedSnapshot).toContain('/jg-execute');
-    expect(supervisedSnapshot).not.toContain('/jg-execute autonomous');
+    expect(supervisedSnapshot).not.toContain('/jg-execute auto');
     expect(supervisedSnapshot).not.toContain('For each milestone');
 
     await page.locator('[data-workflow-run]').getByText('Autonomous', { exact: true }).click();
 
     const autonomousSnapshot = await page.locator('[data-workflow-run]').ariaSnapshot();
 
-    expect(autonomousSnapshot).toContain('/jg-execute autonomous');
+    expect(autonomousSnapshot).toContain('/jg-execute auto');
     expect(autonomousSnapshot).not.toContain('You run these when you are ready.');
   });
 

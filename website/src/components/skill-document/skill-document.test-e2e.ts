@@ -126,7 +126,7 @@ test.describe('skill pages', () => {
 
     await page.goto('/skills/jg-execute/');
     await expect(page.locator('[data-skill-usage]')).toHaveText(
-      '/jg-execute [autonomous] [plan-path] [milestone N]',
+      '/jg-execute [auto] [plan-path] [milestone N]',
     );
   });
 });
