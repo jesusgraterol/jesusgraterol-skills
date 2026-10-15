@@ -238,10 +238,12 @@
     background: var(--secondary);
   }
 
+  /* skill instructions hold long slash-joined terms that must still wrap at 320px */
   .article-content {
     color: var(--foreground);
     font-size: 1.0625rem;
     line-height: 1.75;
+    overflow-wrap: break-word;
   }
 
   .article-content :is(h2, h3) {
@@ -288,12 +290,37 @@
     text-underline-offset: 0.18em;
   }
 
+  /* long identifiers such as AbortSignal.timeout(milliseconds) must wrap at 320px instead of overflowing */
   .article-content :not(pre) > code {
     border-radius: 0.25rem;
     background: var(--code);
     padding: 0.15em 0.35em;
     font-size: 0.9em;
     font-weight: 650;
+    overflow-wrap: anywhere;
+  }
+
+  /* fixed layout lets cells wrap within the column, so wide reference tables never scroll the page */
+  .article-content table {
+    margin-top: 1.25rem;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .article-content :is(th, td) {
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.625rem;
+    overflow-wrap: anywhere;
+    vertical-align: top;
+    text-align: left;
+  }
+
+  .article-content th {
+    background: var(--code);
+    font-weight: 700;
   }
 
   .article-content blockquote {

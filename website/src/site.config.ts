@@ -250,6 +250,58 @@ export const SKILL_CATALOG = {
     stage: 'context',
     whenToUse: 'Use it when you need what another session decided without rereading it yourself.',
   },
+  'jg-postgres': {
+    examples: [
+      {
+        outcome:
+          'Names the new index by the convention, creates it concurrently through the documented migration workflow, and reports the migration it added.',
+        request: 'Add a migration that indexes orders by customer and creation date.',
+      },
+    ],
+    kind: 'implicit',
+    order: 15,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that applies PostgreSQL naming, constraint, query, and migration standards whenever a task touches SQL.',
+    searchTitle: 'jg-postgres: PostgreSQL standards for coding agents',
+    stage: 'implicit',
+    whenToUse:
+      'It loads on its own when a task touches PostgreSQL schemas, queries, or migrations. Call it by name to load it before such a task.',
+  },
+  'jg-redis': {
+    examples: [
+      {
+        outcome:
+          'Names the key by the convention, sets its expiry in the same write, and keeps the database as the source of truth.',
+        request: "Cache each user's dashboard summary in Redis for five minutes.",
+      },
+    ],
+    kind: 'implicit',
+    order: 16,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that applies Redis key, expiry, scanning, and locking standards whenever a task touches Redis.',
+    searchTitle: 'jg-redis: Redis standards for coding agents',
+    stage: 'implicit',
+    whenToUse:
+      'It loads on its own when a task touches Redis keys, caching, locks, or queues. Call it by name to load it before such a task.',
+  },
+  'jg-scripts': {
+    examples: [
+      {
+        outcome:
+          "Resolves every path from the script's own root, keeps each write inside the output folder, and runs the same way on Windows, macOS, and Linux.",
+        request:
+          'Write a script that copies the generated assets into dist and removes the old build.',
+      },
+    ],
+    kind: 'implicit',
+    order: 17,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps scripts, CLIs, and filesystem code portable and safe on Windows, macOS, and Linux.',
+    searchTitle: 'jg-scripts: Portable scripts for coding agents',
+    stage: 'implicit',
+    whenToUse:
+      'It loads on its own when a task touches scripts, CLIs, build tooling, or filesystem code. Call it by name to load it before such a task.',
+  },
 } as const satisfies Record<string, ISkillCatalogEntry>;
 
 // skill names in catalog order, used to build the remove command
