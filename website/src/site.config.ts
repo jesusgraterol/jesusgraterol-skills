@@ -250,6 +250,57 @@ export const SKILL_CATALOG = {
     stage: 'context',
     whenToUse: 'Use it when you need what another session decided without rereading it yourself.',
   },
+  'jg-frontend': {
+    examples: [
+      {
+        outcome:
+          "Reuses the UI package's components, works from 320 pixels up in both themes, and keeps the form usable by keyboard and screen reader.",
+        request: 'Build a settings page with a profile form and a theme switcher.',
+      },
+    ],
+    kind: 'implicit',
+    order: 12,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps UI work accessible, responsive, themed, and on your design system whenever a task touches it.',
+    searchTitle: 'jg-frontend: Frontend standards for coding agents',
+    stage: 'implicit',
+    whenToUse:
+      'It loads on its own when a task touches UI, styling, forms, or frontend tests. Call it by name to load it before such a task.',
+  },
+  'jg-react': {
+    examples: [
+      {
+        outcome:
+          'Loads the data through the route or query layer, keeps renders cheap, and tests the table the way a user would use it.',
+        request: 'Add a filterable orders table to the dashboard.',
+      },
+    ],
+    kind: 'implicit',
+    order: 13,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that applies React 19 APIs, render-performance rules, and testing standards whenever a task touches React.',
+    searchTitle: 'jg-react: React standards for coding agents',
+    stage: 'implicit',
+    whenToUse:
+      'It loads on its own when a task touches React components, hooks, state, or tests. Call it by name to load it before such a task.',
+  },
+  'jg-nestjs': {
+    examples: [
+      {
+        outcome:
+          'Validates the ID with a schema, keeps the controller thin, logs through the Nest logger, and tests the module through dependency injection.',
+        request: 'Add an endpoint that archives a project by its ID.',
+      },
+    ],
+    kind: 'implicit',
+    order: 14,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that applies NestJS module, validation, logging, lifecycle, and test standards whenever a task touches Nest.',
+    searchTitle: 'jg-nestjs: NestJS standards for coding agents',
+    stage: 'implicit',
+    whenToUse:
+      'It loads on its own when a task touches NestJS modules, controllers, providers, or tests. Call it by name to load it before such a task.',
+  },
   'jg-postgres': {
     examples: [
       {
