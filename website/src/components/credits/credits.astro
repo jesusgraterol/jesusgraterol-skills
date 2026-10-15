@@ -1,0 +1,120 @@
+---
+import ExternalLink from '../external-link/external-link.astro';
+
+// one open-source collection whose ideas were adapted into these skills
+interface ICredit {
+  author: string;
+  // the author's initials, shown on a monogram tile instead of any third-party mark
+  initials: string;
+  license: string;
+  name: string;
+  summary: string;
+  url: string;
+}
+
+// collections whose ideas are rewritten in our own words in these skills
+const CREDITS = [
+  {
+    author: 'Jesse Vincent',
+    initials: 'JV',
+    license: 'MIT',
+    name: 'superpowers',
+    summary:
+      'Fixing only blocking findings, checking acceptance criteria before calling work done, a three-attempt stop rule, reporting decisions, and a plan self-check.',
+    url: 'https://github.com/obra/superpowers',
+  },
+  {
+    author: 'Addy Osmani',
+    initials: 'AO',
+    license: 'MIT',
+    name: 'agent-skills',
+    summary: 'Labeling findings by severity, and listing what you noticed but left alone.',
+    url: 'https://github.com/addyosmani/agent-skills',
+  },
+  {
+    author: 'Lauren Tan',
+    initials: 'LT',
+    license: 'MIT',
+    name: 'pstack',
+    summary:
+      'Proving a change works on the real path, and never weakening a check to get it through.',
+    url: 'https://github.com/poteto/plugins/tree/main/pstack',
+  },
+  {
+    author: 'Matt Pocock',
+    initials: 'MP',
+    license: 'MIT',
+    name: 'skills',
+    summary:
+      'Milestones that fit one context window, batched questions with recommended answers, and the debugging loop behind jg-debug.',
+    url: 'https://github.com/mattpocock/skills',
+  },
+] as const satisfies readonly ICredit[];
+---
+
+<section
+  id="credits"
+  class="section-space scroll-mt-16"
+  aria-labelledby="credits-title"
+>
+  <div class="page-shell">
+    <p class="eyebrow">Credits</p>
+    <h2
+      id="credits-title"
+      class="section-title mt-4"
+    >
+      Ideas we built on.
+    </h2>
+    <p class="lede mt-5 max-w-2xl">
+      A few ideas in these skills are adapted from other open-source collections and rewritten in
+      our own words.
+    </p>
+    <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        CREDITS.map(({ author, initials, license, name, summary, url }) => (
+          <li>
+            {/* the whole card is the link target, so the card draws the keyboard focus ring for it */}
+            <article
+              class="relative flex h-full flex-col rounded-xl border border-border bg-surface p-5 shadow-surface transition-colors hover:border-border-strong has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-focus motion-reduce:transition-none"
+              data-credit
+            >
+              <div class="flex items-center gap-3">
+                <span
+                  class="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary font-mono text-sm font-bold text-accent-on-primary"
+                  aria-hidden="true"
+                >
+                  {initials}
+                </span>
+                <div class="min-w-0">
+                  <h3 class="font-mono text-base font-bold wrap-anywhere">
+                    <ExternalLink
+                      class="no-underline outline-none after:absolute after:inset-0 after:rounded-xl"
+                      href={url}
+                    >
+                      {name}
+                    </ExternalLink>
+                  </h3>
+                  <p
+                    class="text-sm text-muted"
+                    data-credit-author
+                  >
+                    by {author}
+                  </p>
+                </div>
+              </div>
+              <p class="mt-4 flex-1 text-sm leading-6 text-muted">{summary}</p>
+              <p class="mt-5">
+                <span
+                  class="rounded-full border border-border px-2.5 py-0.5 font-mono text-xs font-semibold"
+                  data-credit-license
+                >
+                  {license}
+                </span>
+              </p>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
