@@ -1,165 +1,75 @@
 ---
-import { SKILL_CATALOG } from '../../site.config.ts';
-import { SKILL_HOSTS } from '../../utilities/skill-catalog/index.ts';
+import TerminalWindow from '../terminal-window/terminal-window.astro';
 
-// visual tone of one agent reply line on the dark session panel
-type IReplyTone = 'path' | 'plain' | 'verdict';
+// who wrote one line of the session: the shell, the developer, or the coding agent
+type ISessionSpeaker = 'agent' | 'shell' | 'you';
 
 /*
- * A faithful, static session that follows the skills' real output contracts. Invocations come
- * from the catalog examples so the demo and the skill pages cannot drift apart.
+ * A short, static terminal session: the developer discusses a change with the coding agent,
+ * then turns it into a plan, reviews the result, and pushes it. Prompts are rendered from
+ * expressions so formatters cannot drop them.
  */
-const DEMO_TURNS = [
-  {
-    invocation: SKILL_CATALOG['jg-plan'].example.invocation,
-    reply: [
-      { text: 'Inspected README.md, the API middleware, and the request tests.', tone: 'plain' },
-      { text: 'Saved coding-agent-planning/1792000000_rate-limiting/plan.md', tone: 'path' },
-      {
-        text: 'Approval required: per-account sliding-window limits on public routes, a 429 response contract, and focused tests.',
-        tone: 'plain',
-      },
-    ],
-  },
-  {
-    invocation: SKILL_CATALOG['jg-challenge-plan'].example.invocation,
-    reply: [
-      { text: 'Plan revision required before proceeding', tone: 'verdict' },
-      {
-        text: '1. Choose the limit store: Redis (recommended) or in-process memory.',
-        tone: 'plain',
-      },
-      {
-        text: 'Next step: answer decision 1, invoke jg-plan with it, then challenge the revised plan.',
-        tone: 'plain',
-      },
-    ],
-  },
-] as const satisfies readonly {
-  invocation: string;
-  reply: readonly { text: string; tone: IReplyTone }[];
-}[];
+const SESSION_LINES = [
+  { speaker: 'shell', text: 'claude' },
+  { speaker: 'you', text: "Let's rate-limit the public API per account." },
+  { speaker: 'agent', text: 'Agreed. A sliding window per account in Redis fits your middleware.' },
+  { speaker: 'you', text: '/jg-plan' },
+  { speaker: 'agent', text: 'Plan saved. Approve it to start building.' },
+  { speaker: 'you', text: '/jg-review' },
+  { speaker: 'agent', text: 'Ready to commit' },
+  { speaker: 'you', text: '/jg-push' },
+  { speaker: 'agent', text: 'Pushed to main' },
+] as const satisfies readonly { speaker: ISessionSpeaker; text: string }[];
 
-// text classes for each reply tone, all readable on the primary surface in both themes
-const REPLY_TONE_CLASSES = {
-  path: 'text-accent-on-primary',
-  plain: 'text-primary-foreground/80',
-  verdict: 'font-bold text-warning',
-} as const satisfies Record<IReplyTone, string>;
-
-/** Splits an invocation into the skill name and the text supplied with it. */
-const splitInvocation = (invocation: string): { name: string; text: string } => {
-  const separatorIndex = invocation.indexOf(' ');
-
-  return separatorIndex < 0
-    ? { name: invocation, text: '' }
-    : { name: invocation.slice(0, separatorIndex), text: invocation.slice(separatorIndex) };
-};
-
-const turns = DEMO_TURNS.map(({ invocation, reply }) => ({
-  ...splitInvocation(invocation),
-  reply,
-}));
+// visible prompt and spoken label for each speaker
+const SPEAKERS = {
+  agent: { label: 'Agent', prompt: '' },
+  shell: { label: 'Shell', prompt: '$' },
+  you: { label: 'You', prompt: '>' },
+} as const satisfies Record<ISessionSpeaker, { label: string; prompt: string }>;
 ---
 
-<figure
-  class="group/demo overflow-hidden rounded-2xl border border-border-strong bg-primary text-primary-foreground shadow-raised"
-  data-session-demo
->
-  <div
-    class="flex flex-wrap items-center justify-between gap-3 border-b border-primary-foreground/15 px-4 py-3 sm:px-5"
-  >
-    <p
-      class="flex items-center gap-2 font-mono text-xs font-semibold text-primary-foreground/80"
-      data-session-demo-title
+<div data-session-demo>
+  <TerminalWindow title="~/projects/acme-api">
+    <ol
+      class="grid gap-1"
+      aria-label="Example session with a coding agent"
     >
-      <img
-        class="size-4 object-contain group-has-[[data-demo-host=codex]:checked]/demo:hidden"
-        src="/coding-agents/claude-code.svg"
-        width="16"
-        height="16"
-        alt=""
-      />
-      <img
-        class="hidden size-4 object-contain invert group-has-[[data-demo-host=codex]:checked]/demo:block"
-        src="/coding-agents/codex.svg"
-        width="16"
-        height="16"
-        alt=""
-      />
-      <span class="group-has-[[data-demo-host=codex]:checked]/demo:hidden">Claude Code</span>
-      <span class="hidden group-has-[[data-demo-host=codex]:checked]/demo:inline">Codex</span>
-    </p>
-    <fieldset class="flex items-center gap-1 rounded-full border border-primary-foreground/20 p-1">
-      <legend class="sr-only">Agent shown in the example session</legend>
-      <label
-        class="cursor-pointer rounded-full px-3 py-1 text-xs font-semibold text-primary-foreground/80 has-checked:bg-primary-foreground has-checked:text-primary has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent-on-primary"
-      >
-        <input
-          class="sr-only"
-          type="radio"
-          name="session-demo-host"
-          value="claude-code"
-          data-demo-host="claude-code"
-          checked
-        />
-        Claude Code
-      </label>
-      <label
-        class="cursor-pointer rounded-full px-3 py-1 text-xs font-semibold text-primary-foreground/80 has-checked:bg-primary-foreground has-checked:text-primary has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent-on-primary"
-      >
-        <input
-          class="sr-only"
-          type="radio"
-          name="session-demo-host"
-          value="codex"
-          data-demo-host="codex"
-        />
-        Codex
-      </label>
-    </fieldset>
-  </div>
-
-  <ol class="grid gap-7 px-4 py-6 font-mono text-sm leading-6 sm:px-5">
-    {
-      turns.map(({ name, reply, text }) => (
-        <li class="grid gap-3">
-          <div>
-            <p class="text-xs font-bold tracking-wider text-primary-foreground/60 uppercase">You</p>
-            <p
-              class="mt-1 wrap-anywhere"
-              data-session-demo-invocation
+      {
+        SESSION_LINES.map(({ speaker, text }) => (
+          <li
+            class:list={[
+              'flex gap-3 wrap-anywhere',
+              speaker === 'you' && 'mt-3 first:mt-0',
+              speaker === 'agent' && 'text-primary-foreground/70',
+            ]}
+            data-session-line={speaker}
+          >
+            <span class="sr-only">{`${SPEAKERS[speaker].label}: `}</span>
+            <span
+              class:list={[
+                'flex h-6 w-3 shrink-0 items-center justify-center select-none',
+                speaker === 'shell' ? 'text-accent-on-primary' : 'text-primary-foreground/50',
+              ]}
+              aria-hidden="true"
             >
-              <span class="font-bold text-accent-on-primary">
-                <span class="group-has-[[data-demo-host=codex]:checked]/demo:hidden">
-                  {SKILL_HOSTS['claude-code'].prefix}
-                </span>
-                <span class="hidden group-has-[[data-demo-host=codex]:checked]/demo:inline">
-                  {SKILL_HOSTS.codex.prefix}
-                </span>
-                {name}
-              </span>
+              {speaker === 'agent' ? (
+                <span class="size-1.5 rounded-full bg-accent-on-primary" />
+              ) : (
+                SPEAKERS[speaker].prompt
+              )}
+            </span>
+            <span
+              class:list={[
+                text.startsWith('/') && 'font-bold text-accent-on-primary',
+                speaker === 'shell' && 'text-primary-foreground',
+              ]}
+            >
               {text}
-            </p>
-          </div>
-          <div class="border-l-2 border-primary-foreground/15 pl-4">
-            <p class="text-xs font-bold tracking-wider text-primary-foreground/60 uppercase">
-              Agent
-            </p>
-            <ul class="mt-1 grid gap-1.5">
-              {reply.map(({ text: line, tone }) => (
-                <li class:list={['wrap-anywhere', REPLY_TONE_CLASSES[tone]]}>{line}</li>
-              ))}
-            </ul>
-          </div>
-        </li>
-      ))
-    }
-  </ol>
-
-  <figcaption
-    class="border-t border-primary-foreground/15 px-4 py-3 text-xs leading-5 text-primary-foreground/70 sm:px-5"
-  >
-    An example session. Switch the agent to see how each one invokes a skill.
-  </figcaption>
-</figure>
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+  </TerminalWindow>
+</div>

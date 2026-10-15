@@ -1,39 +1,42 @@
 # jesusgraterol-skills
 
-Seven Agent Skills for planning, challenging, breaking down, reviewing, and publishing changes with Claude Code and Codex. Every skill runs only when you invoke it by name, and each one defers general engineering standards to the coding instructions of the repository you use it in.
+Solid, battle-tested Agent Skills for planning, reviewing, and shipping changes with coding agents, used by professional software developers in their daily work. Every skill runs only when you invoke it by name, and each one defers general engineering standards to the coding instructions of the repository you use it in.
 
-Browse the skills, their full instructions, and an example session at [skills.jesusgraterol.dev](https://skills.jesusgraterol.dev).
+Browse the skills, their full instructions, and an example session at [jg-skills.jesusgraterol.dev](https://jg-skills.jesusgraterol.dev).
 
 ## Install
 
+Run this from your repository's root:
+
 ```bash
-npx skills add jesusgraterol/jesusgraterol-skills -g --skill "*" -a claude-code -a codex -y
+npx skills add jesusgraterol/jesusgraterol-skills --skill "*" -y
 ```
 
-The command uses the [skills CLI](https://github.com/vercel-labs/skills) through `npx`, so it needs Node.js. It installs all seven skills globally for Claude Code and Codex.
+The command uses the [skills CLI](https://github.com/vercel-labs/skills) through `npx`, so it needs Node.js. It installs the skills into the project for the coding agents you use there, so you can commit them and share the same workflow with your team.
 
 ## Use
 
-Invoke a skill by name, followed by any text it should take into account:
+Discuss a change with your coding agent, then invoke a skill by name, followed by any text it should take into account:
 
-| Agent       | Invocation                                                 |
-| ----------- | ---------------------------------------------------------- |
-| Claude Code | `/jg-plan Add per-account rate limiting to the public API` |
-| Codex       | `$jg-plan Add per-account rate limiting to the public API` |
+```text
+/jg-plan
+```
 
-The skills never load on their own. Claude Code reads `disable-model-invocation: true` and Codex reads `policy.allow_implicit_invocation: false`, so a skill enters the conversation only when you call it.
+The skills never load on their own. Each one sets `disable-model-invocation: true` in its frontmatter and ships an `agents/openai.yaml` policy that disables implicit invocation, so it enters the conversation only when you call it. This is verified with Claude Code and Codex.
 
 ## Update and remove
 
+Run these from your repository's root:
+
 ```bash
-npx skills update -g
+npx skills update -p
 ```
 
 ```bash
-npx skills remove -g jg-plan jg-challenge-plan jg-breakdown jg-review jg-push jg-feedback jg-session
+npx skills remove jg-plan jg-challenge-plan jg-breakdown jg-review jg-push jg-feedback jg-session
 ```
 
-Remove the skills by name. A wildcard remove would also delete every other global skill you have installed.
+Remove the skills by name so other skills in the project stay installed.
 
 ## Skills
 
@@ -49,7 +52,7 @@ Remove the skills by name. A wildcard remove would also delete every other globa
 
 ## A typical run
 
-1. `jg-plan Add per-account rate limiting to the public API` saves a plan under `coding-agent-planning/` and asks for approval.
+1. Talk the change through with your agent, then run `jg-plan`. It turns the discussion into a plan under `coding-agent-planning/` and asks for approval.
 2. `jg-challenge-plan` returns a verdict, any required corrections, and numbered decisions.
 3. `jg-plan` with your answers and the corrections revises the same plan.
 4. `jg-breakdown` writes `milestones.md` when the plan has real milestone boundaries.
@@ -83,11 +86,11 @@ The build fails when the site catalog in `website/src/site.config.ts` and the sk
 
 ### Deployment
 
-`.github/workflows/pages.yml` verifies every pull request and deploys `main` to GitHub Pages. The site expects to be served at the root of `https://skills.jesusgraterol.dev`, so before the first deployment:
+`.github/workflows/pages.yml` verifies every pull request and deploys `main` to GitHub Pages. The site expects to be served at the root of `https://jg-skills.jesusgraterol.dev`, so before the first deployment:
 
 1. Set the repository's GitHub Pages source to GitHub Actions.
-2. Add the custom domain `skills.jesusgraterol.dev`.
-3. Create a DNS `CNAME` record pointing `skills.jesusgraterol.dev` to `jesusgraterol.github.io`.
+2. Add the custom domain `jg-skills.jesusgraterol.dev`.
+3. Create a DNS `CNAME` record pointing `jg-skills.jesusgraterol.dev` to `jesusgraterol.github.io`.
 
 Until then, the deploy job fails, or the site is served under a path where its root-relative links and assets break.
 
@@ -103,7 +106,7 @@ Until then, the deploy job fails, or the site is served under a path where its r
 │       └── agents/
 │           └── openai.yaml  # Codex invocation policy
 ├── website/
-│   ├── public/              # favicon, agent marks, robots.txt, and the generated open-graph image
+│   ├── public/              # favicon, robots.txt, and the generated open-graph image
 │   ├── scripts/             # open-graph generation and build-artifact verification
 │   ├── src/
 │   │   ├── components/      # focused Astro presentation modules
@@ -121,7 +124,7 @@ Until then, the deploy job fails, or the site is served under a path where its r
 - Every skill directory name matches the `name` in its `SKILL.md` frontmatter.
 - Every skill is explicit-only in both agents: its frontmatter sets `disable-model-invocation: true`, and its `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`. Keep both when adding a skill.
 - Every skill is self-contained. Its `## Invocation` section holds the rules all skills share, and it never links to sections of a specific `AGENTS.md`. Skills refer to each other by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix.
-- The website shares its design tokens, Ubuntu Sans typography, and tooling with Agentic Coding and jesusgraterol.dev. [`docs/asset-attribution.md`](docs/asset-attribution.md) records where its brand marks come from.
+- The website shares its design tokens, Ubuntu Sans typography, and tooling with Agentic Coding and jesusgraterol.dev. [`docs/asset-attribution.md`](docs/asset-attribution.md) records where its brand mark comes from.
 - Local coding instructions (`AGENTS.md`, `CANDIDATE.md`) and `coding-agent-planning/` are git-ignored and never published.
 - `/docs` is reserved for concise, quickly scannable documentation of essential, durable project concepts and processes. API and HTTP endpoint documentation, if the project ever needs it, belongs outside `/docs`.
 

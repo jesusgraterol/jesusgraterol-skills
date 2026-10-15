@@ -26,7 +26,7 @@ export const buildLlmsText = (skills: readonly ILlmsSkill[]): string => {
     '',
     `> ${SITE_CONFIG.defaultDescription}`,
     '',
-    'Every skill runs only when the developer invokes it by name: `/jg-plan` in Claude Code or `$jg-plan` in Codex. Each skill defers general engineering standards to the coding instructions of the repository it runs in.',
+    'Every skill runs only when the developer invokes it by name, for example `/jg-plan`, and defers general engineering standards to the coding instructions of the repository it runs in. Install the skills per project from the repository root.',
     '',
     '## Install',
     '',

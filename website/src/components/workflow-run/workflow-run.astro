@@ -1,48 +1,36 @@
 ---
-import { SKILL_CATALOG } from '../../site.config.ts';
-
-// one plan-to-push run, shown with the Claude Code prefix; plain messages are not skills
+// one change from conversation to push; titles starting with a slash invoke a skill
 const WORKFLOW_STEPS = [
-  {
-    input: `/${SKILL_CATALOG['jg-plan'].example.invocation}`,
-    result: 'Saves plan.md under coding-agent-planning/ and waits for your approval.',
-  },
-  {
-    input: '/jg-challenge-plan',
-    result: 'Returns a verdict, the corrections the plan needs, and numbered decisions.',
-  },
-  {
-    input: '/jg-plan Use Redis for the limit store and apply the corrections',
-    result: 'Revises the same plan in place instead of starting over.',
-  },
-  {
-    input: '/jg-breakdown',
-    result: 'Writes milestones.md with a review checkpoint for each milestone.',
-  },
-  {
-    input: 'Approved, implement milestone 1',
-    result: 'A plain message. The agent builds one milestone and stops at its checkpoint.',
-  },
-  {
-    input: '/jg-review',
-    result: 'Reports findings first and answers Ready to commit, Not ready, or Review incomplete.',
-  },
-  {
-    input: '/jg-push',
-    result: 'Creates one signed-off, signed commit and pushes only the current branch.',
-  },
+  { isOptional: false, text: 'Talk the change through with your agent.', title: 'Discuss' },
+  { isOptional: false, text: 'Save it as a plan you approve.', title: '/jg-plan' },
+  { isOptional: true, text: 'Find gaps before you approve.', title: '/jg-challenge-plan' },
+  { isOptional: true, text: 'Split a large plan into milestones.', title: '/jg-breakdown' },
+  { isOptional: false, text: 'Approve, and the agent builds it.', title: 'Build' },
+  { isOptional: false, text: 'Check the change before it ships.', title: '/jg-review' },
+  { isOptional: false, text: 'Commit and push it.', title: '/jg-push' },
 ] as const;
 ---
 
-<ol class="grid gap-px overflow-hidden rounded-xl border border-border bg-border">
+<ol class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
   {
-    WORKFLOW_STEPS.map(({ input, result }, index) => (
-      <li class="grid gap-3 bg-surface p-5 sm:grid-cols-[3rem_minmax(0,1fr)_minmax(0,1fr)] sm:items-baseline sm:gap-6">
-        <span class="font-mono text-xs font-bold text-muted">
-          {String(index + 1).padStart(2, '0')}
-        </span>
-        <code class="font-mono text-sm font-semibold wrap-anywhere">{input}</code>
-        <p class="text-sm leading-6 text-muted">{result}</p>
+    WORKFLOW_STEPS.map(({ isOptional, text, title }, index) => (
+      <li class="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 shadow-surface">
+        <div class="flex min-h-6 items-center justify-between gap-3">
+          <span class="font-mono text-xs font-bold text-muted">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          {isOptional && (
+            <span class="rounded-full border border-border px-2 py-0.5 text-xs text-muted">
+              Optional
+            </span>
+          )}
+        </div>
+        {title.startsWith('/') ? (
+          <code class="font-mono text-sm font-bold text-accent">{title}</code>
+        ) : (
+          <span class="text-sm font-semibold">{title}</span>
+        )}
+        <p class="text-sm leading-6 text-muted">{text}</p>
       </li>
     ))
   }

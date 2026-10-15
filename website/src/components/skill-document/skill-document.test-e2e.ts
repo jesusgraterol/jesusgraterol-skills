@@ -4,7 +4,7 @@ import { SKILL_CATALOG } from '../../site.config.ts';
 
 test.describe('skill pages', () => {
   for (const [name, { example }] of Object.entries(SKILL_CATALOG)) {
-    test(`/skills/${name}/ renders its instructions, both invocations, and its source`, async ({
+    test(`/skills/${name}/ renders its instructions, its example, and its source`, async ({
       page,
     }) => {
       await page.goto(`/skills/${name}/`);
@@ -21,11 +21,11 @@ test.describe('skill pages', () => {
         'This skill runs only when the developer invokes it.',
       );
 
-      await expect(page.locator(`#${name}-example-claude-code`)).toHaveText(
-        `/${example.invocation}`,
+      await expect(page.locator('[data-skill-usage]')).toHaveText(
+        new RegExp(`^/${name}( (\\[|<).+)?$`, 'u'),
       );
-      await expect(page.locator(`#${name}-example-codex`)).toHaveText(`$${example.invocation}`);
-      await expect(page.getByText(example.outcome)).toBeVisible();
+      await expect(page.locator(`#${name}-invocation`)).toHaveText(`/${example.invocation}`);
+      await expect(page.locator('[data-skill-outcome]')).toHaveText(example.outcome);
 
       await expect(page.getByRole('link', { name: 'View SKILL.md on GitHub' })).toHaveAttribute(
         'href',

@@ -20,25 +20,34 @@ test.describe('install command', () => {
     await page.goto('/');
 
     for (const [sourceId, name] of [
-      ['hero-install-command', 'Copy install all seven command'],
+      ['hero-install-command', 'Copy install command'],
       ['install-command', 'Copy install command'],
       ['update-command', 'Copy update command'],
       ['remove-command', 'Copy remove command'],
     ] as const) {
-      await expect(page.getByRole('button', { name, exact: true })).toHaveAttribute(
-        'data-copy-source',
-        sourceId,
+      await expect(page.locator(`button[data-copy-source="${sourceId}"]`)).toHaveAccessibleName(
+        name,
       );
     }
 
     await page.goto('/skills/jg-plan/');
 
     await expect(
-      page.getByRole('button', { name: 'Copy Claude Code invocation', exact: true }),
-    ).toHaveAttribute('data-copy-source', 'jg-plan-example-claude-code');
-    await expect(
-      page.getByRole('button', { name: 'Copy Codex invocation', exact: true }),
-    ).toHaveAttribute('data-copy-source', 'jg-plan-example-codex');
+      page.locator('button[data-copy-source="jg-plan-invocation"]'),
+    ).toHaveAccessibleName('Copy invocation');
+  });
+
+  test('shows a shell prompt that is never part of the copied command', async ({ page }) => {
+    await page.goto('/');
+
+    const terminal = page
+      .locator('[data-terminal]')
+      .filter({ has: page.locator('#install-command') });
+
+    await expect(terminal).toContainText(`$${SITE_CONFIG.commands.install}`);
+    expect(await page.locator('#install-command').evaluate((element) => element.textContent)).toBe(
+      SITE_CONFIG.commands.install,
+    );
   });
 
   test('copy writes the exact command and announces success', async ({ context, page }) => {

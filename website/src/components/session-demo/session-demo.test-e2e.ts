@@ -1,54 +1,42 @@
 import { expect, test } from '@playwright/test';
 
-import { SKILL_CATALOG } from '../../site.config.ts';
-
-const PLAN_INVOCATION = SKILL_CATALOG['jg-plan'].example.invocation;
-const CHALLENGE_INVOCATION = SKILL_CATALOG['jg-challenge-plan'].example.invocation;
-
 test.describe('session demo', () => {
-  test('shows Claude Code invocations by default', async ({ page }) => {
-    await page.goto('/');
-
-    const demo = page.locator('[data-session-demo]');
-    const invocations = demo.locator('[data-session-demo-invocation]');
-
-    await expect(demo.getByRole('radio', { name: 'Claude Code' })).toBeChecked();
-    await expect(demo.locator('[data-session-demo-title]')).toHaveText('Claude Code', {
-      useInnerText: true,
-    });
-    await expect(invocations).toHaveText([`/${PLAN_INVOCATION}`, `/${CHALLENGE_INVOCATION}`], {
-      useInnerText: true,
-    });
-  });
-
-  test('switches to Codex invocations with the keyboard', async ({ page }) => {
+  test('shows a terminal session that discusses, plans, reviews, and pushes a change', async ({
+    page,
+  }) => {
     await page.goto('/');
 
     const demo = page.locator('[data-session-demo]');
 
-    await demo.getByRole('radio', { name: 'Claude Code' }).focus();
-    await page.keyboard.press('ArrowRight');
-
-    await expect(demo.getByRole('radio', { name: 'Codex' })).toBeChecked();
-    await expect(demo.locator('[data-session-demo-title]')).toHaveText('Codex', {
-      useInnerText: true,
-    });
-    await expect(demo.locator('[data-session-demo-invocation]')).toHaveText(
-      [`$${PLAN_INVOCATION}`, `$${CHALLENGE_INVOCATION}`],
-      { useInnerText: true },
-    );
+    await expect(demo.locator('[data-terminal]')).toBeVisible();
+    await expect(demo.locator('[data-session-line="shell"]')).toContainText('claude');
+    await expect(demo.locator('[data-session-line="you"]')).toContainText([
+      "Let's rate-limit the public API per account.",
+      '/jg-plan',
+      '/jg-review',
+      '/jg-push',
+    ]);
+    await expect(demo.locator('[data-session-line="agent"]')).toHaveCount(4);
   });
 
-  test('exposes only the selected agent prefix to assistive technology', async ({ page }) => {
+  test('labels every line for assistive technology without reading the prompt glyphs', async ({
+    page,
+  }) => {
     await page.goto('/');
 
-    const firstInvocation = page.locator('[data-session-demo-invocation]').first();
-
-    await expect(firstInvocation).toMatchAriaSnapshot(`- paragraph: /${PLAN_INVOCATION}`);
-
-    await page.locator('[data-session-demo]').locator('label').filter({ hasText: 'Codex' }).click();
-
-    await expect(firstInvocation).toMatchAriaSnapshot(`- paragraph: $${PLAN_INVOCATION}`);
+    await expect(page.getByRole('list', { name: 'Example session with a coding agent' }))
+      .toMatchAriaSnapshot(`
+      - list "Example session with a coding agent":
+        - listitem: "Shell: claude"
+        - listitem: "You: Let's rate-limit the public API per account."
+        - listitem: "Agent: Agreed. A sliding window per account in Redis fits your middleware."
+        - listitem: "You: /jg-plan"
+        - listitem: "Agent: Plan saved. Approve it to start building."
+        - listitem: "You: /jg-review"
+        - listitem: "Agent: Ready to commit"
+        - listitem: "You: /jg-push"
+        - listitem: "Agent: Pushed to main"
+    `);
   });
 
   test('keeps the session readable without horizontal overflow at 320 pixels', async ({ page }) => {

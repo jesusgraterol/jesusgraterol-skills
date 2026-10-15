@@ -9,9 +9,9 @@ export const SKILL_CATALOG = {
   'jg-plan': {
     access: 'planning-files',
     example: {
-      invocation: 'jg-plan Add per-account rate limiting to the public API',
+      invocation: 'jg-plan',
       outcome:
-        'Saves an implementation-ready plan under coding-agent-planning/ and stops for your approval.',
+        'Turns the change you just discussed into an implementation-ready plan, saves it under coding-agent-planning/, and stops for your approval.',
     },
     order: 1,
     stage: 'plan',
@@ -88,26 +88,26 @@ export const SITE_CONFIG = {
     name: 'Jesus Graterol',
     url: 'https://jesusgraterol.dev/',
   },
+  // project-scoped commands, run from the repository root
   commands: {
-    install:
-      'npx skills add jesusgraterol/jesusgraterol-skills -g --skill "*" -a claude-code -a codex -y',
-    remove: `npx skills remove -g ${SKILL_NAMES.join(' ')}`,
-    update: 'npx skills update -g',
+    install: 'npx skills add jesusgraterol/jesusgraterol-skills --skill "*" -y',
+    remove: `npx skills remove ${SKILL_NAMES.join(' ')}`,
+    update: 'npx skills update -p',
   },
   defaultDescription:
-    'Seven explicit-only skills for planning, challenging, breaking down, reviewing, and publishing changes with Claude Code and Codex.',
+    'Solid, battle-tested skills for planning, reviewing, and shipping changes with coding agents, used by professional software developers in their daily work.',
   language: 'en',
   license: 'MIT',
   name: 'JG Skills',
   navigation: [
     { href: '/#skills', label: 'Skills' },
-    { href: '/#workflow', label: 'Workflow' },
+    { href: '/#workflow', label: 'How it works' },
     { href: '/#install', label: 'Install' },
   ],
   openGraph: {
     height: 630,
     image: '/og/jg-skills.png',
-    imageAlt: 'JG Skills: explicit-only skills for Claude Code and Codex',
+    imageAlt: 'JG Skills: battle-tested skills for coding agents',
     imageType: 'image/png',
     locale: 'en_US',
     width: 1200,
@@ -117,5 +117,5 @@ export const SITE_CONFIG = {
     dark: '#1e2939',
     light: '#fefdfb',
   },
-  url: 'https://skills.jesusgraterol.dev',
+  url: 'https://jg-skills.jesusgraterol.dev',
 } as const;

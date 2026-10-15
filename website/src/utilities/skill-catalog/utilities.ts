@@ -1,11 +1,6 @@
 import { SITE_CONFIG } from '../../site.config.ts';
 
-import {
-  EXPLICIT_ONLY_OPENAI_POLICY,
-  SKILL_CATALOG_ERROR_MESSAGES,
-  SKILL_HOSTS,
-} from './constants.ts';
-import type { ISkillHost } from './types.ts';
+import { EXPLICIT_ONLY_OPENAI_POLICY, SKILL_CATALOG_ERROR_MESSAGES } from './constants.ts';
 
 /**
  * Asserts that a skill's frontmatter name matches the directory it is installed from.
@@ -53,15 +48,6 @@ export const assertCatalogCoverage = (
     );
   }
 };
-
-/**
- * Formats a prefix-free invocation for one coding agent.
- * @param host The coding agent the developer is using.
- * @param invocation The skill name followed by any supplied text.
- * @returns The invocation as the developer types it in that agent.
- */
-export const formatInvocation = (host: ISkillHost, invocation: string): string =>
-  `${SKILL_HOSTS[host].prefix}${invocation}`;
 
 /**
  * Builds the public source URL of one skill's instructions.

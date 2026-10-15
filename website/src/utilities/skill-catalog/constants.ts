@@ -1,4 +1,4 @@
-import type { ISkillAccess, ISkillHost, ISkillStage } from './types.ts';
+import type { ISkillAccess, ISkillStage } from './types.ts';
 
 // exact Codex policy every skill ships so it is never invoked implicitly
 export const EXPLICIT_ONLY_OPENAI_POLICY = 'policy:\n  allow_implicit_invocation: false\n';
@@ -23,9 +23,3 @@ export const SKILL_ACCESS_LABELS = {
   'planning-files': 'Writes planning files',
   'read-only': 'Read-only',
 } as const satisfies Record<ISkillAccess, string>;
-
-// invocation prefix and display name for each supported coding agent
-export const SKILL_HOSTS = {
-  'claude-code': { label: 'Claude Code', prefix: '/' },
-  codex: { label: 'Codex', prefix: '$' },
-} as const satisfies Record<ISkillHost, { label: string; prefix: string }>;

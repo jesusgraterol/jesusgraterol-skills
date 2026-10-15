@@ -161,12 +161,12 @@ describe('static build artifact', () => {
     ],
     [
       'canonical URL missing from the sitemap',
-      'Canonical URL is missing from the sitemap: https://skills.jesusgraterol.dev/skills/jg-plan/',
+      'Canonical URL is missing from the sitemap: https://jg-skills.jesusgraterol.dev/skills/jg-plan/',
       async (buildDirectory) =>
         replaceBuildFileText(
           buildDirectory,
           'sitemap-0.xml',
-          '<loc>https://skills.jesusgraterol.dev/skills/jg-plan/</loc>',
+          '<loc>https://jg-skills.jesusgraterol.dev/skills/jg-plan/</loc>',
           '',
         ),
     ],
@@ -177,8 +177,8 @@ describe('static build artifact', () => {
         replaceBuildFileText(
           buildDirectory,
           SKILL_PAGE,
-          '"url":"https://skills.jesusgraterol.dev/skills/jg-plan/"',
-          '"url":"https://skills.jesusgraterol.dev/skills/jg-push/"',
+          '"url":"https://jg-skills.jesusgraterol.dev/skills/jg-plan/"',
+          '"url":"https://jg-skills.jesusgraterol.dev/skills/jg-push/"',
         ),
     ],
     [
@@ -217,11 +217,11 @@ describe('static build artifact', () => {
     ],
     [
       'broken llms.txt link',
-      'Broken internal llms.txt link: https://skills.jesusgraterol.dev/skills/jg-missing/ -> skills/jg-missing/index.html',
+      'Broken internal llms.txt link: https://jg-skills.jesusgraterol.dev/skills/jg-missing/ -> skills/jg-missing/index.html',
       async (buildDirectory) =>
         appendFile(
           resolveBuildFile(buildDirectory, 'llms.txt'),
-          '- [jg-missing](https://skills.jesusgraterol.dev/skills/jg-missing/): Missing.\n',
+          '- [jg-missing](https://jg-skills.jesusgraterol.dev/skills/jg-missing/): Missing.\n',
           'utf8',
         ),
     ],

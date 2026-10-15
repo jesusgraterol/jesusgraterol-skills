@@ -1,7 +1,9 @@
 ---
-import CopyControl from '../copy-control/copy-control.astro';
+import TerminalWindow from '../terminal-window/terminal-window.astro';
 
 interface Props {
+  // what the command does, used to name its copy button, e.g. "install"
+  action: string;
   command: string;
   id: string;
   label: string;
@@ -9,20 +11,40 @@ interface Props {
 
 // tokens longer than this may break mid-token on narrow screens; shorter ones such as flags stay whole
 const MAX_UNBROKEN_TOKEN_LENGTH = 16;
+// shell prompt shown before the command but never copied
+const SHELL_PROMPT = '$';
 
-const { command, id, label } = Astro.props;
+const { action, command, id, label } = Astro.props;
 const tokens = command.split(' ');
 ---
 
-<div class="overflow-hidden rounded-xl border border-border bg-surface shadow-surface">
-  <div class="flex items-center justify-between gap-3 border-b border-border py-2 pr-2 pl-4">
-    <span class="font-mono text-xs font-semibold text-muted">{label}</span>
-    <CopyControl
-      context={`${label.toLowerCase()} command`}
-      label="Copy"
-      sourceId={id}
-    />
-  </div>
-  <pre
-    class="px-4 py-4 font-mono text-sm leading-6 whitespace-pre-wrap"><code id={id}>{tokens.map((token, index) => (<>{index > 0 && ' '}<span class:list={[token.length > MAX_UNBROKEN_TOKEN_LENGTH ? 'wrap-anywhere' : 'whitespace-nowrap']}>{token}</span></>))}</code></pre>
-</div>
+<TerminalWindow
+  copy={{ context: `${action} command`, sourceId: id }}
+  title={label}
+>
+  <p class="flex gap-3">
+    <span
+      class="text-accent-on-primary select-none"
+      aria-hidden="true"
+      >{SHELL_PROMPT}</span
+    >
+    <code
+      class="min-w-0 whitespace-pre-wrap"
+      id={id}
+      >{
+        tokens.map((token, index) => (
+          <>
+            {index > 0 && ' '}
+            <span
+              class:list={[
+                token.length > MAX_UNBROKEN_TOKEN_LENGTH ? 'wrap-anywhere' : 'whitespace-nowrap',
+              ]}
+            >
+              {token}
+            </span>
+          </>
+        ))
+      }</code
+    >
+  </p>
+</TerminalWindow>

@@ -6,7 +6,6 @@ import {
   assertExplicitOnlyPolicy,
   assertSkillName,
   buildSourceUrl,
-  formatInvocation,
 } from './utilities.ts';
 
 describe('assertSkillName', () => {
@@ -88,17 +87,6 @@ describe('assertCatalogCoverage', () => {
     ],
   ])('assertCatalogCoverage(%s) -> throws', (_caseName, skillNames, catalogNames, message) => {
     expect(() => assertCatalogCoverage(skillNames, catalogNames)).toThrow(message);
-  });
-});
-
-describe('formatInvocation', () => {
-  test.each([
-    ['claude-code', 'jg-review', '/jg-review'],
-    ['codex', 'jg-review', '$jg-review'],
-    ['claude-code', 'jg-plan Add rate limiting', '/jg-plan Add rate limiting'],
-    ['codex', 'jg-plan Add rate limiting', '$jg-plan Add rate limiting'],
-  ] as const)('formatInvocation(%s, %s) -> %s', (host, invocation, expected) => {
-    expect(formatInvocation(host, invocation)).toBe(expected);
   });
 });
 

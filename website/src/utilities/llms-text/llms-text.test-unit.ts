@@ -18,13 +18,13 @@ describe('buildLlmsText', () => {
 
     expect(text).toMatch(/^# JG Skills\n\n> .+\n/u);
     expect(text).toContain(
-      '## Install\n\n```bash\nnpx skills add jesusgraterol/jesusgraterol-skills -g --skill "*" -a claude-code -a codex -y\n```\n',
+      '## Install\n\n```bash\nnpx skills add jesusgraterol/jesusgraterol-skills --skill "*" -y\n```\n',
     );
     expect(text).toContain(
-      '- [jg-plan](https://skills.jesusgraterol.dev/skills/jg-plan/): Create or revise a plan. Save it for approval.',
+      '- [jg-plan](https://jg-skills.jesusgraterol.dev/skills/jg-plan/): Create or revise a plan. Save it for approval.',
     );
     expect(text).toContain(
-      '- [jg-\\[review\\]](https://skills.jesusgraterol.dev/skills/jg-[review]/): Review the uncommitted change.',
+      '- [jg-\\[review\\]](https://jg-skills.jesusgraterol.dev/skills/jg-[review]/): Review the uncommitted change.',
     );
     expect(text.indexOf('/skills/jg-plan/')).toBeLessThan(text.indexOf('/skills/jg-[review]/'));
     expect(text).toMatch(/\n## Optional\n/u);

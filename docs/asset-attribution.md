@@ -1,17 +1,6 @@
 # Asset attribution
 
-`/docs` is reserved for essential, durable project concepts and processes. This page records the provenance and usage boundaries of the brand assets the website copies.
-
-## Coding-agent marks
-
-The marks under `website/public/coding-agents/` identify the two coding agents the skills are verified with. Their presence does not imply vendor endorsement, partnership, or sponsorship. Keep their geometry unchanged and preserve their intrinsic dimensions. The Codex mark is black, so the site inverts it on dark surfaces.
-
-| Mark        | Source                                                        |
-| ----------- | ------------------------------------------------------------- |
-| Claude Code | [Claude](https://claude.ai/)                                  |
-| Codex       | [Official OpenAI brand guidelines](https://openai.com/brand/) |
-
-These copies come unchanged from the sibling Agentic Coding website.
+`/docs` is reserved for essential, durable project concepts and processes. This page records the provenance and usage boundaries of the brand mark the website uses.
 
 ## JG mark
 

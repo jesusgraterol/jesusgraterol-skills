@@ -1,12 +1,12 @@
 {
   "name": "jesusgraterol-skills-website",
   "version": "1.0.0",
-  "description": "Install, browse, and learn the explicit-only jg skills for Claude Code and Codex.",
+  "description": "Install, browse, and learn the battle-tested jg skills for coding agents.",
   "author": "Jesus Graterol",
   "license": "MIT",
   "private": true,
   "type": "module",
-  "homepage": "https://skills.jesusgraterol.dev",
+  "homepage": "https://jg-skills.jesusgraterol.dev",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jesusgraterol/jesusgraterol-skills.git"

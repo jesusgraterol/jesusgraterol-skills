@@ -7,7 +7,7 @@ import {
   SKILL_STAGES,
   type ISkill,
 } from '../../utilities/skill-catalog/index.ts';
-import HostInvocations from '../host-invocations/host-invocations.astro';
+import TerminalWindow from '../terminal-window/terminal-window.astro';
 
 interface Props {
   skill: ISkill;
@@ -15,6 +15,10 @@ interface Props {
 
 const { skill } = Astro.props;
 const { Content } = await render(skill.entry);
+// the skill name, highlighted, and any text supplied with it
+const [invocationName = skill.name, ...invocationWords] = skill.example.invocation.split(' ');
+const invocationText = invocationWords.length > 0 ? ` ${invocationWords.join(' ')}` : '';
+const invocationId = `${skill.name}-invocation`;
 ---
 
 <article class="prose-shell py-12 sm:py-16">
@@ -53,15 +57,13 @@ const { Content } = await render(skill.entry);
         <dd class="mt-1 font-semibold">{SKILL_ACCESS_LABELS[skill.access]}</dd>
       </div>
       <div>
-        <dt class="font-mono text-xs font-bold text-muted uppercase">Arguments</dt>
+        <dt class="font-mono text-xs font-bold text-muted uppercase">Usage</dt>
         <dd class="mt-1">
-          {
-            skill.argumentHint ? (
-              <code class="rounded-md bg-code px-1.5 py-0.5 font-mono">{skill.argumentHint}</code>
-            ) : (
-              <span class="font-semibold">None</span>
-            )
-          }
+          <code
+            class="font-mono font-semibold"
+            data-skill-usage
+            >{`/${skill.name}${skill.argumentHint ? ` ${skill.argumentHint}` : ''}`}</code
+          >
         </dd>
       </div>
     </dl>
@@ -78,17 +80,38 @@ const { Content } = await render(skill.entry);
       Example
     </h2>
     <p class="mt-2 text-sm leading-6 text-muted">
-      Type the skill name with your agent's prefix, followed by any text it should consider.
+      Invoke the skill by name in your coding agent, followed by any text it should consider.
     </p>
     <div class="mt-5">
-      <HostInvocations
-        id={`${skill.name}-example`}
-        invocation={skill.example.invocation}
-      />
+      <TerminalWindow
+        copy={{ context: 'invocation', sourceId: invocationId }}
+        title="Example"
+      >
+        <p class="flex gap-3">
+          <span
+            class="flex h-6 w-3 shrink-0 justify-center text-primary-foreground/50 select-none"
+            aria-hidden="true"
+            >{'>'}</span
+          >
+          <code
+            class="min-w-0 wrap-anywhere"
+            id={invocationId}
+            ><span class="font-bold text-accent-on-primary">{`/${invocationName}`}</span>{
+              invocationText
+            }</code
+          >
+        </p>
+        <p class="mt-3 flex gap-3 text-primary-foreground/70">
+          <span
+            class="flex h-6 w-3 shrink-0 items-center justify-center"
+            aria-hidden="true"
+          >
+            <span class="size-1.5 rounded-full bg-accent-on-primary"></span>
+          </span>
+          <span data-skill-outcome>{skill.example.outcome}</span>
+        </p>
+      </TerminalWindow>
     </div>
-    <p class="mt-4 text-sm leading-6">
-      <span class="font-semibold">Result:</span>{' '}{skill.example.outcome}
-    </p>
   </section>
 
   <section

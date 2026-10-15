@@ -6,9 +6,6 @@ export type ISkillStage = 'plan' | 'ship' | 'context';
 // what a skill may change when it runs
 export type ISkillAccess = 'read-only' | 'planning-files' | 'commits-and-pushes';
 
-// coding agents whose explicit invocation syntax the site documents
-export type ISkillHost = 'claude-code' | 'codex';
-
 // a realistic invocation, written without a host prefix, and what it produces
 export interface ISkillExample {
   invocation: string;

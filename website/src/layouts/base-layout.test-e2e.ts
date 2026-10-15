@@ -16,15 +16,15 @@ test.describe('production website', () => {
       await expect(page.locator('main h1')).toHaveCount(1);
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
         'href',
-        `https://skills.jesusgraterol.dev${route}`,
+        `https://jg-skills.jesusgraterol.dev${route}`,
       );
       await expect(page.locator('link[rel="describedby"]')).toHaveAttribute(
         'href',
-        'https://skills.jesusgraterol.dev/llms.txt',
+        'https://jg-skills.jesusgraterol.dev/llms.txt',
       );
       await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
         'content',
-        'https://skills.jesusgraterol.dev/og/jg-skills.png',
+        'https://jg-skills.jesusgraterol.dev/og/jg-skills.png',
       );
       await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
 
@@ -159,7 +159,7 @@ test.describe('production website', () => {
     expect(response.headers()['content-type']).toContain('text/plain');
 
     for (const route of SKILL_ROUTES) {
-      expect(text).toContain(`https://skills.jesusgraterol.dev${route}`);
+      expect(text).toContain(`https://jg-skills.jesusgraterol.dev${route}`);
     }
   });
 });
