@@ -33,13 +33,13 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
    - Confirm the plan still matches the repository. Stop and report if it doesn't.
    - Look for blockers you can spot up front, such as missing access, checks that cannot run, or unmet dependencies on earlier milestones.
    - In autonomous mode:
-     - `jg-review` and `jg-push` are explicit-only skills, so don't invoke them. Read their `SKILL.md` files from the folders next to this skill's own folder, and stop with an install hint if either file is missing.
-     - If the branch has unpushed commits, publish them first by following `jg-push`'s `SKILL.md` with an empty task scope, which only pushes.
-     - If the next milestone's commit is already on the branch, pushed or not, write its status line and move on.
+     - `jg-review` and `jg-push` are explicit-only skills, so don't invoke them. Read their `SKILL.md` files from the folders next to this skill's own folder, and stop with an install hint if either file is missing. Following either file from this skill counts as the developer invoking it.
+     - If the branch has unpushed commits, list them with your preflight questions, and publish them only after the developer confirms, by following `jg-push`'s `SKILL.md` with an empty task scope, which only pushes. If the developer doesn't want them published, stop, because every later push would publish them too.
    - If the next milestone already has uncommitted work, list those files, ask the developer to confirm them, and continue from that work instead of redoing it. Confirmed files join the unit's scope.
+   - If the next milestone has no uncommitted work and its acceptance criteria already hold, write its status line and move on.
    - Ask every question in one message.
 5. **Each unit.**
-   - Implement it following the plan and the repository's coding instructions.
+   - Implement it following the plan and the repository's coding instructions (such as `AGENTS.md` or `CLAUDE.md`).
    - Run the checks the plan lists for it. When it lists none, run the repository's tests for the affected boundary. Fix the failures the work caused.
    - Before calling the unit finished, check each of its acceptance criteria, or what was agreed for a task, against evidence. Where you can, run the changed behavior itself; passing tests alone don't show it works.
    - The files the unit changed, plus any the developer confirmed, are its task scope for review and push.
@@ -47,7 +47,7 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
 6. **Supervised mode.** Run the unit. When it is a milestone and its acceptance criteria are met, write its status line. Then stop and report the files changed, the checks and their results, anything left undone, and the next commands: `jg-review`, `jg-push`, or `jg-execute` for the next milestone. Do not review, commit, or push.
 7. **Autonomous mode.** For each unit, in order:
    1. Run it.
-   2. Follow `jg-review`'s `SKILL.md` on the unit's scope. Fix the blocking findings and review again until none remain; list non-blocking findings in the report instead of fixing them. Following it from here counts as the developer invoking it.
+   2. Follow `jg-review`'s `SKILL.md` on the unit's scope, including files changed by review fixes. Fix the blocking findings and review again until it reports `Ready to commit`; list non-blocking findings in the report instead of fixing them.
    3. When review fixes changed the unit, recheck its acceptance criteria, then follow `jg-push`'s `SKILL.md` on the same scope.
    4. When the unit is a milestone, write its status line. Report the commit and continue with the next unit.
 
@@ -58,6 +58,7 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
    - a destructive action the plan doesn't call for
    - a check that cannot run
    - the same failure or blocking finding survives three fix attempts
+   - a review that ends in `Review incomplete`, or three review rounds that still report blocking findings
    - a merge conflict, or a rejected or failed push
    - changes in scope that nobody can account for
 

@@ -25,7 +25,7 @@ Pause the work in progress at the nearest safe point, report where it stands, an
 3. **Report briefly:**
    - what is done
    - what is half-finished: the exact files, and what still has to change to match
-   - uncommitted changes
+   - uncommitted changes and unpushed commits
    - anything still running
    - the next step
 4. **Wait.** Answer questions, but do no work until the developer says to continue or gives a new direction.
