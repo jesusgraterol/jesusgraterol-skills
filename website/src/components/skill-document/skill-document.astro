@@ -1,5 +1,5 @@
 ---
-import { ArrowLeft, ArrowUpRight } from '@lucide/astro';
+import { ArrowLeft, ArrowRight } from '@lucide/astro';
 import { render } from 'astro:content';
 
 import {
@@ -7,13 +7,17 @@ import {
   SKILL_STAGES,
   type ISkill,
 } from '../../utilities/skill-catalog/index.ts';
+import ExternalLink from '../external-link/external-link.astro';
 import TerminalWindow from '../terminal-window/terminal-window.astro';
 
 interface Props {
+  // neighboring skills in catalog order, absent at either end
+  next?: ISkill | undefined;
+  previous?: ISkill | undefined;
   skill: ISkill;
 }
 
-const { skill } = Astro.props;
+const { next, previous, skill } = Astro.props;
 const { Content } = await render(skill.entry);
 // the skill name, highlighted, and any text supplied with it
 const [invocationName = skill.name, ...invocationWords] = skill.example.invocation.split(' ');
@@ -68,6 +72,24 @@ const invocationId = `${skill.name}-invocation`;
       </div>
     </dl>
   </header>
+
+  <section
+    class="mt-12"
+    aria-labelledby="when-to-use-heading"
+  >
+    <h2
+      id="when-to-use-heading"
+      class="text-2xl font-semibold tracking-tight"
+    >
+      When to use it
+    </h2>
+    <p
+      class="mt-3 leading-7"
+      data-skill-when-to-use
+    >
+      {skill.whenToUse}
+    </p>
+  </section>
 
   <section
     class="mt-12"
@@ -139,28 +161,64 @@ const invocationId = `${skill.name}-invocation`;
     </div>
   </section>
 
-  <footer class="mt-14 flex flex-wrap gap-3 border-t border-border pt-8">
-    <a
-      class="action-secondary"
-      href="/#skills"
+  <footer class="mt-14 border-t border-border pt-8">
+    <nav
+      class="grid gap-3 sm:grid-cols-2"
+      aria-label="Previous and next skills"
     >
-      <ArrowLeft
-        class="size-4"
-        aria-hidden="true"
-      />
-      All skills
-    </a>
-    <a
-      class="action-secondary"
-      href={skill.sourceUrl}
-      target="_blank"
-      rel="noreferrer"
-    >
-      View SKILL.md on GitHub
-      <ArrowUpRight
-        class="size-4"
-        aria-hidden="true"
-      />
-    </a>
+      {
+        previous && (
+          <a
+            class="flex flex-col gap-1 rounded-xl border border-border bg-surface p-4 no-underline transition-colors hover:border-border-strong"
+            href={`/skills/${previous.name}/`}
+            rel="prev"
+          >
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-muted">
+              <ArrowLeft
+                class="size-3.5"
+                aria-hidden="true"
+              />
+              Previous skill
+            </span>
+            <span class="font-mono font-bold wrap-anywhere">{previous.name}</span>
+          </a>
+        )
+      }
+      {
+        next && (
+          <a
+            class="flex flex-col items-end gap-1 rounded-xl border border-border bg-surface p-4 text-right no-underline transition-colors hover:border-border-strong sm:col-start-2"
+            href={`/skills/${next.name}/`}
+            rel="next"
+          >
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-muted">
+              Next skill
+              <ArrowRight
+                class="size-3.5"
+                aria-hidden="true"
+              />
+            </span>
+            <span class="font-mono font-bold wrap-anywhere">{next.name}</span>
+          </a>
+        )
+      }
+    </nav>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a
+        class="action-secondary"
+        href="/#skills"
+      >
+        <ArrowLeft
+          class="size-4"
+          aria-hidden="true"
+        />
+        All skills
+      </a>
+      <ExternalLink
+        class="action-secondary"
+        href={skill.sourceUrl}
+        >View SKILL.md on GitHub</ExternalLink
+      >
+    </div>
   </footer>
 </article>

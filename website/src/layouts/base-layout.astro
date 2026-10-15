@@ -5,6 +5,8 @@ import { SITE_CONFIG } from '../site.config.ts';
 import {
   buildStructuredData,
   type IBreadcrumbItem,
+  type IListedPage,
+  type IStructuredDataSkill,
   type IStructuredDataType,
 } from '../utilities/seo/index.ts';
 import { THEME_STORAGE_KEY } from '../utilities/theme-preference/index.ts';
@@ -14,7 +16,11 @@ interface Props {
   breadcrumbs?: readonly IBreadcrumbItem[] | undefined;
   canonicalPath: string;
   description: string;
+  // pages a website page lists, published as its structured item list
+  listedPages?: readonly IListedPage[] | undefined;
   noIndex?: boolean | undefined;
+  // the skill a skill page documents, published as structured source code
+  skill?: IStructuredDataSkill | undefined;
   structuredDataTitle?: string | undefined;
   structuredDataType?: IStructuredDataType | undefined;
   title: string;
@@ -24,7 +30,9 @@ const {
   breadcrumbs,
   canonicalPath,
   description,
+  listedPages,
   noIndex = false,
+  skill,
   structuredDataType,
   title,
   structuredDataTitle = title,
@@ -37,6 +45,8 @@ const structuredData = structuredDataType
       breadcrumbs,
       canonicalUrl,
       description,
+      listedPages,
+      skill,
       title: structuredDataTitle,
       type: structuredDataType,
     })
@@ -146,6 +156,10 @@ const serializedStructuredData = structuredData
     <meta
       name="twitter:card"
       content="summary_large_image"
+    />
+    <meta
+      name="twitter:creator"
+      content={SITE_CONFIG.author.twitterHandle}
     />
     <meta
       name="twitter:title"

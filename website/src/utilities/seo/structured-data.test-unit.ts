@@ -11,6 +11,19 @@ const WEBSITE_REFERENCE = {
   url: 'https://jg-skills.jesusgraterol.dev/',
 };
 
+// author identity, linked to the author's public profiles
+const AUTHOR = {
+  '@type': 'Person',
+  name: 'Jesus Graterol',
+  sameAs: [
+    'https://github.com/jesusgraterol',
+    'https://www.linkedin.com/in/jesus-graterol',
+    'https://x.com/jesus__graterol',
+    'https://www.kaggle.com/jesusgraterol',
+  ],
+  url: 'https://jesusgraterol.dev/',
+};
+
 describe('buildStructuredData', () => {
   test('describes the canonical website without fabricated page fields', () => {
     expect(
@@ -24,11 +37,7 @@ describe('buildStructuredData', () => {
       '@context': 'https://schema.org',
       '@id': 'https://jg-skills.jesusgraterol.dev/#website',
       '@type': 'WebSite',
-      author: {
-        '@type': 'Person',
-        name: 'Jesus Graterol',
-        url: 'https://jesusgraterol.dev/',
-      },
+      author: AUTHOR,
       description: 'Explicit-only skills for Claude Code and Codex.',
       inLanguage: 'en',
       name: 'JG Skills',
@@ -104,6 +113,85 @@ describe('buildStructuredData', () => {
       isPartOf: WEBSITE_REFERENCE,
       name: 'Not found',
       url: 'https://jg-skills.jesusgraterol.dev/missing/',
+    });
+  });
+  test('lists the pages a website presents in display order', () => {
+    expect(
+      buildStructuredData({
+        canonicalUrl: 'https://jg-skills.jesusgraterol.dev/',
+        description: 'Agent skills for Claude Code and Codex.',
+        listedPages: [
+          { name: 'jg-brainstorm', path: '/skills/jg-brainstorm/' },
+          { name: 'jg-plan', path: '/skills/jg-plan/' },
+        ],
+        title: 'JG Skills',
+        type: 'website',
+      }),
+    ).toStrictEqual({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@id': 'https://jg-skills.jesusgraterol.dev/#website',
+          '@type': 'WebSite',
+          author: AUTHOR,
+          description: 'Agent skills for Claude Code and Codex.',
+          inLanguage: 'en',
+          name: 'JG Skills',
+          url: 'https://jg-skills.jesusgraterol.dev/',
+        },
+        {
+          '@id': 'https://jg-skills.jesusgraterol.dev/#skills',
+          '@type': 'ItemList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              name: 'jg-brainstorm',
+              position: 1,
+              url: 'https://jg-skills.jesusgraterol.dev/skills/jg-brainstorm/',
+            },
+            {
+              '@type': 'ListItem',
+              name: 'jg-plan',
+              position: 2,
+              url: 'https://jg-skills.jesusgraterol.dev/skills/jg-plan/',
+            },
+          ],
+        },
+      ],
+    });
+  });
+
+  test('describes the documented skill as source code between the page and its breadcrumb', () => {
+    expect(
+      buildStructuredData({
+        breadcrumbs: [
+          { name: 'JG Skills', path: '/' },
+          { name: 'jg-pause', path: '/skills/jg-pause/' },
+        ],
+        canonicalUrl: 'https://jg-skills.jesusgraterol.dev/skills/jg-pause/',
+        description: 'Stops the agent at the nearest safe point and waits.',
+        skill: { name: 'jg-pause', stage: 'Build' },
+        title: 'jg-pause',
+        type: 'webpage',
+      }),
+    ).toStrictEqual({
+      '@context': 'https://schema.org',
+      '@graph': [
+        expect.objectContaining({ '@type': 'WebPage' }),
+        {
+          '@id': 'https://jg-skills.jesusgraterol.dev/skills/jg-pause/#source',
+          '@type': 'SoftwareSourceCode',
+          author: AUTHOR,
+          codeRepository: 'https://github.com/jesusgraterol/jesusgraterol-skills',
+          description: 'Stops the agent at the nearest safe point and waits.',
+          keywords: ['Agent Skills', 'Claude Code', 'Codex', 'coding agents', 'Build'],
+          license: 'https://github.com/jesusgraterol/jesusgraterol-skills/blob/main/LICENSE',
+          name: 'jg-pause',
+          programmingLanguage: 'Markdown',
+          url: 'https://jg-skills.jesusgraterol.dev/skills/jg-pause/',
+        },
+        expect.objectContaining({ '@type': 'BreadcrumbList' }),
+      ],
     });
   });
 });

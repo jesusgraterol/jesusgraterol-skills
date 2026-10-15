@@ -3,6 +3,7 @@ import { extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { SITE_CONFIG } from '../src/site.config.ts';
+import { SEARCH_TEXT_LIMITS } from '../src/utilities/seo/index.ts';
 
 const websiteRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const DEFAULT_BUILD_DIRECTORY = resolve(websiteRoot, 'dist');
@@ -13,6 +14,7 @@ const VERIFY_BUILD_ERROR_MESSAGES = {
   BrokenInternalLink: 'Broken internal link',
   BrokenInternalLlmsTextLink: 'Broken internal llms.txt link',
   CanonicalUrlMissingFromSitemap: 'Canonical URL is missing from the sitemap',
+  IncompleteSkillItemList: 'Home page item list does not list every skill',
   InvalidLlmsTextStructure: 'llms.txt does not follow the required project index structure',
   InvalidStructuredData: 'Invalid structured data',
   InvalidStructuredDataGraph: 'Structured data graph is invalid',
@@ -20,8 +22,11 @@ const VERIFY_BUILD_ERROR_MESSAGES = {
   MissingOrDuplicatePageTitle: 'Missing or duplicate page title',
   MissingRequiredMetadata: 'Missing required metadata',
   MissingSkillPage: 'Missing skill page',
+  MissingSoftwareSourceCode: 'Skill page is missing its source code entity',
   MissingStructuredData: 'Missing structured data',
   NonObjectStructuredData: 'Structured data is not an object',
+  PageDescriptionOutOfRange: 'Page description is not 70 to 160 characters long',
+  PageTitleTooLong: 'Page title is longer than 60 characters',
   ProductionBuildContainsTestFile: 'Production build contains a test file',
   SearchIndexableNotFoundPage: 'The custom 404 page must remain excluded from search indexes',
   StructuredDataDoesNotMatchPage: 'Structured data does not match the canonical page',
@@ -35,6 +40,28 @@ const REQUIRED_BUILD_PATHS = [
   'robots.txt',
   'sitemap-index.xml',
 ] as const;
+
+// named entities Astro may emit in titles and attribute values
+const NAMED_HTML_ENTITIES = { amp: '&', apos: "'", gt: '>', lt: '<', quot: '"' } as const;
+
+/** Decodes HTML entities so text lengths are measured as readers see them. */
+const decodeHtmlEntities = (input: string): string =>
+  input.replace(/&(#x[\da-f]+|#\d+|amp|apos|gt|lt|quot);/giu, (_match, entity: string) => {
+    if (/^#x/iu.test(entity)) return String.fromCodePoint(Number.parseInt(entity.slice(2), 16));
+    if (entity.startsWith('#')) return String.fromCodePoint(Number.parseInt(entity.slice(1), 10));
+
+    return NAMED_HTML_ENTITIES[entity.toLowerCase() as keyof typeof NAMED_HTML_ENTITIES];
+  });
+
+/** Checks whether a decoded meta description fits search results. */
+const isDescriptionInRange = (description: string): boolean => {
+  const { length } = decodeHtmlEntities(description);
+
+  return (
+    length >= SEARCH_TEXT_LIMITS.descriptionMinLength &&
+    length <= SEARCH_TEXT_LIMITS.descriptionMaxLength
+  );
+};
 
 /** Escapes a literal value before interpolating it into a regular expression. */
 const escapeRegularExpression = (input: string): string =>
@@ -164,9 +191,13 @@ const extractStructuredDataEntities = (
  * - Missing required metadata
  * - Missing or duplicate page description
  * - Missing or duplicate page title
+ * - Page title is longer than 60 characters
+ * - Page description is not 70 to 160 characters long
  * - Canonical URL is missing from the sitemap
  * - Structured data does not match the canonical page
+ * - Home page item list does not list every skill
  * - Breadcrumb hierarchy is incomplete
+ * - Skill page is missing its source code entity
  * - Broken internal link
  * - The custom 404 page must remain excluded from search indexes
  * - llms.txt does not follow the required project index structure
@@ -250,6 +281,10 @@ export const verifyBuild = async (
       /<meta property="og:image:alt" content="[^"]+"/u,
       /<meta name="twitter:card" content="summary_large_image"/u,
       new RegExp(
+        `<meta name="twitter:creator" content="${escapeRegularExpression(SITE_CONFIG.author.twitterHandle)}"`,
+        'u',
+      ),
+      new RegExp(
         `<meta name="twitter:image" content="${escapeRegularExpression(openGraphImageUrl)}"`,
         'u',
       ),
@@ -279,6 +314,14 @@ export const verifyBuild = async (
     descriptions.add(description);
     titles.add(title);
 
+    if (decodeHtmlEntities(title).length > SEARCH_TEXT_LIMITS.titleMaxLength) {
+      throw new Error(`${VERIFY_BUILD_ERROR_MESSAGES.PageTitleTooLong} in ${htmlPath}`);
+    }
+
+    if (!isDescriptionInRange(description)) {
+      throw new Error(`${VERIFY_BUILD_ERROR_MESSAGES.PageDescriptionOutOfRange} in ${htmlPath}`);
+    }
+
     if (!sitemap.includes(`<loc>${canonicalUrl}</loc>`)) {
       throw new Error(
         `${VERIFY_BUILD_ERROR_MESSAGES.CanonicalUrlMissingFromSitemap}: ${canonicalUrl}`,
@@ -301,6 +344,31 @@ export const verifyBuild = async (
       throw new Error(
         `${VERIFY_BUILD_ERROR_MESSAGES.StructuredDataDoesNotMatchPage} in ${htmlPath}`,
       );
+    }
+
+    if (htmlPath === 'index.html') {
+      const listItems = structuredDataEntities.find((entity) => entity['@type'] === 'ItemList')?.[
+        'itemListElement'
+      ];
+      const listedUrls = isRecordArray(listItems)
+        ? listItems
+            .filter(
+              (listItem, index) =>
+                listItem['@type'] === 'ListItem' &&
+                listItem['position'] === index + 1 &&
+                typeof listItem['name'] === 'string',
+            )
+            .map((listItem) => listItem['url'])
+        : [];
+      const skillUrls = skillNames.map((name) => resolveCanonicalUrl(`skills/${name}/index.html`));
+
+      if (
+        listedUrls.length !== skillUrls.length ||
+        new Set(listedUrls).size !== listedUrls.length ||
+        !skillUrls.every((skillUrl) => listedUrls.includes(skillUrl))
+      ) {
+        throw new Error(VERIFY_BUILD_ERROR_MESSAGES.IncompleteSkillItemList);
+      }
     }
 
     if (htmlPath !== 'index.html') {
@@ -328,6 +396,15 @@ export const verifyBuild = async (
       }
     }
 
+    if (
+      htmlPath.startsWith('skills/') &&
+      !structuredDataEntities.some(
+        (entity) => entity['@type'] === 'SoftwareSourceCode' && entity['url'] === canonicalUrl,
+      )
+    ) {
+      throw new Error(`${VERIFY_BUILD_ERROR_MESSAGES.MissingSoftwareSourceCode} in ${htmlPath}`);
+    }
+
     const internalLinks = [...html.matchAll(/href="(\/(?!\/)[^"]*)"/gu)].map(
       (match) => match[1] ?? '/',
     );
@@ -349,6 +426,14 @@ export const verifyBuild = async (
 
   if (!notFoundHtml.includes('<meta name="robots" content="noindex, follow">')) {
     throw new Error(VERIFY_BUILD_ERROR_MESSAGES.SearchIndexableNotFoundPage);
+  }
+
+  const notFoundDescription = notFoundHtml.match(
+    /<meta name="description" content="([^"]+)"/u,
+  )?.[1];
+
+  if (!notFoundDescription || !isDescriptionInRange(notFoundDescription)) {
+    throw new Error(`${VERIFY_BUILD_ERROR_MESSAGES.PageDescriptionOutOfRange} in 404.html`);
   }
 
   const llmsText = await readFile(resolve(buildDirectory, 'llms.txt'), 'utf8');

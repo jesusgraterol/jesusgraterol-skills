@@ -4,19 +4,25 @@ import type { GetStaticPaths } from 'astro';
 import SkillDocument from '../../components/skill-document/skill-document.astro';
 import BaseLayout from '../../layouts/base-layout.astro';
 import { SITE_CONFIG } from '../../site.config.ts';
-import { loadSkills, type ISkill } from '../../utilities/skill-catalog/index.ts';
+import { loadSkills, SKILL_STAGES, type ISkill } from '../../utilities/skill-catalog/index.ts';
 
 export const getStaticPaths = (async () => {
   const skills = await loadSkills();
 
-  return skills.map((skill) => ({ params: { name: skill.name }, props: { skill } }));
+  return skills.map((skill, index) => ({
+    params: { name: skill.name },
+    props: { next: skills[index + 1], previous: skills[index - 1], skill },
+  }));
 }) satisfies GetStaticPaths;
 
 interface Props {
+  // neighboring skills in catalog order, absent at either end
+  next: ISkill | undefined;
+  previous: ISkill | undefined;
   skill: ISkill;
 }
 
-const { skill } = Astro.props;
+const { next, previous, skill } = Astro.props;
 const canonicalPath = `/skills/${skill.name}/`;
 ---
 
@@ -26,10 +32,15 @@ const canonicalPath = `/skills/${skill.name}/`;
     { name: skill.name, path: canonicalPath },
   ]}
   canonicalPath={canonicalPath}
-  description={skill.description}
+  description={skill.searchDescription}
+  skill={{ name: skill.name, stage: SKILL_STAGES[skill.stage].label }}
   structuredDataTitle={skill.name}
   structuredDataType="webpage"
-  title={`${skill.name} | ${SITE_CONFIG.name}`}
+  title={skill.searchTitle}
 >
-  <SkillDocument skill={skill} />
+  <SkillDocument
+    next={next}
+    previous={previous}
+    skill={skill}
+  />
 </BaseLayout>

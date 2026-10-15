@@ -1,0 +1,25 @@
+---
+import { ExternalLink as ExternalLinkIcon } from '@lucide/astro';
+
+interface Props {
+  class?: string | undefined;
+  href: string;
+}
+
+// spoken after the link text so screen reader users know the link opens a new tab
+const NEW_TAB_NOTICE = ' (opens in a new tab)';
+
+const { class: className, href } = Astro.props;
+---
+
+<a
+  class={className}
+  href={href}
+  target="_blank"
+  rel="noreferrer"
+  ><slot /><ExternalLinkIcon
+    class="ml-1 inline-block size-3.5 shrink-0 align-[-0.125em]"
+    aria-hidden="true"
+    data-external-icon
+  /><span class="sr-only">{NEW_TAB_NOTICE}</span></a
+>

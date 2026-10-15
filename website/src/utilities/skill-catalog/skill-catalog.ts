@@ -9,6 +9,7 @@ import type { ISkill } from './types.ts';
 import {
   assertCatalogCoverage,
   assertExplicitOnlyPolicy,
+  assertSearchMetadata,
   assertSkillName,
   buildSourceUrl,
 } from './utilities.ts';
@@ -19,13 +20,14 @@ const isCatalogName = (name: string): name is keyof typeof SKILL_CATALOG =>
 
 /**
  * Loads every skill under the repository's skills directory, merged with its catalog entry.
- * Fails the build when a skill folder and the site disagree or a skill could be invoked
- * implicitly by Codex.
+ * Fails the build when a skill folder and the site disagree, a skill could be invoked
+ * implicitly by Codex, or its search metadata would be cut off in search results.
  * @returns A promise that resolves to the skills in catalog order.
  * @throws
  * - Skill name does not match its directory
  * - Skill catalog does not match the skill folders
  * - Skill does not ship the explicit-only Codex policy
+ * - Skill search metadata is outside its limits
  */
 export const loadSkills = async (): Promise<ISkill[]> => {
   const entries = await getCollection('skills');
@@ -46,8 +48,12 @@ export const loadSkills = async (): Promise<ISkill[]> => {
         throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.CatalogMismatch}: ${entry.id}`);
       }
 
+      const catalogEntry = SKILL_CATALOG[entry.id];
+
+      assertSearchMetadata(entry.id, catalogEntry.searchTitle, catalogEntry.searchDescription);
+
       return {
-        ...SKILL_CATALOG[entry.id],
+        ...catalogEntry,
         argumentHint: entry.data['argument-hint'],
         description: entry.data.description,
         entry,

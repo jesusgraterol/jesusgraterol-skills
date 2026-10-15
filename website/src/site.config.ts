@@ -14,7 +14,12 @@ export const SKILL_CATALOG = {
         'Weighs the options against your codebase, recommends a direction, and lists what is still open.',
     },
     order: 1,
+    searchDescription:
+      'An explicit-only agent skill for Claude Code and Codex that weighs options against your codebase and recommends a direction before you plan.',
+    searchTitle: 'jg-brainstorm: Brainstorm ideas with Claude Code and Codex',
     stage: 'plan',
+    whenToUse:
+      'Use it when you have an idea or a question and want to settle the approach before writing a plan.',
   },
   'jg-plan': {
     access: 'planning-files',
@@ -24,7 +29,12 @@ export const SKILL_CATALOG = {
         'Turns the change you just discussed into an implementation-ready plan, saves it under coding-agent-planning/, and stops for your approval.',
     },
     order: 2,
+    searchDescription:
+      'An explicit-only agent skill that turns the change you discussed with Claude Code or Codex into an implementation-ready plan you approve.',
+    searchTitle: 'jg-plan: Implementation plans for Claude Code and Codex',
     stage: 'plan',
+    whenToUse:
+      'Use it once a change is agreed in conversation and you want a reviewable plan before any code changes.',
   },
   'jg-challenge-plan': {
     access: 'read-only',
@@ -34,7 +44,12 @@ export const SKILL_CATALOG = {
         'Returns a verdict, the corrections the plan needs, and numbered decisions in under 1,000 words.',
     },
     order: 3,
+    searchDescription:
+      'An explicit-only agent skill for Claude Code and Codex that challenges a plan before approval and surfaces material risks, gaps, and decisions.',
+    searchTitle: 'jg-challenge-plan: Challenge a plan before approval',
     stage: 'plan',
+    whenToUse:
+      'Use it on a plan you are about to approve, especially one that touches data, public contracts, or publishing.',
   },
   'jg-breakdown': {
     access: 'planning-files',
@@ -44,7 +59,11 @@ export const SKILL_CATALOG = {
         'Writes milestones.md when the plan has real boundaries, or tells you to build it as one scope.',
     },
     order: 4,
+    searchDescription:
+      'An explicit-only agent skill for Claude Code and Codex that splits a plan into ordered milestones you can build and review one at a time.',
+    searchTitle: 'jg-breakdown: Split plans into reviewable milestones',
     stage: 'plan',
+    whenToUse: 'Use it when a plan is too large to build and review as one change.',
   },
   'jg-execute': {
     access: 'changes-code',
@@ -54,7 +73,12 @@ export const SKILL_CATALOG = {
         'Builds each remaining milestone, reviews it until clean, and pushes it before starting the next.',
     },
     order: 5,
+    searchDescription:
+      "An explicit-only agent skill for Claude Code and Codex that builds a plan's milestones, supervised by default or autonomously with review and push.",
+    searchTitle: 'jg-execute: Build plans supervised or autonomously',
     stage: 'build',
+    whenToUse:
+      'Use it once a plan is approved: on its own to build the next milestone and stop, or with autonomous to build, review, and push every remaining milestone.',
   },
   'jg-pause': {
     access: 'read-only',
@@ -64,7 +88,12 @@ export const SKILL_CATALOG = {
         'Stops at the next safe point, lists what is done and what is half-finished, and waits until you say continue.',
     },
     order: 6,
+    searchDescription:
+      'An explicit-only agent skill for Claude Code and Codex that stops the agent at the nearest safe point, reports where things stand, and waits.',
+    searchTitle: 'jg-pause: Pause a coding agent at a safe point',
     stage: 'build',
+    whenToUse:
+      'Use it when you need to step away or check something mid-task without leaving half-changed files unexplained.',
   },
   'jg-review': {
     access: 'read-only',
@@ -74,7 +103,12 @@ export const SKILL_CATALOG = {
         'Reports findings first, then the checks it ran, and answers Ready to commit, Not ready, or Review incomplete.',
     },
     order: 7,
+    searchDescription:
+      "An explicit-only agent skill for Claude Code and Codex that reviews the current task's changes or a branch and issues a readiness verdict.",
+    searchTitle: 'jg-review: Code review for Claude Code and Codex',
     stage: 'ship',
+    whenToUse:
+      "Use it before committing a task's changes, or before merging a branch into its target.",
   },
   'jg-push': {
     access: 'commits-and-pushes',
@@ -84,7 +118,12 @@ export const SKILL_CATALOG = {
         "Commits only this task's files with a signed-off, signed commit and pushes the current branch.",
     },
     order: 8,
+    searchDescription:
+      "An explicit-only agent skill for Claude Code and Codex that commits only the current task's files with a signed-off, signed commit and pushes.",
+    searchTitle: 'jg-push: Signed commits and pushes for coding agents',
     stage: 'ship',
+    whenToUse:
+      'Use it when a reviewed change is ready to publish, even while other agents work in the same checkout.',
   },
   'jg-feedback': {
     access: 'read-only',
@@ -94,7 +133,12 @@ export const SKILL_CATALOG = {
         'Checks each claim against the code and recommends what to adopt, reject, or adjust.',
     },
     order: 9,
+    searchDescription:
+      'An explicit-only agent skill for Claude Code and Codex that checks feedback against the evidence and recommends what to adopt, reject, or adjust.',
+    searchTitle: 'jg-feedback: Assess review feedback with evidence',
     stage: 'context',
+    whenToUse:
+      'Use it when a reviewer, another agent, or a teammate sends claims you want checked before acting on them.',
   },
   'jg-session': {
     access: 'read-only',
@@ -104,7 +148,11 @@ export const SKILL_CATALOG = {
         'Finds the named Codex or Claude Code session and answers from its latest decisions.',
     },
     order: 10,
+    searchDescription:
+      'An explicit-only agent skill that finds a named Claude Code or Codex session and answers questions from its latest decisions and state.',
+    searchTitle: 'jg-session: Read past Claude Code and Codex sessions',
     stage: 'context',
+    whenToUse: 'Use it when you need what another session decided without rereading it yourself.',
   },
 } as const satisfies Record<string, ISkillCatalogEntry>;
 
@@ -116,6 +164,14 @@ export const SITE_CONFIG = {
   agenticCodingUrl: 'https://agenticcoding.jesusgraterol.dev/',
   author: {
     name: 'Jesus Graterol',
+    // public profiles that identify the author to search engines
+    sameAs: [
+      'https://github.com/jesusgraterol',
+      'https://www.linkedin.com/in/jesus-graterol',
+      'https://x.com/jesus__graterol',
+      'https://www.kaggle.com/jesusgraterol',
+    ],
+    twitterHandle: '@jesus__graterol',
     url: 'https://jesusgraterol.dev/',
   },
   // project-scoped commands, run from the repository root
@@ -125,7 +181,7 @@ export const SITE_CONFIG = {
     update: 'npx skills update -p',
   },
   defaultDescription:
-    'Solid, battle-tested skills for planning, reviewing, and shipping changes with coding agents, used by professional software developers in their daily work.',
+    'Battle-tested agent skills for Claude Code, Codex, and other coding agents. Brainstorm, plan, build, review, and ship changes like professional developers.',
   language: 'en',
   license: 'MIT',
   name: 'JG Skills',

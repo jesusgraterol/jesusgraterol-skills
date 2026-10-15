@@ -1,4 +1,5 @@
 import { SITE_CONFIG } from '../../site.config.ts';
+import { SEARCH_TEXT_LIMITS } from '../seo/index.ts';
 
 import { EXPLICIT_ONLY_OPENAI_POLICY, SKILL_CATALOG_ERROR_MESSAGES } from './constants.ts';
 
@@ -25,6 +26,30 @@ export const assertSkillName = (directoryName: string, frontmatterName: string):
 export const assertExplicitOnlyPolicy = (skillName: string, policyText: string): void => {
   if (policyText.replaceAll('\r\n', '\n') !== EXPLICIT_ONLY_OPENAI_POLICY) {
     throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.ImplicitInvocationAllowed}: ${skillName}`);
+  }
+};
+
+/**
+ * Asserts that a skill's search title leads with its name and that its title and description fit
+ * in search results.
+ * @param skillName The skill whose search metadata is checked.
+ * @param searchTitle The page title shown in search results.
+ * @param searchDescription The meta description shown in search results.
+ * @throws
+ * - Skill search metadata is outside its limits
+ */
+export const assertSearchMetadata = (
+  skillName: string,
+  searchTitle: string,
+  searchDescription: string,
+): void => {
+  if (
+    !searchTitle.startsWith(skillName) ||
+    searchTitle.length > SEARCH_TEXT_LIMITS.titleMaxLength ||
+    searchDescription.length < SEARCH_TEXT_LIMITS.descriptionMinLength ||
+    searchDescription.length > SEARCH_TEXT_LIMITS.descriptionMaxLength
+  ) {
+    throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.InvalidSearchMetadata}: ${skillName}`);
   }
 };
 

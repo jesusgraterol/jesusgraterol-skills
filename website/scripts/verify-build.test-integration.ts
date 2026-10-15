@@ -225,6 +225,61 @@ describe('static build artifact', () => {
           'utf8',
         ),
     ],
+    [
+      'page title over the search limit',
+      `Page title is longer than 60 characters in ${SKILL_PAGE}`,
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          SKILL_PAGE,
+          /<title>[^<]+<\/title>/u,
+          '<title>jg-plan: An implementation plan title too long to fit in search results</title>',
+        ),
+    ],
+    [
+      'page description under the search limit',
+      `Page description is not 70 to 160 characters long in ${SKILL_PAGE}`,
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          SKILL_PAGE,
+          /<meta name="description" content="[^"]+">/u,
+          '<meta name="description" content="A plan skill.">',
+        ),
+    ],
+    [
+      'missing twitter creator',
+      'Missing required metadata in index.html: <meta name="twitter:creator" content="@jesus__graterol"',
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          'index.html',
+          '<meta name="twitter:creator" content="@jesus__graterol">',
+          '',
+        ),
+    ],
+    [
+      'home item list missing a skill',
+      'Home page item list does not list every skill',
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          'index.html',
+          '"url":"https://jg-skills.jesusgraterol.dev/skills/jg-session/"',
+          '"url":"https://jg-skills.jesusgraterol.dev/skills/jg-unknown/"',
+        ),
+    ],
+    [
+      'missing skill source code entity',
+      `Skill page is missing its source code entity in ${SKILL_PAGE}`,
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          SKILL_PAGE,
+          '"@type":"SoftwareSourceCode"',
+          '"@type":"CreativeWork"',
+        ),
+    ],
   ])('rejects a build with %s', async (_caseName, expectedMessage, mutation) => {
     const buildDirectory = await createBuildFixture();
 

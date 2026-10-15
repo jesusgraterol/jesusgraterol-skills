@@ -85,7 +85,7 @@ npm run dev
 | `npm run format`          | Format the website files.                                                                           |
 | `npm run assets:generate` | Regenerate the committed open-graph image from its HTML template.                                   |
 
-The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, or when a skill does not ship the explicit-only Codex policy. When you add a skill, add its catalog entry with an example invocation.
+The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill does not ship the explicit-only Codex policy, or when a skill's search title or description would be cut off in search results. When you add a skill, add its catalog entry with an example invocation, a search title of at most 60 characters that starts with the skill name, a search description of 70 to 160 characters, and a short note on when to use it.
 
 ### Deployment
 
@@ -127,6 +127,7 @@ Until then, the deploy job fails, or the site is served under a path where its r
 - Every skill directory name matches the `name` in its `SKILL.md` frontmatter.
 - Every skill is explicit-only in both agents: its frontmatter sets `disable-model-invocation: true`, and its `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`. Keep both when adding a skill.
 - Every skill is self-contained. Its `## Invocation` section holds the rules all skills share, and it never links to sections of a specific `AGENTS.md`. Skills refer to each other by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix. Every skill works on its own: a mention of another skill is only a pointer, and the one runtime dependency is `jg-execute autonomous`, which reads the `jg-review` and `jg-push` `SKILL.md` files from the neighboring folders.
+- Website links show where they lead: `ArrowDown` for a section on the same page, `ArrowRight` (or `ArrowLeft` going back) for another page on the site, and the `external-link` component, which adds an icon and a screen-reader note, for other sites.
 - The website shares its design tokens, Ubuntu Sans typography, and tooling with Agentic Coding and jesusgraterol.dev. [`docs/asset-attribution.md`](docs/asset-attribution.md) records where its brand mark comes from.
 - Local coding instructions (`AGENTS.md`, `CANDIDATE.md`) and `coding-agent-planning/` are git-ignored and never published.
 - `/docs` is reserved for concise, quickly scannable documentation of essential, durable project concepts and processes. API and HTTP endpoint documentation, if the project ever needs it, belongs outside `/docs`.

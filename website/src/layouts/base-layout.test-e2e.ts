@@ -28,6 +28,17 @@ test.describe('production website', () => {
       );
       await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
 
+      const description =
+        (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
+
+      expect((await page.title()).length).toBeLessThanOrEqual(60);
+      expect(description.length).toBeGreaterThanOrEqual(70);
+      expect(description.length).toBeLessThanOrEqual(160);
+      await expect(page.locator('meta[name="twitter:creator"]')).toHaveAttribute(
+        'content',
+        '@jesus__graterol',
+      );
+
       if (route !== '/') {
         const breadcrumb = page.getByRole('navigation', { name: 'Breadcrumb' });
 
@@ -36,6 +47,46 @@ test.describe('production website', () => {
       }
     });
   }
+
+  for (const route of [...PUBLIC_ROUTES, '/404.html']) {
+    test(`${route} marks every link to another site as opening a new tab`, async ({ page }) => {
+      await page.goto(route);
+
+      const pageOrigin = new URL(page.url()).origin;
+
+      for (const link of await page.locator('a[href]').all()) {
+        const href = (await link.getAttribute('href')) ?? '';
+        const externalIcon = link.locator('[data-external-icon]');
+
+        if (new URL(href, page.url()).origin === pageOrigin) {
+          await expect(externalIcon).toHaveCount(0);
+          continue;
+        }
+
+        await expect(link).toHaveAttribute('target', '_blank');
+        await expect(link).toHaveAttribute('rel', /\bnoreferrer\b/u);
+
+        const spokenName = await link.evaluate(
+          (element) => element.getAttribute('aria-label') ?? element.textContent ?? '',
+        );
+
+        expect(spokenName).toMatch(/\(opens in a new tab\)$/u);
+
+        if ((await externalIcon.count()) === 0) {
+          await expect(link).toHaveAttribute('title', spokenName);
+        }
+      }
+    });
+  }
+
+  test('the hero links down to the skills with a down arrow', async ({ page }) => {
+    await page.goto('/');
+
+    const browseLink = page.getByRole('link', { name: 'Browse the skills' });
+
+    await expect(browseLink).toHaveAttribute('href', '#skills');
+    await expect(browseLink.locator('svg.lucide-arrow-down')).toHaveCount(1);
+  });
 
   for (const route of ACCESSIBILITY_ROUTES) {
     test(`${route} has no automatically detectable accessibility violations`, async ({ page }) => {

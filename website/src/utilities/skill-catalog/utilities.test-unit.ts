@@ -4,6 +4,7 @@ import { describe, expect, test } from 'vitest';
 import {
   assertCatalogCoverage,
   assertExplicitOnlyPolicy,
+  assertSearchMetadata,
   assertSkillName,
   buildSourceUrl,
 } from './utilities.ts';
@@ -47,6 +48,34 @@ describe('assertExplicitOnlyPolicy', () => {
     expect(() => assertExplicitOnlyPolicy('jg-push', policyText)).toThrow(
       'Skill does not ship the explicit-only Codex policy: jg-push',
     );
+  });
+});
+
+describe('assertSearchMetadata', () => {
+  const description = 'A search description that is long enough to describe the skill properly.';
+
+  test('accepts a title that leads with the skill name and fits both limits', () => {
+    expect(() =>
+      assertSearchMetadata('jg-plan', 'jg-plan: Implementation plans', description),
+    ).not.toThrow();
+  });
+
+  test.each([
+    ['a title without the skill name', 'Implementation plans with jg-plan', description],
+    ['a 61-character title', `jg-plan: ${'x'.repeat(52)}`, description],
+    ['a 69-character description', 'jg-plan: Plans', 'x'.repeat(69)],
+    ['a 161-character description', 'jg-plan: Plans', 'x'.repeat(161)],
+  ])('assertSearchMetadata(%s) -> throws', (_caseName, searchTitle, searchDescription) => {
+    expect(() => assertSearchMetadata('jg-plan', searchTitle, searchDescription)).toThrow(
+      'Skill search metadata is outside its limits: jg-plan',
+    );
+  });
+
+  test('accepts the exact boundary lengths', () => {
+    expect(() =>
+      assertSearchMetadata('jg-plan', `jg-plan: ${'x'.repeat(51)}`, 'x'.repeat(70)),
+    ).not.toThrow();
+    expect(() => assertSearchMetadata('jg-plan', 'jg-plan: Plans', 'x'.repeat(160))).not.toThrow();
   });
 });
 

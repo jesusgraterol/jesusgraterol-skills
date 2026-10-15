@@ -17,7 +17,13 @@ export interface ISkillCatalogEntry {
   access: ISkillAccess;
   example: ISkillExample;
   order: number;
+  // search result description, 70 to 160 characters
+  searchDescription: string;
+  // search result title, at most 60 characters and starting with the skill name
+  searchTitle: string;
   stage: ISkillStage;
+  // one or two vendor-neutral sentences on when to reach for the skill
+  whenToUse: string;
 }
 
 // one skill merged from its SKILL.md entry and its catalog entry

@@ -7,6 +7,7 @@ export const EXPLICIT_ONLY_OPENAI_POLICY = 'policy:\n  allow_implicit_invocation
 export const SKILL_CATALOG_ERROR_MESSAGES = {
   CatalogMismatch: 'Skill catalog does not match the skill folders',
   ImplicitInvocationAllowed: 'Skill does not ship the explicit-only Codex policy',
+  InvalidSearchMetadata: 'Skill search metadata is outside its limits',
   NameMismatch: 'Skill name does not match its directory',
 } as const;
 
