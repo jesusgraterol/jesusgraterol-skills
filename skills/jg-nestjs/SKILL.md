@@ -32,6 +32,33 @@ The agent loads this skill on its own when a task touches its area. This skill's
 - `<module>.validations.ts` may own the injectable `<Module>Validations` singleton; unprefixed `validations.ts`, `utilities.ts`, and `transformers.ts` must contain only pure functions.
 - Name tests for supporting singletons after the artifact, such as `<module>.cache.test-unit.ts`, `<module>.model.test-integration.ts`, and `<module>.validations.test-unit.ts`.
 - Keep `index.ts` as a thin public import boundary. Export supporting singletons only when they are genuinely consumed outside the module.
+- A module directory's entry file exports only externally consumed NestJS modules, providers, services, controllers, guards, contracts, and other public symbols, each re-exported from its owning file: primary services from `<module>.service.ts`, and supporting singletons from `<module>.model.ts`, `<module>.cache.ts`, or `<module>.validations.ts`.
+- Exception to the repository's coding instructions: do not add comments or JSDoc above NestJS artifact class declarations, such as modules, services, controllers, and guards. Document non-obvious contracts on their members or in module documentation instead.
+
+A module, with only the artifacts it needs. The supporting singleton and pure-function files are optional:
+
+```txt
+example/
+  index.ts
+  example.module.ts
+  example.service.ts
+  example.controller.ts
+  example.guard.ts
+  example.model.ts
+  example.cache.ts
+  example.validations.ts
+  example.exception.ts
+  types.ts
+  constants.ts
+  utilities.ts
+  transformers.ts
+  validations.ts
+  example.service.test-unit.ts
+  example.cache.test-unit.ts
+  example.model.test-integration.ts
+  example.validations.test-unit.ts
+  example.exception.test-unit.ts
+```
 
 ## Controllers and validation
 

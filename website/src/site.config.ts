@@ -418,6 +418,42 @@ export const SKILL_CATALOG = {
     whenToUse:
       'It loads on its own when a task touches GitHub Actions workflows or CI and deployment pipelines. Call it by name to load it before such a task.',
   },
+  'jg-zod': {
+    examples: [
+      {
+        outcome:
+          'Uses a strict object schema with Zod 4 formats, derives the type from it, and returns field errors with z.flattenError.',
+        request: 'Validate the signup request body and return field errors the form can show.',
+      },
+    ],
+    kind: 'implicit',
+    order: 21,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that applies Zod 4 schema, strictness, and error standards whenever a task validates data.',
+    searchTitle: 'jg-zod: Zod 4 validation standards for coding agents',
+    stage: 'implicit',
+    summary: 'Strictness, metadata, errors, and Zod 4 APIs for validating boundary data.',
+    whenToUse:
+      'It loads on its own when a task validates data with Zod schemas. Call it by name to load it before such a task.',
+  },
+  'jg-testing': {
+    examples: [
+      {
+        outcome:
+          'Finds elements by role, waits on assertions instead of sleeps, fixes the clock, and runs the new test three times before calling it done.',
+        request: 'Add an end-to-end test for the checkout flow.',
+      },
+    ],
+    kind: 'implicit',
+    order: 22,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps Vitest and Playwright tests deterministic and fast whenever a task touches tests.',
+    searchTitle: 'jg-testing: Vitest and Playwright standards for agents',
+    stage: 'implicit',
+    summary: 'Deterministic waits, timeouts, retries, and repeat runs for Vitest and Playwright.',
+    whenToUse:
+      'It loads on its own when a task touches Vitest or Playwright tests. Call it by name to load it before such a task.',
+  },
 } as const satisfies Record<string, ISkillCatalogEntry>;
 
 // skill names in catalog order, used to build the remove command

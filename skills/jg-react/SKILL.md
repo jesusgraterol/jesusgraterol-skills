@@ -23,13 +23,42 @@ The agent loads this skill on its own when a task touches its area. This skill's
 
 - Place each meaningful React component or component module in its own directory.
 - Avoid multiple non-trivial components per file. Local subcomponents may remain only when very small, tightly parent-coupled, scannable, and unlikely to be reused. Give meaningful, growing, or reusable subcomponents their own modules.
-- Component symbols must use `PascalCase`.
+- Component symbols must use `PascalCase`. Hook symbols use `camelCase` and must start with `use`. Exported context and provider symbols use `PascalCase` with clear `Context` or `Provider` suffixes.
 - Component directories must use `kebab-case`.
-- Component implementation files must use `kebab-case.component.tsx`.
+- Component implementation files must use `kebab-case.component.tsx`, and hook implementation files `kebab-case.hook.ts`.
 - The component implementation must live in a dedicated component file, not in `index.ts` or `index.tsx`.
 - Use dedicated suffixed files for other React content, such as `.hook.ts`, `.context.tsx`, or `.provider.tsx`.
 - Keep `index.ts` as the public import boundary unless the repository already requires `index.tsx`.
 - Both `index.ts` and `index.tsx` must be thin public export boundaries without JSX, state, effects, handlers, rendering, hook/context/provider logic, or non-trivial component helpers.
+- Re-export each React artifact from its owning file: components from their `.component.tsx` file, hooks from their `.hook.ts` file, providers from their `.provider.tsx` file, and contexts from their `.context.tsx` file.
+- A component directory's entry file exports only externally consumed components, hooks, providers, contracts, constants, and other public symbols.
+
+A component module, with only the files it needs:
+
+```txt
+some-component/
+  index.ts
+  some-component.component.tsx
+  types.ts
+  constants.ts
+  utilities.ts
+  validations.ts
+  some-component.component.test-unit.tsx
+  some-component.css
+```
+
+Its entry file:
+
+```ts
+// types
+export type { IOtpDialogProps } from './types.js';
+
+// components
+export { OtpDialog } from './otp-dialog.component.js';
+
+// hooks
+export { useOtpDialog } from './otp-dialog.hook.js';
+```
 
 ## React performance and render optimization
 

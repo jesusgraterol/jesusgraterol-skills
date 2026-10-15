@@ -218,7 +218,15 @@ Do not dynamically construct classes Tailwind cannot statically detect; prefer e
 
 Use the established composition helper, e.g. `cn`, `clsx`, `cva`, or `tailwind-merge`. Resolve possible conflicts with the established merge utility, not accidental class order.
 
-Keep classes readable and intentional, grouping by purpose manually but using the configured official Tailwind Prettier plugin for final ordering.
+Use canonical class names from the installed Tailwind CSS version and configuration.
+
+Keep classes readable and intentional, grouping by purpose manually but leaving final ordering to the configured official Tailwind Prettier plugin:
+
+- Let the plugin sort classes and remove duplicate Tailwind classes and extra whitespace (0.6+), and don't reorder classes in ways that fight it.
+- On Tailwind CSS v4, the sort matches the project's theme and utilities only when the plugin's `tailwindStylesheet` option points at the CSS entry file (0.6.9+).
+- Class strings inside helpers such as `clsx` or `cva` are sorted only when the plugin's `tailwindFunctions` option lists those helpers.
+- The plugin must load last in Prettier's `plugins` list.
+- Don't add or configure the plugin for a targeted change unless the task includes formatting-tooling setup.
 
 Do not use `@apply` for ordinary components; allow it only for an established clear design-system pattern or meaningful deduplication that preserves visible structure.
 
