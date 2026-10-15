@@ -73,7 +73,7 @@ Both commands name the skills, so other skills in the project are left alone.
 | `jg-redis`    | Redis keys, caching, locks, rate limits, streams, or pub/sub.                    | Redis 8, node-redis 5          |
 | `jg-scripts`  | Developer scripts, CLIs, build tooling, or filesystem code.                      | Node.js 24                     |
 
-Each implicit skill states the versions it was written for. Items that need a newer version are marked with it, and apply only when that version or a later one is installed.
+Each implicit skill states the versions it was written for. Items that need a newer version are marked with it, and apply only when that version or a later one is installed. When an installed version is newer than the one a skill was written for, the agent follows that version's official guidance for the skill's version-specific items, reports any that look outdated, and offers to open an issue here.
 
 ## A typical run
 
