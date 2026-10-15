@@ -28,7 +28,7 @@
 | `jg-debug`          | `Bug`                | Finds and fixes a bug.                                                                 |
 | `jg-pause`          | `CirclePause`        | Stops at a safe point.                                                                 |
 | `jg-command`        | `Terminal`           | Shell commands.                                                                        |
-| `jg-review`         | `FileDiff`           | Reviews a change.                                                                      |
+| `jg-review`         | `SearchCheck`        | Inspects a change and gives a verdict.                                                 |
 | `jg-push`           | `Upload`             | Publishes commits, and differs from its `GitCommitHorizontal` badge.                   |
 | `jg-feedback`       | `Scale`              | Weighs feedback.                                                                       |
 | `jg-session`        | `MessagesSquare`     | Reads past sessions.                                                                   |

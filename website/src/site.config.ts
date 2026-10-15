@@ -213,7 +213,7 @@ export const SKILL_CATALOG = {
           'Reviews everything the current branch would merge into main and answers Ready to merge into main, Not ready, or Review incomplete.',
       },
     ],
-    icon: 'file-diff',
+    icon: 'search-check',
     kind: 'explicit',
     order: 9,
     searchDescription:
