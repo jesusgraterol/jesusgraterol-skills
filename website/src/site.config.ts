@@ -453,7 +453,7 @@ export const SKILL_CATALOG = {
       'An implicit agent skill for Claude Code and Codex that applies Zod 4 schema, strictness, and error standards whenever a task validates data.',
     searchTitle: 'jg-zod: Zod 4 validation standards for coding agents',
     stage: 'implicit',
-    summary: 'Strictness, metadata, errors, and Zod 4 APIs for validating boundary data.',
+    summary: 'Strictness, metadata, error handling, formats, and composition for Zod 4 schemas.',
     whenToUse:
       'It loads on its own when a task validates data with Zod schemas. Call it by name to load it before such a task.',
   },

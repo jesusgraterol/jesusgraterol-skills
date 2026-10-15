@@ -2,12 +2,45 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+  assertBareSkillReferences,
   assertCatalogCoverage,
   assertInvocationSettings,
+  assertNoSectionLinks,
   assertSearchMetadata,
+  assertSharedSections,
   assertSkillName,
+  assertVersionLine,
   buildSourceUrl,
+  extractSection,
 } from './utilities.ts';
+
+// a shared explicit section, followed by the workflow each skill writes for itself
+const buildExplicitBody = (invocation: string, workflow: string): string =>
+  `## Invocation\n\n${invocation}\n\n## Workflow\n\n${workflow}\n`;
+
+// a shared implicit section with its two changeable lines, followed by one topic section
+const buildImplicitBody = ({
+  area = "This skill's area is React components.",
+  sharedBullet = '- It never authorizes actions.',
+  versionBullet = '- Check the installed versions first. This skill was written for React 19.2.',
+}: {
+  area?: string;
+  sharedBullet?: string;
+  versionBullet?: string;
+} = {}): string =>
+  [
+    '## Application',
+    '',
+    `The agent loads this skill on its own when a task touches its area. ${area}`,
+    '',
+    sharedBullet,
+    versionBullet,
+    '',
+    '## Topic',
+    '',
+    '- A rule only this skill has.',
+    '',
+  ].join('\n');
 
 describe('assertSkillName', () => {
   test('accepts a frontmatter name equal to its directory', () => {
@@ -142,6 +175,183 @@ describe('buildSourceUrl', () => {
   test('points at the skill instructions on the main branch', () => {
     expect(buildSourceUrl('jg-push')).toBe(
       'https://github.com/jesusgraterol/jg-skills/blob/main/skills/jg-push/SKILL.md',
+    );
+  });
+});
+
+describe('extractSection', () => {
+  test('returns the lines up to the next level-two heading', () => {
+    expect(extractSection(buildExplicitBody('Shared rules.', 'Steps.'), 'Invocation')).toBe(
+      '\nShared rules.',
+    );
+  });
+
+  test('returns the rest of the body for the last section', () => {
+    expect(extractSection(buildExplicitBody('Shared rules.', 'Steps.'), 'Workflow')).toBe(
+      '\nSteps.',
+    );
+  });
+
+  test('reads CRLF line endings from a Windows checkout', () => {
+    expect(
+      extractSection(
+        buildExplicitBody('Shared rules.', 'Steps.').replaceAll('\n', '\r\n'),
+        'Invocation',
+      ),
+    ).toBe('\nShared rules.');
+  });
+
+  test('returns undefined for a missing section', () => {
+    expect(extractSection('## Workflow\n\nSteps.', 'Invocation')).toBeUndefined();
+  });
+});
+
+describe('assertSharedSections', () => {
+  test('accepts explicit skills whose workflows differ but whose Invocation sections match', () => {
+    expect(() =>
+      assertSharedSections([
+        { body: buildExplicitBody('Shared rules.', 'Plan.'), kind: 'explicit', name: 'jg-plan' },
+        { body: buildExplicitBody('Shared rules.', 'Push.'), kind: 'explicit', name: 'jg-push' },
+      ]),
+    ).not.toThrow();
+  });
+
+  test('accepts implicit skills that change only their area sentence and version bullet', () => {
+    expect(() =>
+      assertSharedSections([
+        { body: buildImplicitBody(), kind: 'implicit', name: 'jg-react' },
+        {
+          body: buildImplicitBody({
+            area: "This skill's area is bash scripts.",
+            versionBullet:
+              "- Check the target's versions first. This skill was written for Bash 5.3 and POSIX sh.",
+          }),
+          kind: 'implicit',
+          name: 'jg-bash',
+        },
+      ]),
+    ).not.toThrow();
+  });
+
+  test.each([
+    [
+      'an explicit Invocation section that differs',
+      [
+        { body: buildExplicitBody('Shared rules.', 'Plan.'), kind: 'explicit', name: 'jg-plan' },
+        { body: buildExplicitBody('Shared rules.', 'Debug.'), kind: 'explicit', name: 'jg-debug' },
+        { body: buildExplicitBody('Changed rules.', 'Push.'), kind: 'explicit', name: 'jg-push' },
+      ],
+      'jg-push',
+    ],
+    [
+      'an implicit section that changes a shared bullet',
+      [
+        { body: buildImplicitBody(), kind: 'implicit', name: 'jg-react' },
+        { body: buildImplicitBody(), kind: 'implicit', name: 'jg-redis' },
+        {
+          body: buildImplicitBody({ sharedBullet: '- It authorizes actions.' }),
+          kind: 'implicit',
+          name: 'jg-zod',
+        },
+      ],
+      'jg-zod',
+    ],
+    [
+      'an implicit section that changes its fixed first sentence',
+      [
+        { body: buildImplicitBody(), kind: 'implicit', name: 'jg-react' },
+        { body: buildImplicitBody(), kind: 'implicit', name: 'jg-redis' },
+        {
+          body: buildImplicitBody().replace('The agent loads', 'An agent loads'),
+          kind: 'implicit',
+          name: 'jg-zod',
+        },
+      ],
+      'jg-zod',
+    ],
+    [
+      'a skill without its shared section',
+      [
+        { body: buildExplicitBody('Shared rules.', 'Plan.'), kind: 'explicit', name: 'jg-plan' },
+        { body: '## Workflow\n\nPush.\n', kind: 'explicit', name: 'jg-push' },
+      ],
+      'jg-push',
+    ],
+  ] as const)('assertSharedSections(%s) -> throws', (_caseName, skills, differing) => {
+    expect(() => assertSharedSections(skills)).toThrow(
+      `Skill shared section differs from the other skills of its kind: ${differing}`,
+    );
+  });
+});
+
+describe('assertVersionLine', () => {
+  test('accepts an implicit skill with a version bullet', () => {
+    expect(() =>
+      assertVersionLine({ body: buildImplicitBody(), kind: 'implicit', name: 'jg-react' }),
+    ).not.toThrow();
+  });
+
+  test('skips explicit skills, which have no version line', () => {
+    expect(() =>
+      assertVersionLine({
+        body: buildExplicitBody('Rules.', 'Steps.'),
+        kind: 'explicit',
+        name: 'jg-plan',
+      }),
+    ).not.toThrow();
+  });
+
+  test.each([
+    [
+      'a version bullet without the marker',
+      buildImplicitBody({ versionBullet: '- Check the installed versions first.' }),
+    ],
+    ['no Application section', '## Topic\n\n- This skill was written for React 19.2.\n'],
+  ])('assertVersionLine(%s) -> throws', (_caseName, body) => {
+    expect(() => assertVersionLine({ body, kind: 'implicit', name: 'jg-react' })).toThrow(
+      'Implicit skill has no version line: jg-react',
+    );
+  });
+});
+
+describe('assertNoSectionLinks', () => {
+  test('accepts links to other pages and plain text', () => {
+    expect(() =>
+      assertNoSectionLinks({
+        body: 'See [the docs](https://react.dev/reference) and the Decision precedence rules.',
+        name: 'jg-react',
+      }),
+    ).not.toThrow();
+  });
+
+  test('rejects a link to a heading anchor', () => {
+    expect(() =>
+      assertNoSectionLinks({
+        body: 'Follow [Decision precedence](#decision-precedence).',
+        name: 'jg-react',
+      }),
+    ).toThrow('Skill links to a section of another document: jg-react (](#decision-precedence))');
+  });
+});
+
+describe('assertBareSkillReferences', () => {
+  test.each([
+    ['a bare name', 'Run jg-plan first.'],
+    ['a bare name in code', 'Invoke `jg-execute auto`.'],
+    ['a path to a skill folder', 'Read `skills/jg-review/SKILL.md` from the neighboring folder.'],
+    ['a dot-folder path', 'Copy it into `.agents/skills/jg-command`.'],
+  ])('accepts %s', (_caseName, body) => {
+    expect(() => assertBareSkillReferences({ body, name: 'jg-execute' })).not.toThrow();
+  });
+
+  test.each([
+    ['a slash command in code', 'Then run `/jg-plan`.', '/jg-plan'],
+    ['a slash command in prose', 'Then run /jg-plan.', '/jg-plan'],
+    ['a Codex mention', 'Then run $jg-plan.', '$jg-plan'],
+    ['a prefix at the start of a line', '/jg-review checks it.', '/jg-review'],
+  ])('assertBareSkillReferences(%s) -> throws', (_caseName, body, reference) => {
+    expect(() => assertBareSkillReferences({ body, name: 'jg-execute' })).toThrow(
+      `Skill refers to another skill with a / or $ prefix: jg-execute (${reference})`,
     );
   });
 });

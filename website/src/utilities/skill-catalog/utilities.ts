@@ -2,11 +2,20 @@ import { SITE_CONFIG } from '../../site.config.ts';
 import { SEARCH_TEXT_LIMITS } from '../seo/index.ts';
 
 import {
+  APPLICATION_AREA_PREFIX,
+  APPLICATION_VERSION_MARKER,
   EXPLICIT_ONLY_OPENAI_POLICY,
   IMPLICIT_OPENAI_POLICY,
+  SHARED_SECTION_HEADINGS,
   SKILL_CATALOG_ERROR_MESSAGES,
 } from './constants.ts';
-import type { ISkillKind } from './types.ts';
+import type { ISkillDocument, ISkillKind } from './types.ts';
+
+// a link to a heading anchor, which a self-contained skill never needs
+const SECTION_LINK_PATTERN = /\]\(#[^)]*\)/u;
+
+// a skill name written with a slash-command or mention prefix, but not a path such as skills/jg-x
+const PREFIXED_SKILL_REFERENCE_PATTERN = /(?:^|[\s`('"])([/$]jg-[a-z0-9-]+)/mu;
 
 // the frontmatter flag and Codex policy each kind of skill must ship
 const INVOCATION_SETTINGS = {
@@ -98,6 +107,156 @@ export const assertCatalogCoverage = (
   if (missing.length > 0 || extra.length > 0) {
     throw new Error(
       `${SKILL_CATALOG_ERROR_MESSAGES.CatalogMismatch}: missing from catalog [${missing.join(', ')}], missing from skills [${extra.join(', ')}]`,
+    );
+  }
+};
+
+/**
+ * Extracts the text of one level-two section from a skill body.
+ * @param body The SKILL.md body without its frontmatter.
+ * @param heading The section heading, without the leading `## `.
+ * @returns The lines between the heading and the next level-two heading, trimmed at the end, or
+ * undefined when the section is missing.
+ */
+export const extractSection = (body: string, heading: string): string | undefined => {
+  const lines = body.replaceAll('\r\n', '\n').split('\n');
+  const start = lines.indexOf(`## ${heading}`);
+
+  if (start === -1) {
+    return undefined;
+  }
+
+  const end = lines.findIndex((line, index) => index > start && line.startsWith('## '));
+
+  return lines
+    .slice(start + 1, end === -1 ? undefined : end)
+    .join('\n')
+    .trimEnd();
+};
+
+/**
+ * Sets aside the lines a skill may change in its shared section: an implicit skill's area sentence
+ * and version bullet. An explicit skill's section is compared exactly.
+ * @param kind The skill's kind.
+ * @param section The text of the skill's shared section.
+ * @returns The section with its changeable lines replaced by fixed placeholders.
+ */
+const normalizeSharedSection = (kind: ISkillKind, section: string): string =>
+  kind === 'explicit'
+    ? section
+    : section
+        .split('\n')
+        .map((line) => {
+          if (line.startsWith(APPLICATION_AREA_PREFIX)) {
+            return '<area>';
+          }
+
+          return line.startsWith('- ') && line.includes(APPLICATION_VERSION_MARKER)
+            ? '- <version>'
+            : line;
+        })
+        .join('\n');
+
+/**
+ * Asserts that every skill of a kind carries the same shared section: `## Invocation` for explicit
+ * skills and `## Application` for implicit ones, apart from the two lines an implicit skill may
+ * change. The skills that differ from the most common version, or lack the section, are named.
+ * @param skills The name, kind, and SKILL.md body of every skill.
+ * @throws
+ * - Skill shared section differs from the other skills of its kind
+ */
+export const assertSharedSections = (skills: readonly ISkillDocument[]): void => {
+  const differing = (['explicit', 'implicit'] as const).flatMap((kind) => {
+    const sections = skills
+      .filter((skill) => skill.kind === kind)
+      .map(({ body, name }) => {
+        const section = extractSection(body, SHARED_SECTION_HEADINGS[kind]);
+
+        return {
+          name,
+          normalized: section === undefined ? undefined : normalizeSharedSection(kind, section),
+        };
+      });
+    const counts = new Map<string, number>();
+
+    sections.forEach(({ normalized }) => {
+      if (normalized !== undefined) {
+        counts.set(normalized, (counts.get(normalized) ?? 0) + 1);
+      }
+    });
+
+    const reference = [...counts.entries()].toSorted(
+      (first, second) => second[1] - first[1],
+    )[0]?.[0];
+
+    return sections
+      .filter(({ normalized }) => normalized === undefined || normalized !== reference)
+      .map(({ name }) => name);
+  });
+
+  if (differing.length > 0) {
+    throw new Error(
+      `${SKILL_CATALOG_ERROR_MESSAGES.SharedSectionMismatch}: ${differing.toSorted().join(', ')}`,
+    );
+  }
+};
+
+/**
+ * Asserts that an implicit skill states the versions it was written for in its Application
+ * section.
+ * @param skill The skill's name, kind, and SKILL.md body.
+ * @throws
+ * - Implicit skill has no version line
+ */
+export const assertVersionLine = ({ body, kind, name }: ISkillDocument): void => {
+  if (kind === 'explicit') {
+    return;
+  }
+
+  const section = extractSection(body, SHARED_SECTION_HEADINGS.implicit) ?? '';
+  const hasVersionLine = section
+    .split('\n')
+    .some((line) => line.startsWith('- ') && line.includes(APPLICATION_VERSION_MARKER));
+
+  if (!hasVersionLine) {
+    throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.MissingVersionLine}: ${name}`);
+  }
+};
+
+/**
+ * Asserts that a skill never links to a heading anchor, because skills are self-contained and must
+ * not depend on the sections of a particular instructions file.
+ * @param skill The skill's name and SKILL.md body.
+ * @throws
+ * - Skill links to a section of another document
+ */
+export const assertNoSectionLinks = ({
+  body,
+  name,
+}: Pick<ISkillDocument, 'body' | 'name'>): void => {
+  const match = SECTION_LINK_PATTERN.exec(body);
+
+  if (match) {
+    throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.SectionLink}: ${name} (${match[0]})`);
+  }
+};
+
+/**
+ * Asserts that a skill names other skills bare, such as jg-plan, never as a host command like
+ * /jg-plan or $jg-plan, so the same text works in every agent.
+ * @param skill The skill's name and SKILL.md body.
+ * @throws
+ * - Skill refers to another skill with a / or $ prefix
+ */
+export const assertBareSkillReferences = ({
+  body,
+  name,
+}: Pick<ISkillDocument, 'body' | 'name'>): void => {
+  const match = PREFIXED_SKILL_REFERENCE_PATTERN.exec(body);
+
+  if (match) {
+    throw new Error(
+      `${SKILL_CATALOG_ERROR_MESSAGES.PrefixedSkillReference}: ${name} (${match[1]})`,
     );
   }
 };

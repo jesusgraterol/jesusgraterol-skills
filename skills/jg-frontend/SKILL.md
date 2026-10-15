@@ -188,7 +188,7 @@ With Tailwind and installed/configured `tw-animate-css`, prefer its utilities ov
 
 Do not add `tw-animate-css`, replace animation systems, or migrate existing animations solely for a targeted change unless explicitly requested or the current approach creates a high-impact issue.
 
-Always respect reduced motion. Every new/modified animation must have an equivalent reduced-motion path through Tailwind `motion-reduce:`, existing utilities, or CSS `@media (prefers-reduced-motion: reduce)`. It should remove/substantially reduce motion while preserving information, layout, timing assumptions, focus management, and interaction state.
+Always respect reduced motion. Every new/modified animation must have an equivalent reduced-motion path through Tailwind `motion-reduce:`, existing utilities, or CSS `@media (prefers-reduced-motion: reduce)`. That path removes or substantially reduces the motion while preserving information, layout, timing assumptions, focus management, and interaction state.
 
 ## Tailwind CSS guidance
 

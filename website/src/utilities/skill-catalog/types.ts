@@ -114,3 +114,10 @@ interface ISkillSource {
 
 // one skill merged from its SKILL.md entry and its catalog entry
 export type ISkill = ISkillCatalogEntry & ISkillSource;
+
+// the parts of a skill its content checks read: its name, its kind, and its SKILL.md body
+export interface ISkillDocument {
+  body: string;
+  kind: ISkillKind;
+  name: string;
+}

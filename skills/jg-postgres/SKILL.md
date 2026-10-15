@@ -141,7 +141,7 @@ Raw SQL results and supporting TypeScript types may retain matching `snake_case`
 
 Allow SQL aliases only when syntax requires them or ambiguous, duplicate, or unusable output cannot be fixed by selecting fewer columns or restructuring. Keep unavoidable aliases descriptive, explicit, and narrowly scoped; never use `au`, `pm`, `a1`, `x`, or `tmp`-style abbreviations.
 
-Name CTEs after their result, e.g. `active_partners` or `monthly_revenue`. Names should describe the resulting relation, not abbreviate it.
+Name CTEs after their result, e.g. `active_partners` or `monthly_revenue`. Each name describes the resulting relation instead of abbreviating it.
 
 Preserve the repository's SQL filename convention:
 
