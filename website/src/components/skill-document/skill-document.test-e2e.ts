@@ -8,8 +8,8 @@ const ORDERED_NAMES = Object.entries(SKILL_CATALOG)
   .map(([name]) => name);
 
 test.describe('skill pages', () => {
-  for (const [name, { example, whenToUse }] of Object.entries(SKILL_CATALOG)) {
-    test(`/skills/${name}/ renders its instructions, its example, and its source`, async ({
+  for (const [name, { examples, whenToUse }] of Object.entries(SKILL_CATALOG)) {
+    test(`/skills/${name}/ renders its instructions, its examples, and its source`, async ({
       page,
     }) => {
       await page.goto(`/skills/${name}/`);
@@ -29,8 +29,15 @@ test.describe('skill pages', () => {
       await expect(page.locator('[data-skill-usage]')).toHaveText(
         new RegExp(`^/${name}( (\\[|<).+)?$`, 'u'),
       );
-      await expect(page.locator(`#${name}-invocation`)).toHaveText(`/${example.invocation}`);
-      await expect(page.locator('[data-skill-outcome]')).toHaveText(example.outcome);
+      // exact text, because the copy buttons copy it verbatim
+      expect(
+        await page
+          .locator('[data-skill-invocation]')
+          .evaluateAll((elements) => elements.map((element) => element.textContent)),
+      ).toEqual(examples.map(({ invocation }) => `/${invocation}`));
+      await expect(page.locator('[data-skill-outcome]')).toHaveText(
+        examples.map(({ outcome }) => outcome),
+      );
       await expect(page.getByRole('heading', { level: 2, name: 'When to use it' })).toBeVisible();
       await expect(page.locator('[data-skill-when-to-use]')).toHaveText(whenToUse);
 
@@ -61,6 +68,33 @@ test.describe('skill pages', () => {
       );
     });
   }
+
+  test('labels one example per supported case, each with its own copy button', async ({ page }) => {
+    await page.goto('/skills/jg-execute/');
+    await expect(page.getByRole('heading', { level: 2, name: 'Examples' })).toBeVisible();
+    await expect(
+      page.getByText('it should consider. Each example shows one supported case.'),
+    ).toBeVisible();
+
+    for (const [index, { label }] of SKILL_CATALOG['jg-execute'].examples.entries()) {
+      const sourceId = `jg-execute-invocation-${index + 1}`;
+      const terminal = page
+        .locator('[data-terminal]')
+        .filter({ has: page.locator(`#${sourceId}`) });
+
+      await expect(terminal.locator('figcaption')).toContainText(label);
+      await expect(page.locator(`button[data-copy-source="${sourceId}"]`)).toHaveAccessibleName(
+        `Copy ${label.toLowerCase()} invocation`,
+      );
+    }
+
+    await page.goto('/skills/jg-pause/');
+    await expect(
+      page.getByRole('heading', { exact: true, level: 2, name: 'Example' }),
+    ).toBeVisible();
+    await expect(page.locator('[data-terminal] figcaption')).toContainText('Example');
+    await expect(page.getByText('Each example shows one supported case.')).toHaveCount(0);
+  });
 
   test('shows the usage line with and without an argument hint', async ({ page }) => {
     await page.goto('/skills/jg-pause/');

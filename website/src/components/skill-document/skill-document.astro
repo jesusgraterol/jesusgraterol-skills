@@ -19,10 +19,21 @@ interface Props {
 
 const { next, previous, skill } = Astro.props;
 const { Content } = await render(skill.entry);
-// the skill name, highlighted, and any text supplied with it
-const [invocationName = skill.name, ...invocationWords] = skill.example.invocation.split(' ');
-const invocationText = invocationWords.length > 0 ? ` ${invocationWords.join(' ')}` : '';
-const invocationId = `${skill.name}-invocation`;
+const hasCases = skill.examples.length > 1;
+const examples = skill.examples.map((example, index) => {
+  // the skill name, highlighted, and any text supplied with it
+  const [name = skill.name, ...words] = example.invocation.split(' ');
+  const label = 'label' in example ? example.label : undefined;
+
+  return {
+    copyContext: label ? `${label.toLowerCase()} invocation` : 'invocation',
+    id: `${skill.name}-invocation-${index + 1}`,
+    name,
+    outcome: example.outcome,
+    text: words.length > 0 ? ` ${words.join(' ')}` : '',
+    title: label ?? 'Example',
+  };
+});
 ---
 
 <article class="prose-shell py-12 sm:py-16">
@@ -99,40 +110,47 @@ const invocationId = `${skill.name}-invocation`;
       id="example-heading"
       class="text-2xl font-semibold tracking-tight"
     >
-      Example
+      {hasCases ? 'Examples' : 'Example'}
     </h2>
     <p class="mt-2 text-sm leading-6 text-muted">
       Invoke the skill by name in your coding agent, followed by any text it should consider.
+      {hasCases && ' Each example shows one supported case.'}
     </p>
-    <div class="mt-5">
-      <TerminalWindow
-        copy={{ context: 'invocation', sourceId: invocationId }}
-        title="Example"
-      >
-        <p class="flex gap-3">
-          <span
-            class="flex h-6 w-3 shrink-0 justify-center text-primary-foreground/50 select-none"
-            aria-hidden="true"
-            >{'>'}</span
+    <div class="mt-5 grid gap-4">
+      {
+        examples.map((example) => (
+          <TerminalWindow
+            copy={{ context: example.copyContext, sourceId: example.id }}
+            title={example.title}
           >
-          <code
-            class="min-w-0 wrap-anywhere"
-            id={invocationId}
-            ><span class="font-bold text-accent-on-primary">{`/${invocationName}`}</span>{
-              invocationText
-            }</code
-          >
-        </p>
-        <p class="mt-3 flex gap-3 text-primary-foreground/70">
-          <span
-            class="flex h-6 w-3 shrink-0 items-center justify-center"
-            aria-hidden="true"
-          >
-            <span class="size-1.5 rounded-full bg-accent-on-primary"></span>
-          </span>
-          <span data-skill-outcome>{skill.example.outcome}</span>
-        </p>
-      </TerminalWindow>
+            <p class="flex gap-3">
+              <span
+                class="flex h-6 w-3 shrink-0 justify-center text-primary-foreground/50 select-none"
+                aria-hidden="true"
+              >
+                {'>'}
+              </span>
+              <code
+                class="min-w-0 wrap-anywhere"
+                id={example.id}
+                data-skill-invocation
+              >
+                <span class="font-bold text-accent-on-primary">{`/${example.name}`}</span>
+                {example.text}
+              </code>
+            </p>
+            <p class="mt-3 flex gap-3 text-primary-foreground/70">
+              <span
+                class="flex h-6 w-3 shrink-0 items-center justify-center"
+                aria-hidden="true"
+              >
+                <span class="size-1.5 rounded-full bg-accent-on-primary" />
+              </span>
+              <span data-skill-outcome>{example.outcome}</span>
+            </p>
+          </TerminalWindow>
+        ))
+      }
     </div>
   </section>
 

@@ -17,10 +17,20 @@ export interface ISkillExample {
   outcome: string;
 }
 
+// one of several supported invocation cases, labeled by what sets it apart, e.g. "Autonomous"
+export interface ISkillCaseExample extends ISkillExample {
+  label: string;
+}
+
+// a single example, or one labeled example per supported case when a skill takes flags or named arguments
+export type ISkillExamples =
+  | readonly [ISkillExample]
+  | readonly [ISkillCaseExample, ISkillCaseExample, ...ISkillCaseExample[]];
+
 // site-owned presentation data for one skill; the skill folder owns everything else
 export interface ISkillCatalogEntry {
   access: ISkillAccess;
-  example: ISkillExample;
+  examples: ISkillExamples;
   order: number;
   // search result description, 70 to 160 characters
   searchDescription: string;

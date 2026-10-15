@@ -1,5 +1,8 @@
 import type { ISkillCatalogEntry } from './utilities/skill-catalog/index.ts';
 
+// a plan path in the layout jg-plan writes, shared by the examples that name a plan
+const EXAMPLE_PLAN_PATH = 'coding-agent-planning/1787592334_sign-in-flow/plan.md';
+
 /*
  * Site-owned presentation data for every skill under ../skills. Names, descriptions,
  * argument hints, and instructions come from each SKILL.md; the build fails when this
@@ -8,11 +11,13 @@ import type { ISkillCatalogEntry } from './utilities/skill-catalog/index.ts';
 export const SKILL_CATALOG = {
   'jg-brainstorm': {
     access: 'read-only',
-    example: {
-      invocation: 'jg-brainstorm Should we rate-limit the public API per account?',
-      outcome:
-        'Weighs the options against your codebase, recommends a direction, and lists what is still open.',
-    },
+    examples: [
+      {
+        invocation: 'jg-brainstorm Should we rate-limit the public API per account?',
+        outcome:
+          'Weighs the options against your codebase, recommends a direction, and lists what is still open.',
+      },
+    ],
     order: 1,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that weighs options against your codebase and recommends a direction before you plan.',
@@ -23,11 +28,13 @@ export const SKILL_CATALOG = {
   },
   'jg-plan': {
     access: 'planning-files',
-    example: {
-      invocation: 'jg-plan',
-      outcome:
-        'Turns the change you just discussed into an implementation-ready plan, saves it under coding-agent-planning/, and stops for your approval.',
-    },
+    examples: [
+      {
+        invocation: 'jg-plan',
+        outcome:
+          'Turns the change you just discussed into an implementation-ready plan, saves it under coding-agent-planning/, and stops for your approval.',
+      },
+    ],
     order: 2,
     searchDescription:
       'An explicit-only agent skill that turns the change you discussed with Claude Code or Codex into an implementation-ready plan you approve.',
@@ -38,11 +45,20 @@ export const SKILL_CATALOG = {
   },
   'jg-challenge-plan': {
     access: 'read-only',
-    example: {
-      invocation: 'jg-challenge-plan',
-      outcome:
-        'Returns a verdict, the corrections the plan needs, and numbered decisions in under 1,000 words.',
-    },
+    examples: [
+      {
+        invocation: 'jg-challenge-plan',
+        label: 'Current plan',
+        outcome:
+          'Returns a verdict, the corrections the plan needs, and numbered decisions in under 1,000 words.',
+      },
+      {
+        invocation: `jg-challenge-plan ${EXAMPLE_PLAN_PATH}`,
+        label: 'Named plan',
+        outcome:
+          'Challenges the plan at that path instead of the one in this conversation, with the same verdict, corrections, and decisions.',
+      },
+    ],
     order: 3,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that challenges a plan before approval and surfaces material risks, gaps, and decisions.',
@@ -53,11 +69,20 @@ export const SKILL_CATALOG = {
   },
   'jg-breakdown': {
     access: 'planning-files',
-    example: {
-      invocation: 'jg-breakdown',
-      outcome:
-        'Writes milestones.md when the plan has real boundaries, or tells you to build it as one scope.',
-    },
+    examples: [
+      {
+        invocation: 'jg-breakdown',
+        label: 'Current plan',
+        outcome:
+          'Writes milestones.md when the plan has real boundaries, or tells you to build it as one scope.',
+      },
+      {
+        invocation: `jg-breakdown ${EXAMPLE_PLAN_PATH}`,
+        label: 'Named plan',
+        outcome:
+          'Splits the plan at that path instead of the one in this conversation, writing milestones.md beside it.',
+      },
+    ],
     order: 4,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that splits a plan into ordered milestones you can build and review one at a time.',
@@ -67,11 +92,38 @@ export const SKILL_CATALOG = {
   },
   'jg-execute': {
     access: 'changes-code-and-pushes',
-    example: {
-      invocation: 'jg-execute autonomous',
-      outcome:
-        'Builds each remaining milestone, reviews it until clean, and pushes it before starting the next.',
-    },
+    examples: [
+      {
+        invocation: 'jg-execute',
+        label: 'Supervised',
+        outcome:
+          'Builds the next unfinished milestone of the current plan, runs its checks, and stops so you can review and push it.',
+      },
+      {
+        invocation: 'jg-execute autonomous',
+        label: 'Autonomous',
+        outcome:
+          'Builds each remaining milestone, reviews it until clean, and pushes it before starting the next.',
+      },
+      {
+        invocation: `jg-execute ${EXAMPLE_PLAN_PATH}`,
+        label: 'Named plan',
+        outcome:
+          'Builds the next unfinished milestone of the plan at that path instead of the one in this conversation.',
+      },
+      {
+        invocation: 'jg-execute milestone 2',
+        label: 'One milestone',
+        outcome:
+          'Builds only milestone 2, runs its checks, and stops so you can review and push it.',
+      },
+      {
+        invocation: `jg-execute autonomous ${EXAMPLE_PLAN_PATH} milestone 3`,
+        label: 'All options',
+        outcome:
+          'Builds milestone 3 of the plan at that path, reviews it until clean, pushes it, and stops.',
+      },
+    ],
     order: 5,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that builds a plan's milestones, supervised by default or autonomously with review and push.",
@@ -82,11 +134,13 @@ export const SKILL_CATALOG = {
   },
   'jg-debug': {
     access: 'changes-code',
-    example: {
-      invocation: 'jg-debug Checkout totals are off by one cent for some carts.',
-      outcome:
-        'Reproduces the bug, narrows it to one cause, and fixes it with a regression test that failed first.',
-    },
+    examples: [
+      {
+        invocation: 'jg-debug Checkout totals are off by one cent for some carts.',
+        outcome:
+          'Reproduces the bug, narrows it to one cause, and fixes it with a regression test that failed first.',
+      },
+    ],
     order: 6,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that reproduces a bug, finds its cause, and fixes it with a test that fails first.',
@@ -96,11 +150,13 @@ export const SKILL_CATALOG = {
   },
   'jg-pause': {
     access: 'read-only',
-    example: {
-      invocation: 'jg-pause',
-      outcome:
-        'Stops at the next safe point, lists what is done and what is half-finished, and waits until you say continue.',
-    },
+    examples: [
+      {
+        invocation: 'jg-pause',
+        outcome:
+          'Stops at the next safe point, lists what is done and what is half-finished, and waits until you say continue.',
+      },
+    ],
     order: 7,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that stops the agent at the nearest safe point, reports where things stand, and waits.',
@@ -111,11 +167,20 @@ export const SKILL_CATALOG = {
   },
   'jg-review': {
     access: 'read-only',
-    example: {
-      invocation: 'jg-review',
-      outcome:
-        'Reports findings first, then the checks it ran, and answers Ready to commit, Not ready, or Review incomplete.',
-    },
+    examples: [
+      {
+        invocation: 'jg-review',
+        label: 'Task changes',
+        outcome:
+          'Reports findings first, then the checks it ran, and answers Ready to commit, Not ready, or Review incomplete.',
+      },
+      {
+        invocation: 'jg-review main',
+        label: 'Branch',
+        outcome:
+          'Reviews everything the current branch would merge into main and answers Ready to merge into main, Not ready, or Review incomplete.',
+      },
+    ],
     order: 8,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that reviews the current task's changes or a branch and issues a readiness verdict.",
@@ -126,11 +191,13 @@ export const SKILL_CATALOG = {
   },
   'jg-push': {
     access: 'commits-and-pushes',
-    example: {
-      invocation: 'jg-push',
-      outcome:
-        "Commits only this task's files with a signed-off, signed commit and pushes the current branch.",
-    },
+    examples: [
+      {
+        invocation: 'jg-push',
+        outcome:
+          "Commits only this task's files with a signed-off, signed commit and pushes the current branch.",
+      },
+    ],
     order: 9,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that commits only the current task's files with a signed-off, signed commit and pushes.",
@@ -141,11 +208,13 @@ export const SKILL_CATALOG = {
   },
   'jg-feedback': {
     access: 'read-only',
-    example: {
-      invocation: 'jg-feedback A reviewer says the retry loop can charge a customer twice.',
-      outcome:
-        'Checks each claim against the code and recommends what to adopt, reject, or adjust.',
-    },
+    examples: [
+      {
+        invocation: 'jg-feedback A reviewer says the retry loop can charge a customer twice.',
+        outcome:
+          'Checks each claim against the code and recommends what to adopt, reject, or adjust.',
+      },
+    ],
     order: 10,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that checks feedback against the evidence and recommends what to adopt, reject, or adjust.',
@@ -156,11 +225,13 @@ export const SKILL_CATALOG = {
   },
   'jg-session': {
     access: 'read-only',
-    example: {
-      invocation: 'jg-session rate-limiting What did that session decide about the limit store?',
-      outcome:
-        'Finds the named Codex or Claude Code session and answers from its latest decisions.',
-    },
+    examples: [
+      {
+        invocation: 'jg-session rate-limiting What did that session decide about the limit store?',
+        outcome:
+          'Finds the named Codex or Claude Code session and answers from its latest decisions.',
+      },
+    ],
     order: 11,
     searchDescription:
       'An explicit-only agent skill that finds a named Claude Code or Codex session and answers questions from its latest decisions and state.',
