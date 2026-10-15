@@ -2,7 +2,7 @@
 
 [![JG Skills: battle-tested skills for coding agents](website/public/og/jg-skills.png)](https://jg-skills.jesusgraterol.dev)
 
-Solid, battle-tested Agent Skills for planning, reviewing, and shipping changes with coding agents, used by professional software developers in their daily work. Each skill defines what it may change and defers general engineering standards to the coding instructions of the repository you use it in.
+Solid, battle-tested Agent Skills for planning, reviewing, and shipping changes with coding agents, used by professional software developers in their daily work. Explicit skills define what they may change and defer general engineering standards to the coding instructions of the repository you use them in. Implicit skills carry the stack-specific standards, such as PostgreSQL or React, and load on their own when a task touches their stack.
 
 Browse the skills, their full instructions, and an example session at [jg-skills.jesusgraterol.dev](https://jg-skills.jesusgraterol.dev).
 
@@ -26,44 +26,61 @@ Discuss a change with your coding agent, then invoke a skill by name, followed b
 
 In Codex, type `$jg-plan` instead.
 
-The current collection contains explicit skills that run only when you invoke them by name. Implicit skills will be added in the future. Each current skill sets `disable-model-invocation: true` in its frontmatter and ships an `agents/openai.yaml` policy that disables implicit invocation. Explicit-only loading is verified with Claude Code and Codex.
+The collection has two kinds of skill. Explicit skills run only when you invoke them by name: each sets `disable-model-invocation: true` in its frontmatter and ships an `agents/openai.yaml` policy that disables implicit invocation. Explicit-only loading is verified with Claude Code and Codex.
+
+Implicit skills load on their own when a task touches their stack, such as a migration for `jg-postgres` or a component for `jg-react`. They omit that flag, and their `agents/openai.yaml` allows implicit invocation. You can still invoke one by name to load it before a task.
 
 ## Update and remove
 
 Run these from your repository's root:
 
 ```bash
-npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session
+npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts
 ```
 
 ```bash
-npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session
+npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts
 ```
 
 Both commands name the skills, so other skills in the project are left alone.
 
 ## Skills
 
-| Skill               | What it does                                                                                  | What it may change                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `jg-brainstorm`     | Thinks an idea through with you and recommends a direction before planning.                   | Nothing.                                                                                               |
-| `jg-plan`           | Settles your decisions with you, then creates or revises an implementation-ready plan.        | Writes `plan.md` under `coding-agent-planning/`; removes a stale `milestones.md`.                      |
-| `jg-challenge-plan` | Challenges a plan before approval and surfaces material risks, gaps, and decisions.           | Nothing.                                                                                               |
-| `jg-breakdown`      | Splits a plan into ordered, reviewable milestones when it has real implementation boundaries. | Writes or removes `milestones.md` next to the plan.                                                    |
-| `jg-execute`        | Builds an agreed task, a plan, or its milestones; supervised by default, or `autonomous`.     | Code and milestone status lines. In autonomous mode it also commits and pushes each milestone's files. |
-| `jg-debug`          | Reproduces a bug, finds its cause, and fixes it with a regression test that fails first.      | Code, a regression test, and temporary logging it removes. Never commits.                              |
-| `jg-pause`          | Stops at the nearest safe point, reports where things stand, and waits until you continue.    | Nothing.                                                                                               |
-| `jg-review`         | Reviews the task's changes and how they follow its plan, or the branch against a target.      | No files. With a target branch, it may refresh that branch's remote-tracking ref.                      |
-| `jg-push`           | Commits the current task's files with a signed-off, signed commit and pushes the branch.      | Stages and commits the task's files (or every change without a task) and pushes the current branch.    |
-| `jg-feedback`       | Assesses feedback independently and recommends what to adopt, reject, or adjust.              | Nothing.                                                                                               |
-| `jg-session`        | Finds a named Codex or Claude Code session and answers questions about it.                    | Nothing.                                                                                               |
+### Explicit skills
+
+| Skill               | What it does                                                                                  | What it may change                                                                                                          |
+| ------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `jg-brainstorm`     | Thinks an idea through with you and recommends a direction before planning.                   | Nothing.                                                                                                                    |
+| `jg-plan`           | Settles your decisions with you, then creates or revises an implementation-ready plan.        | Writes `plan.md` under `coding-agent-planning/`; removes a stale `milestones.md`.                                           |
+| `jg-challenge-plan` | Challenges a plan before approval and surfaces material risks, gaps, and decisions.           | Nothing.                                                                                                                    |
+| `jg-breakdown`      | Splits a plan into ordered, reviewable milestones when it has real implementation boundaries. | Writes or removes `milestones.md` next to the plan.                                                                         |
+| `jg-execute`        | Builds an agreed task, a plan, or its milestones; supervised by default, or `autonomous`.     | Code, milestone status lines, and the overview table. In autonomous mode it also commits and pushes each milestone's files. |
+| `jg-debug`          | Reproduces a bug, finds its cause, and fixes it with a regression test that fails first.      | Code, a regression test, and temporary logging it removes. Never commits.                                                   |
+| `jg-pause`          | Stops at the nearest safe point, reports where things stand, and waits until you continue.    | Nothing.                                                                                                                    |
+| `jg-review`         | Reviews the task's changes and how they follow its plan, or the branch against a target.      | No files. With a target branch, it may refresh that branch's remote-tracking ref.                                           |
+| `jg-push`           | Commits the current task's files with a signed-off, signed commit and pushes the branch.      | Stages and commits the task's files (or every change without a task) and pushes the current branch.                         |
+| `jg-feedback`       | Assesses feedback independently and recommends what to adopt, reject, or adjust.              | Nothing.                                                                                                                    |
+| `jg-session`        | Finds a named Codex or Claude Code session and answers questions about it.                    | Nothing.                                                                                                                    |
+
+### Implicit skills
+
+| Skill         | Loads when a task touches                                                        | Written for                    |
+| ------------- | -------------------------------------------------------------------------------- | ------------------------------ |
+| `jg-frontend` | UI, styling, forms, accessibility, motion, or frontend tests.                    | Tailwind CSS 4.3               |
+| `jg-react`    | React components, hooks, state, data loading, or React tests.                    | React 19.2, React Router 7     |
+| `jg-nestjs`   | NestJS modules, controllers, providers, configuration, logging, or NestJS tests. | NestJS 12                      |
+| `jg-postgres` | SQL, migrations, schema names, queries, or transactions.                         | PostgreSQL 18, node-postgres 8 |
+| `jg-redis`    | Redis keys, caching, locks, rate limits, streams, or pub/sub.                    | Redis 8, node-redis 5          |
+| `jg-scripts`  | Developer scripts, CLIs, build tooling, or filesystem code.                      | Node.js 24                     |
+
+Each implicit skill states the versions it was written for. Items that need a newer version are marked with it, and apply only when that version is installed.
 
 ## A typical run
 
 1. `jg-brainstorm` thinks the idea through with you and ends with a summary you can plan from.
 2. `jg-plan` asks about any decision that is yours to make, then turns the discussion into a plan under `coding-agent-planning/` and asks for approval. When the idea isn't clear enough to plan, it points you back to `jg-brainstorm`.
 3. Optionally, `jg-challenge-plan` returns a verdict, any required corrections, and numbered decisions, and `jg-plan` with your answers revises the same plan.
-4. Optionally, `jg-breakdown` writes `milestones.md` when the plan has real milestone boundaries, with a status line under each milestone: pending, in progress, or done.
+4. Optionally, `jg-breakdown` writes `milestones.md` when the plan has real milestone boundaries, with an overview table of every milestone's status at the top and a status line under each milestone: pending, in progress, or done.
 5. `jg-execute` builds the next milestone, runs its checks, and stops so you can run `jg-review` and `jg-push` yourself. `jg-review` checks the change against the plan and the milestone it belongs to, as well as the code. `jg-execute autonomous` builds every remaining milestone instead, reviewing and pushing each one before starting the next.
 
 Use `jg-pause` at any point to stop the agent at a safe point and pick up later. Use `jg-debug` when something breaks and the cause isn't obvious.
@@ -90,7 +107,7 @@ npm run dev
 | `npm run format`          | Format the website files.                                                                           |
 | `npm run assets:generate` | Regenerate the committed open-graph image from its HTML template.                                   |
 
-The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill does not ship the explicit-only Codex policy, or when a skill's search title or description would be cut off in search results. When you add a skill, add its catalog entry with an example invocation, a search title of at most 60 characters that starts with the skill name, a search description of 70 to 160 characters, and a short note on when to use it.
+The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill's frontmatter flag or Codex policy doesn't match its kind in the catalog, or when a skill's search title or description would be cut off in search results. When you add a skill, add its catalog entry with its kind, an example invocation (or, for an implicit skill, an example request that loads it), a search title of at most 60 characters that starts with the skill name, a search description of 70 to 160 characters, and a short note on when to use it.
 
 ### Deployment
 
@@ -130,8 +147,8 @@ Until then, the deploy job fails, or the site is served under a path where its r
 ```
 
 - Every skill directory name matches the `name` in its `SKILL.md` frontmatter.
-- The current skills are explicit-only in both agents: their frontmatter sets `disable-model-invocation: true`, and their `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`. Keep both when adding an explicit skill.
-- Every skill is self-contained. Its `## Invocation` section holds the rules all skills share, and it never links to sections of a specific `AGENTS.md`. Skills refer to each other by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix. Every skill works on its own: a mention of another skill is only a pointer, and the one runtime dependency is `jg-execute autonomous`, which reads the `jg-review` and `jg-push` `SKILL.md` files from the neighboring folders.
+- Explicit skills are explicit-only in both agents: their frontmatter sets `disable-model-invocation: true`, and their `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`. Implicit skills omit the flag and set `policy.allow_implicit_invocation: true`. The site catalog's `kind` must match, or the build fails.
+- Every skill is self-contained and never links to sections of a specific `AGENTS.md`. Explicit skills share the rules in their `## Invocation` section. Implicit skills share their `## Application` section, which sets how their rules rank against the repository's coding instructions and conventions. Skills refer to each other by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix. Every skill works on its own: a mention of another skill is only a pointer, and the one runtime dependency is `jg-execute autonomous`, which reads the `jg-review` and `jg-push` `SKILL.md` files from the neighboring folders.
 - Website links show where they lead: `ArrowDown` for a section on the same page, `ArrowRight` (or `ArrowLeft` going back) for another page on the site, and the `external-link` component, which adds a screen-reader note plus an inline new-tab icon, or an up-right arrow in the corner when the link covers a whole card, for other sites.
 - The website shares its design tokens, Ubuntu Sans typography, and tooling with Agentic Coding and jesusgraterol.dev. [`docs/asset-attribution.md`](docs/asset-attribution.md) records where its brand marks come from.
 - Local coding instructions (`AGENTS.md`, `CANDIDATE.md`) and `coding-agent-planning/` are git-ignored and never published.

@@ -26,9 +26,9 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
    - The plan is the one named in the invocation, otherwise the current plan in this conversation. If its directory contains `milestones.md`, the units are its milestones; otherwise the whole plan is one unit.
    - Without a plan file, a task agreed in this conversation is one unit. Restate its scope in a few lines before starting.
    - When the invocation names a milestone, run only that milestone. Otherwise, supervised mode runs the next unfinished milestone or the single unit, and autonomous mode runs every remaining milestone or the single unit.
-   - The status line directly under each milestone heading is `**Status:** pending`, `**Status:** in progress`, or `**Status:** done`; a milestone without one is pending. A milestone is finished once it is done. Unfinished milestones run in order, except that one in progress comes first. Move a status only forward, and never remove one.
+   - The status line directly under each milestone heading is `**Status:** pending`, `**Status:** in progress`, or `**Status:** done`; a milestone without one is pending. A milestone is finished once it is done. Unfinished milestones run in order, except that one in progress comes first. Move a status only forward, and never remove one. When `milestones.md` has an `## Overview` table, update a milestone's row whenever you move its status line; when a row and its status line disagree, the status line wins and you correct the row. Never create the table.
    - If the target is ambiguous, ask one question and stop.
-3. **Authority.** Invoking this skill approves running those units: their implementation, their checks, and their status lines in `milestones.md`. In autonomous mode it also approves reviewing and pushing each unit. This skill never deletes plan files.
+3. **Authority.** Invoking this skill approves running those units: their implementation, their checks, and their status lines and overview table in `milestones.md`. In autonomous mode it also approves reviewing and pushing each unit. This skill never deletes plan files.
 4. **Preflight.** Before changing anything:
    - Confirm the plan still matches the repository. Stop and report if it doesn't.
    - Look for blockers you can spot up front, such as missing access, checks that cannot run, or unmet dependencies on earlier milestones.
@@ -42,7 +42,7 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
    - Ask every question in one message.
 5. **Each unit.**
    - When the unit is a pending milestone, mark it in progress before changing anything else.
-   - Implement it following the plan and the repository's coding instructions (such as `AGENTS.md` or `CLAUDE.md`).
+   - Implement it following the plan and the repository's coding instructions (such as `AGENTS.md` or `CLAUDE.md`) and the implicit jg skills that apply to the affected files.
    - Run the checks the plan lists for it. When it lists none, run the repository's tests for the affected boundary. Fix the failures the work caused.
    - Before calling the unit finished, check each of its acceptance criteria, or what was agreed for a task, against evidence. Where you can, run the changed behavior itself; passing tests alone don't show it works.
    - The files the unit changed, plus any the developer confirmed, are its task scope for review and push.
