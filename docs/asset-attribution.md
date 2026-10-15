@@ -12,4 +12,4 @@
 
 ## GitHub mark
 
-The credits section draws GitHub's mark inline from [Primer Octicons](https://github.com/primer/octicons) (`mark-github-16`, MIT). It appears only on the tile beside each link to a GitHub repository. Keep its geometry unchanged.
+The credits section draws GitHub's mark inline, as `mark-github-16` from [Primer Octicons](https://github.com/primer/octicons). Octicons' MIT license covers its code, not GitHub's logos, so the mark is used under the [GitHub logo guidelines](https://github.com/logos). It appears only on the tile beside each link to a GitHub repository. Keep its geometry unchanged.

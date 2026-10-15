@@ -18,7 +18,7 @@ describe('buildLlmsText', () => {
 
     expect(text).toMatch(/^# JG Skills\n\n> .+\n/u);
     expect(text).toContain(
-      '## Install\n\n```bash\nnpx skills add jesusgraterol/jesusgraterol-skills --skill "*" -y\n```\n',
+      '## Install\n\n```bash\nnpx skills add jesusgraterol/jg-skills --skill "*" -y\n```\n',
     );
     expect(text).toContain(
       '- [jg-plan](https://jg-skills.jesusgraterol.dev/skills/jg-plan/): Create or revise a plan. Save it for approval.',

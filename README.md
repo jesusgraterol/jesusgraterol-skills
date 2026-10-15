@@ -1,6 +1,8 @@
-# jesusgraterol-skills
+# JG Skills
 
-Solid, battle-tested Agent Skills for planning, reviewing, and shipping changes with coding agents, used by professional software developers in their daily work. Every skill runs only when you invoke it by name, and each one defers general engineering standards to the coding instructions of the repository you use it in.
+[![JG Skills: battle-tested skills for coding agents](website/public/og/jg-skills.png)](https://jg-skills.jesusgraterol.dev)
+
+Solid, battle-tested Agent Skills for planning, reviewing, and shipping changes with coding agents, used by professional software developers in their daily work. Each skill defines what it may change and defers general engineering standards to the coding instructions of the repository you use it in.
 
 Browse the skills, their full instructions, and an example session at [jg-skills.jesusgraterol.dev](https://jg-skills.jesusgraterol.dev).
 
@@ -9,7 +11,7 @@ Browse the skills, their full instructions, and an example session at [jg-skills
 Run this from your repository's root:
 
 ```bash
-npx skills add jesusgraterol/jesusgraterol-skills --skill "*" -y
+npx skills add jesusgraterol/jg-skills --skill "*" -y
 ```
 
 The command uses the [skills CLI](https://github.com/vercel-labs/skills) through `npx`, so it needs Node.js. It installs the skills into the project for the coding agents you use there, so you can commit them and share the same workflow with your team.
@@ -22,21 +24,23 @@ Discuss a change with your coding agent, then invoke a skill by name, followed b
 /jg-plan
 ```
 
-The skills never load on their own. Each one sets `disable-model-invocation: true` in its frontmatter and ships an `agents/openai.yaml` policy that disables implicit invocation, so it enters the conversation only when you call it. This is verified with Claude Code and Codex.
+In Codex, type `$jg-plan` instead.
+
+The current collection contains explicit skills that run only when you invoke them by name. Implicit skills will be added in the future. Each current skill sets `disable-model-invocation: true` in its frontmatter and ships an `agents/openai.yaml` policy that disables implicit invocation. Explicit-only loading is verified with Claude Code and Codex.
 
 ## Update and remove
 
 Run these from your repository's root:
 
 ```bash
-npx skills update -p
+npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session
 ```
 
 ```bash
 npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session
 ```
 
-Remove the skills by name so other skills in the project stay installed.
+Both commands name the skills, so other skills in the project are left alone.
 
 ## Skills
 
@@ -126,7 +130,7 @@ Until then, the deploy job fails, or the site is served under a path where its r
 ```
 
 - Every skill directory name matches the `name` in its `SKILL.md` frontmatter.
-- Every skill is explicit-only in both agents: its frontmatter sets `disable-model-invocation: true`, and its `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`. Keep both when adding a skill.
+- The current skills are explicit-only in both agents: their frontmatter sets `disable-model-invocation: true`, and their `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`. Keep both when adding an explicit skill.
 - Every skill is self-contained. Its `## Invocation` section holds the rules all skills share, and it never links to sections of a specific `AGENTS.md`. Skills refer to each other by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix. Every skill works on its own: a mention of another skill is only a pointer, and the one runtime dependency is `jg-execute autonomous`, which reads the `jg-review` and `jg-push` `SKILL.md` files from the neighboring folders.
 - Website links show where they lead: `ArrowDown` for a section on the same page, `ArrowRight` (or `ArrowLeft` going back) for another page on the site, and the `external-link` component, which adds a screen-reader note plus an inline new-tab icon, or an up-right arrow in the corner when the link covers a whole card, for other sites.
 - The website shares its design tokens, Ubuntu Sans typography, and tooling with Agentic Coding and jesusgraterol.dev. [`docs/asset-attribution.md`](docs/asset-attribution.md) records where its brand marks come from.

@@ -122,7 +122,7 @@ describe('assertCatalogCoverage', () => {
 describe('buildSourceUrl', () => {
   test('points at the skill instructions on the main branch', () => {
     expect(buildSourceUrl('jg-push')).toBe(
-      'https://github.com/jesusgraterol/jesusgraterol-skills/blob/main/skills/jg-push/SKILL.md',
+      'https://github.com/jesusgraterol/jg-skills/blob/main/skills/jg-push/SKILL.md',
     );
   });
 });
