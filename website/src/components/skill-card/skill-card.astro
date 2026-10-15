@@ -1,5 +1,13 @@
 ---
-import { ArrowRight, BookOpen, Code, Eye, FilePenLine, GitCommitHorizontal } from '@lucide/astro';
+import {
+  ArrowRight,
+  BookOpen,
+  Code,
+  Eye,
+  FilePenLine,
+  GitCommitHorizontal,
+  SquareTerminal,
+} from '@lucide/astro';
 
 import { SKILL_ACCESS_LABELS, type ISkill } from '../../utilities/skill-catalog/index.ts';
 
@@ -14,6 +22,7 @@ const ACCESS_ICONS = {
   'commits-and-pushes': GitCommitHorizontal,
   'planning-files': FilePenLine,
   'read-only': Eye,
+  'runs-picked-command': SquareTerminal,
 } as const;
 
 const { skill } = Astro.props;

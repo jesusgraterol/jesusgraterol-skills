@@ -30,4 +30,5 @@ export const SKILL_ACCESS_LABELS = {
   'commits-and-pushes': 'Commits and pushes',
   'planning-files': 'Writes planning files',
   'read-only': 'Read-only',
+  'runs-picked-command': 'Runs the command you pick',
 } as const satisfies Record<ISkillAccess, string>;

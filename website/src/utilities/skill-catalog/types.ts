@@ -12,7 +12,8 @@ export type ISkillAccess =
   | 'planning-files'
   | 'changes-code'
   | 'changes-code-and-pushes'
-  | 'commits-and-pushes';
+  | 'commits-and-pushes'
+  | 'runs-picked-command';
 
 // a realistic invocation, written without a host prefix, and what it produces
 export interface ISkillExample {

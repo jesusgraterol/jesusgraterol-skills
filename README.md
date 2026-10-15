@@ -35,11 +35,11 @@ Implicit skills load on their own when a task touches their stack, such as a mig
 Run these from your repository's root:
 
 ```bash
-npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts jg-ci
+npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-command jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts jg-ci
 ```
 
 ```bash
-npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts jg-ci
+npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-command jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts jg-ci
 ```
 
 Both commands name the skills, so other skills in the project are left alone.
@@ -57,6 +57,7 @@ Both commands name the skills, so other skills in the project are left alone.
 | `jg-execute`        | Builds an agreed task, a plan, or its milestones; supervised by default, or `auto`.           | Code, milestone status lines, and the overview table. In autonomous mode it also commits and pushes each milestone's files. |
 | `jg-debug`          | Reproduces a bug, finds its cause, and fixes it with a regression test that fails first.      | Code, a regression test, and temporary logging it removes. Never commits.                                                   |
 | `jg-pause`          | Stops at the nearest safe point, reports where things stand, and waits until you continue.    | Nothing.                                                                                                                    |
+| `jg-command`        | Turns a task into a few checked shell commands for your machine and explains each one.        | Nothing until you pick; then runs that command. Irreversible ones ask again; `sudo` ones are printed.                       |
 | `jg-review`         | Reviews the task's changes and how they follow its plan, or the branch against a target.      | No files. With a target branch, it may refresh that branch's remote-tracking ref.                                           |
 | `jg-push`           | Commits the current task's files with a signed-off, signed commit and pushes the branch.      | Stages and commits the task's files (or every change without a task) and pushes the current branch.                         |
 | `jg-feedback`       | Assesses feedback independently and recommends what to adopt, reject, or adjust.              | Nothing.                                                                                                                    |

@@ -172,6 +172,23 @@ export const SKILL_CATALOG = {
     whenToUse:
       'Use it when you need to step away or check something mid-task without leaving half-changed files unexplained.',
   },
+  'jg-command': {
+    access: 'runs-picked-command',
+    examples: [
+      {
+        invocation: 'jg-command find every file over 100 MB here, skipping .git',
+        outcome:
+          'Detects your system and shell, offers a few checked commands with what each does and how risky it is, and runs the one you pick.',
+      },
+    ],
+    kind: 'explicit',
+    order: 8,
+    searchDescription:
+      'An explicit-only agent skill for Claude Code and Codex that turns a plain-language task into checked shell commands you pick from and run.',
+    searchTitle: 'jg-command: Turn a task into shell commands you pick',
+    stage: 'build',
+    whenToUse: 'Use it when you know what you want done in the terminal but not the exact command.',
+  },
   'jg-review': {
     access: 'read-only',
     examples: [
@@ -189,7 +206,7 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'explicit',
-    order: 8,
+    order: 9,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that reviews a task's changes against its plan, or a branch, and issues a readiness verdict.",
     searchTitle: 'jg-review: Code review for Claude Code and Codex',
@@ -207,7 +224,7 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'explicit',
-    order: 9,
+    order: 10,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that commits only the current task's files with a signed-off, signed commit and pushes.",
     searchTitle: 'jg-push: Signed commits and pushes for coding agents',
@@ -225,7 +242,7 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'explicit',
-    order: 10,
+    order: 11,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that checks feedback against the evidence and recommends what to adopt, reject, or adjust.',
     searchTitle: 'jg-feedback: Assess review feedback with evidence',
@@ -243,7 +260,7 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'explicit',
-    order: 11,
+    order: 12,
     searchDescription:
       'An explicit-only agent skill that finds a named Claude Code or Codex session and answers questions from its latest decisions and state.',
     searchTitle: 'jg-session: Read past Claude Code and Codex sessions',
@@ -259,7 +276,7 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'implicit',
-    order: 12,
+    order: 13,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that keeps UI work accessible, responsive, themed, and on your design system whenever a task touches it.',
     searchTitle: 'jg-frontend: Frontend standards for coding agents',
@@ -278,7 +295,7 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'implicit',
-    order: 13,
+    order: 14,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that applies React 19 APIs, render-performance rules, and testing standards whenever a task touches React.',
     searchTitle: 'jg-react: React standards for coding agents',
@@ -297,7 +314,7 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'implicit',
-    order: 14,
+    order: 15,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that applies NestJS module, validation, logging, lifecycle, and test standards whenever a task touches Nest.',
     searchTitle: 'jg-nestjs: NestJS standards for coding agents',
@@ -315,7 +332,7 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'implicit',
-    order: 15,
+    order: 16,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that applies PostgreSQL naming, constraint, query, and migration standards whenever a task touches SQL.',
     searchTitle: 'jg-postgres: PostgreSQL standards for coding agents',
@@ -334,7 +351,7 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'implicit',
-    order: 16,
+    order: 17,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that applies Redis key, expiry, scanning, and locking standards whenever a task touches Redis.',
     searchTitle: 'jg-redis: Redis standards for coding agents',
@@ -353,7 +370,7 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'implicit',
-    order: 17,
+    order: 18,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that keeps scripts, CLIs, and filesystem code portable and safe on Windows, macOS, and Linux.',
     searchTitle: 'jg-scripts: Portable scripts for coding agents',
@@ -372,7 +389,7 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'implicit',
-    order: 18,
+    order: 19,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that keeps GitHub Actions workflows fast, secure, and reusable whenever a task touches CI.',
     searchTitle: 'jg-ci: GitHub Actions standards for coding agents',
