@@ -33,7 +33,7 @@ test.describe('install command', () => {
     await page.goto('/skills/jg-plan/');
 
     await expect(
-      page.locator('button[data-copy-source="jg-plan-invocation"]'),
+      page.locator('button[data-copy-source="jg-plan-invocation-1"]'),
     ).toHaveAccessibleName('Copy invocation');
   });
 
