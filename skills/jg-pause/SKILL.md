@@ -20,7 +20,7 @@ This skill's own rules about supplied material take precedence over this section
 
 Pause the work in progress at the nearest safe point, report where it stands, and wait.
 
-1. **Start nothing new.** Make no edits, and run no commands, commits, pushes, installs, or external actions. Quick read-only checks such as `git status` are fine for the report. Leave background commands, such as a test run or a dev server, running, and report them.
+1. **Start nothing new.** Make no edits, and run no commands, commits, pushes, installs, or external actions. Quick read-only checks such as `git status` are fine for the report. Let a command that is already running finish. Stop servers and watchers this task started, unless the developer asks to keep them, and report anything still running with how to stop it.
 2. **Leave half-finished work as it is.** Do not make more edits to bring files into line.
 3. **Report briefly:**
    - what is done

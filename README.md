@@ -24,6 +24,8 @@ Discuss a change with your coding agent, then invoke a skill by name, followed b
 /jg-plan
 ```
 
+In Codex, type `$jg-plan` instead.
+
 The current collection contains explicit skills that run only when you invoke them by name. Implicit skills will be added in the future. Each current skill sets `disable-model-invocation: true` in its frontmatter and ships an `agents/openai.yaml` policy that disables implicit invocation. Explicit-only loading is verified with Claude Code and Codex.
 
 ## Update and remove
@@ -31,14 +33,14 @@ The current collection contains explicit skills that run only when you invoke th
 Run these from your repository's root:
 
 ```bash
-npx skills update -p
+npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session
 ```
 
 ```bash
 npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session
 ```
 
-Remove the skills by name so other skills in the project stay installed.
+Both commands name the skills, so other skills in the project are left alone.
 
 ## Skills
 

@@ -37,7 +37,7 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
      - If milestones already marked done still have uncommitted changes, list them with your preflight questions. Once the developer confirms, review and push them first as their own unit; otherwise stop, because later units would be published without the work they build on.
      - If the branch has unpushed commits, list them with your preflight questions, and publish them only after the developer confirms, by following `jg-push`'s `SKILL.md` with an empty task scope, which only pushes. If the developer doesn't want them published, stop, because every later push would publish them too.
    - If the next milestone already has uncommitted work, list those files, ask the developer to confirm them, and continue from that work instead of redoing it. Confirmed files join the unit's scope.
-   - If the next milestone has no uncommitted work and its acceptance criteria already hold, write its status line and move on.
+   - If the next milestone has no uncommitted work and its acceptance criteria already hold, write its status line. Supervised mode then reports and stops; autonomous mode continues with the next unit. A run that names a milestone never moves past it.
    - Ask every question in one message.
 5. **Each unit.**
    - Implement it following the plan and the repository's coding instructions (such as `AGENTS.md` or `CLAUDE.md`).

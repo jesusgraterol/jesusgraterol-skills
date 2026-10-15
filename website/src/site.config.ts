@@ -192,7 +192,7 @@ export const SITE_CONFIG = {
   commands: {
     install: 'npx skills add jesusgraterol/jg-skills --skill "*" -y',
     remove: `npx skills remove ${SKILL_NAMES.join(' ')}`,
-    update: 'npx skills update -p',
+    update: `npx skills update -p ${SKILL_NAMES.join(' ')}`,
   },
   defaultDescription:
     'Battle-tested agent skills for Claude Code, Codex, and other coding agents. Brainstorm, plan, build, review, and ship changes like professional developers.',
