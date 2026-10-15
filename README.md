@@ -28,7 +28,7 @@ In Codex, type `$jg-plan` instead.
 
 The collection has two kinds of skill. Explicit skills run only when you invoke them by name: each sets `disable-model-invocation: true` in its frontmatter and ships an `agents/openai.yaml` policy that disables implicit invocation. Explicit-only loading is verified with Claude Code and Codex.
 
-Implicit skills load on their own when a task touches their stack, such as a migration for `jg-postgres` or a component for `jg-react`. They omit that flag, and their `agents/openai.yaml` allows implicit invocation. You can still invoke one by name to load it before a task.
+Implicit skills load on their own when a task touches their stack, such as a migration for `jg-postgres` or a component for `jg-react`. They omit that flag, and their `agents/openai.yaml` allows implicit invocation. You can still invoke one by name to load it before a task. Implicit loading is verified with Claude Code and Codex.
 
 ## Update and remove
 
