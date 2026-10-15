@@ -29,6 +29,8 @@ test.describe('credits section', () => {
       await expect(card.getByRole('link')).toHaveAttribute('href', url);
       await expect(card.locator('[data-credit-author]')).toHaveText(`by ${author}`);
       await expect(card.locator('[data-credit-license]')).toHaveText('MIT');
+      await expect(card.locator('svg[data-github-mark]')).toHaveCount(1);
+      await expect(card.locator('[data-external-icon].lucide-arrow-up-right')).toHaveCount(1);
     }
   });
 

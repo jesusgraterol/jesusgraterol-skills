@@ -4,52 +4,51 @@ import ExternalLink from '../external-link/external-link.astro';
 // one open-source collection whose ideas were adapted into these skills
 interface ICredit {
   author: string;
-  // the author's initials, shown on a monogram tile instead of any third-party mark
-  initials: string;
   license: string;
   name: string;
   summary: string;
   url: string;
 }
 
-// collections whose ideas are rewritten in our own words in these skills
+// collections whose ideas are rewritten in our own words, with summaries of similar length
 const CREDITS = [
   {
     author: 'Jesse Vincent',
-    initials: 'JV',
     license: 'MIT',
     name: 'superpowers',
     summary:
-      'Fixing only blocking findings, checking acceptance criteria before calling work done, a three-attempt stop rule, reporting decisions, and a plan self-check.',
+      'Fixing only blocking findings, checking acceptance criteria first, and a three-attempt stop rule.',
     url: 'https://github.com/obra/superpowers',
   },
   {
     author: 'Addy Osmani',
-    initials: 'AO',
     license: 'MIT',
     name: 'agent-skills',
-    summary: 'Labeling findings by severity, and listing what you noticed but left alone.',
+    summary:
+      'Labeling review findings by severity, and listing what was noticed but deliberately left alone.',
     url: 'https://github.com/addyosmani/agent-skills',
   },
   {
     author: 'Lauren Tan',
-    initials: 'LT',
     license: 'MIT',
     name: 'pstack',
     summary:
-      'Proving a change works on the real path, and never weakening a check to get it through.',
+      'Proving a change works on the real path, and never weakening a check just to get it through.',
     url: 'https://github.com/poteto/plugins/tree/main/pstack',
   },
   {
     author: 'Matt Pocock',
-    initials: 'MP',
     license: 'MIT',
     name: 'skills',
     summary:
-      'Milestones that fit one context window, batched questions with recommended answers, and the debugging loop behind jg-debug.',
+      'Milestones that fit one context window, batched questions, and the debugging loop in jg-debug.',
     url: 'https://github.com/mattpocock/skills',
   },
 ] as const satisfies readonly ICredit[];
+
+// GitHub's mark from Primer Octicons (mark-github-16, MIT), shown unchanged beside each repository link
+const GITHUB_MARK_PATH =
+  'M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656';
 ---
 
 <section
@@ -71,24 +70,34 @@ const CREDITS = [
     </p>
     <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {
-        CREDITS.map(({ author, initials, license, name, summary, url }) => (
+        CREDITS.map(({ author, license, name, summary, url }) => (
           <li>
             {/* the whole card is the link target, so the card draws the keyboard focus ring for it */}
             <article
               class="relative flex h-full flex-col rounded-xl border border-border bg-surface p-5 shadow-surface transition-colors hover:border-border-strong has-focus-visible:outline-2 has-focus-visible:outline-offset-3 has-focus-visible:outline-focus motion-reduce:transition-none"
               data-credit
             >
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-3 pr-6">
                 <span
-                  class="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary font-mono text-sm font-bold text-accent-on-primary"
+                  class="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
                   aria-hidden="true"
                 >
-                  {initials}
+                  <svg
+                    class="size-5"
+                    viewBox="0 0 16 16"
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                    data-github-mark
+                  >
+                    <path d={GITHUB_MARK_PATH} />
+                  </svg>
                 </span>
                 <div class="min-w-0">
                   <h3 class="font-mono text-base font-bold wrap-anywhere">
                     <ExternalLink
                       class="no-underline outline-none after:absolute after:inset-0 after:rounded-xl"
+                      cornerArrow
                       href={url}
                     >
                       {name}
@@ -102,7 +111,7 @@ const CREDITS = [
                   </p>
                 </div>
               </div>
-              <p class="mt-4 flex-1 text-sm leading-6 text-muted">{summary}</p>
+              <p class="mt-4 flex-1 text-sm leading-6 text-pretty text-muted">{summary}</p>
               <p class="mt-5">
                 <span
                   class="rounded-full border border-border px-2.5 py-0.5 font-mono text-xs font-semibold"
