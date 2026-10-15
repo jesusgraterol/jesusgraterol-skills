@@ -34,6 +34,7 @@ const VERIFY_BUILD_ERROR_MESSAGES = {
 const REQUIRED_BUILD_PATHS = [
   'index.html',
   '404.html',
+  'coding-agents/claude-code.svg',
   'favicon.svg',
   'llms.txt',
   'og/jg-skills.png',

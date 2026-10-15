@@ -114,7 +114,9 @@ test.describe('production website', () => {
     await page.goto('/');
 
     for (const stage of ['Plan', 'Build', 'Ship', 'Context']) {
-      await expect(page.getByRole('heading', { level: 3, name: stage })).toBeVisible();
+      await expect(
+        page.locator('#skills').getByRole('heading', { level: 3, name: stage }),
+      ).toBeVisible();
     }
 
     for (const name of Object.keys(SKILL_CATALOG)) {

@@ -1,37 +1,229 @@
 ---
-// one change from conversation to push; titles starting with a slash invoke a skill
-const WORKFLOW_STEPS = [
-  { isOptional: false, text: 'Talk the change through with your agent.', title: 'Discuss' },
-  { isOptional: false, text: 'Save it as a plan you approve.', title: '/jg-plan' },
-  { isOptional: true, text: 'Find gaps before you approve.', title: '/jg-challenge-plan' },
-  { isOptional: true, text: 'Split a large plan into milestones.', title: '/jg-breakdown' },
-  { isOptional: false, text: 'Approve, and the agent builds it.', title: 'Build' },
-  { isOptional: false, text: 'Check the change before it ships.', title: '/jg-review' },
-  { isOptional: false, text: 'Commit and push it.', title: '/jg-push' },
-] as const;
+import { ChevronRight, CornerDownLeft } from '@lucide/astro';
+
+// one skill invocation inside a phase; commands are rendered from expressions
+interface IWorkflowStep {
+  command: string;
+  isOptional: boolean;
+  text: string;
+}
+
+// agree on the change before any code is written
+const PLAN_STEPS = [
+  { command: 'jg-brainstorm', isOptional: false, text: 'Agree on a direction.' },
+  { command: 'jg-plan', isOptional: false, text: 'Save it as a plan you approve.' },
+  { command: 'jg-challenge-plan', isOptional: true, text: 'Find gaps before you approve.' },
+  { command: 'jg-breakdown', isOptional: true, text: 'Split a large plan into milestones.' },
+] as const satisfies readonly IWorkflowStep[];
+
+// check the change, then publish it
+const SHIP_STEPS = [
+  { command: 'jg-review', isOptional: false, text: 'Check the change before it ships.' },
+  { command: 'jg-push', isOptional: false, text: "Commit and push the task's files." },
+] as const satisfies readonly IWorkflowStep[];
+
+// how jg-execute runs in each mode, and who runs the ship steps
+const MODES = {
+  supervised: {
+    command: 'jg-execute',
+    label: 'Supervised',
+    shipNote: 'You run these when you are ready.',
+    text: 'Builds the next milestone and runs its checks, then stops for you.',
+  },
+  autonomous: {
+    command: 'jg-execute autonomous',
+    label: 'Autonomous',
+    shipNote: 'jg-execute runs these after each milestone.',
+    text: 'Builds every remaining milestone, one at a time.',
+  },
+} as const;
+
+// what autonomous mode repeats for every milestone
+const AUTONOMOUS_CYCLE = ['Implement', 'Checks', 'Review', 'Fix', 'Push'] as const;
 ---
 
-<ol class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-  {
-    WORKFLOW_STEPS.map(({ isOptional, text, title }, index) => (
-      <li class="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 shadow-surface">
-        <div class="flex min-h-6 items-center justify-between gap-3">
-          <span class="font-mono text-xs font-bold text-muted">
-            {String(index + 1).padStart(2, '0')}
-          </span>
-          {isOptional && (
-            <span class="rounded-full border border-border px-2 py-0.5 text-xs text-muted">
-              Optional
-            </span>
-          )}
+<div
+  class="group/workflow"
+  data-workflow-run
+>
+  <fieldset
+    class="inline-flex items-center gap-1 rounded-full border border-border bg-surface p-1 shadow-surface"
+  >
+    <legend class="sr-only">How jg-execute runs</legend>
+    {
+      (['supervised', 'autonomous'] as const).map((mode) => (
+        <label class="cursor-pointer rounded-full px-4 py-1.5 text-sm font-semibold text-muted transition-colors hover:text-foreground has-checked:bg-primary has-checked:text-primary-foreground has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus motion-reduce:transition-none">
+          <input
+            class="sr-only"
+            type="radio"
+            name="workflow-mode"
+            value={mode}
+            checked={mode === 'supervised'}
+            data-workflow-mode={mode}
+          />
+          {MODES[mode].label}
+        </label>
+      ))
+    }
+  </fieldset>
+
+  <ol class="mt-8 grid gap-10 lg:grid-cols-3 lg:gap-6">
+    <li>
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-xs font-bold text-accent">01</span>
+        <h3 class="text-lg font-semibold">Plan</h3>
+        <span
+          class="hidden h-px flex-1 bg-border lg:block"
+          aria-hidden="true"
+        ></span>
+      </div>
+      <p class="mt-1 text-sm leading-6 text-muted">
+        Agree on what to build before any code changes.
+      </p>
+      <div class="relative mt-5">
+        <span
+          class="absolute top-2 bottom-2 left-1 w-px bg-border"
+          aria-hidden="true"
+        ></span>
+        <ol class="grid gap-4">
+          {
+            PLAN_STEPS.map(({ command, isOptional, text }) => (
+              <li class="relative flex gap-3">
+                <span
+                  class="mt-2 size-2.5 shrink-0 rounded-full border-2 border-accent bg-background"
+                  aria-hidden="true"
+                />
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <code class="rounded-md bg-code px-2 py-0.5 font-mono text-sm font-semibold text-accent">
+                      {`/${command}`}
+                    </code>
+                    {isOptional && (
+                      <span class="rounded-full border border-border px-2 py-0.5 text-xs text-muted">
+                        Optional
+                      </span>
+                    )}
+                  </div>
+                  <p class="mt-1.5 text-sm leading-6 text-muted">{text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </li>
+
+    <li>
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-xs font-bold text-accent">02</span>
+        <h3 class="text-lg font-semibold">Build</h3>
+        <span
+          class="hidden h-px flex-1 bg-border lg:block"
+          aria-hidden="true"
+        ></span>
+      </div>
+      <p class="mt-1 text-sm leading-6 text-muted">Turn the approved plan into verified code.</p>
+      <div class="relative mt-5 flex gap-3">
+        <span
+          class="mt-2 size-2.5 shrink-0 rounded-full border-2 border-accent bg-background"
+          aria-hidden="true"
+        ></span>
+        <div class="min-w-0">
+          <code
+            class="rounded-md bg-code px-2 py-0.5 font-mono text-sm font-semibold text-accent group-has-[[data-workflow-mode=autonomous]:checked]/workflow:hidden"
+          >
+            {`/${MODES.supervised.command}`}
+          </code>
+          <code
+            class="hidden rounded-md bg-code px-2 py-0.5 font-mono text-sm font-semibold text-accent group-has-[[data-workflow-mode=autonomous]:checked]/workflow:inline"
+          >
+            {`/${MODES.autonomous.command}`}
+          </code>
+          <p
+            class="mt-1.5 text-sm leading-6 text-muted group-has-[[data-workflow-mode=autonomous]:checked]/workflow:hidden"
+          >
+            {MODES.supervised.text}
+          </p>
+          <div class="hidden group-has-[[data-workflow-mode=autonomous]:checked]/workflow:block">
+            <p class="mt-1.5 text-sm leading-6 text-muted">{MODES.autonomous.text}</p>
+            <p
+              id="workflow-cycle-label"
+              class="mt-4 text-xs font-semibold text-muted"
+            >
+              For each milestone
+            </p>
+            <ol
+              class="mt-2 flex flex-wrap items-center gap-1.5"
+              aria-labelledby="workflow-cycle-label"
+            >
+              {
+                AUTONOMOUS_CYCLE.map((step) => (
+                  <li class="inline-flex items-center gap-1.5">
+                    <span class="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-semibold">
+                      {step}
+                    </span>
+                    <ChevronRight
+                      class="size-3.5 text-muted"
+                      aria-hidden="true"
+                    />
+                  </li>
+                ))
+              }
+              <li
+                class="inline-flex items-center gap-1.5 rounded-full border border-dashed border-border-strong px-2.5 py-0.5 text-xs font-semibold text-muted"
+              >
+                <CornerDownLeft
+                  class="size-3.5"
+                  aria-hidden="true"
+                />
+                Next milestone
+              </li>
+            </ol>
+          </div>
         </div>
-        {title.startsWith('/') ? (
-          <code class="font-mono text-sm font-bold text-accent">{title}</code>
-        ) : (
-          <span class="text-sm font-semibold">{title}</span>
-        )}
-        <p class="text-sm leading-6 text-muted">{text}</p>
-      </li>
-    ))
-  }
-</ol>
+      </div>
+    </li>
+
+    <li>
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-xs font-bold text-accent">03</span>
+        <h3 class="text-lg font-semibold">Ship</h3>
+      </div>
+      <p class="mt-1 text-sm leading-6 text-muted">Check the finished change, then publish it.</p>
+      <div class="relative mt-5">
+        <span
+          class="absolute top-2 bottom-2 left-1 w-px bg-border"
+          aria-hidden="true"
+        ></span>
+        <ol class="grid gap-4">
+          {
+            SHIP_STEPS.map(({ command, text }) => (
+              <li class="relative flex gap-3">
+                <span
+                  class="mt-2 size-2.5 shrink-0 rounded-full border-2 border-accent bg-background"
+                  aria-hidden="true"
+                />
+                <div class="min-w-0">
+                  <code class="rounded-md bg-code px-2 py-0.5 font-mono text-sm font-semibold text-accent">
+                    {`/${command}`}
+                  </code>
+                  <p class="mt-1.5 text-sm leading-6 text-muted">{text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <p
+        class="mt-4 text-sm leading-6 font-semibold group-has-[[data-workflow-mode=autonomous]:checked]/workflow:hidden"
+      >
+        {MODES.supervised.shipNote}
+      </p>
+      <p
+        class="mt-4 hidden text-sm leading-6 font-semibold group-has-[[data-workflow-mode=autonomous]:checked]/workflow:block"
+      >
+        {MODES.autonomous.shipNote}
+      </p>
+    </li>
+  </ol>
+</div>
