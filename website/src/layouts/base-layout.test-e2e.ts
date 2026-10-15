@@ -62,7 +62,7 @@ test.describe('production website', () => {
   test('home page lists every skill grouped by stage and links to its page', async ({ page }) => {
     await page.goto('/');
 
-    for (const stage of ['Plan', 'Ship', 'Context']) {
+    for (const stage of ['Plan', 'Build', 'Ship', 'Context']) {
       await expect(page.getByRole('heading', { level: 3, name: stage })).toBeVisible();
     }
 

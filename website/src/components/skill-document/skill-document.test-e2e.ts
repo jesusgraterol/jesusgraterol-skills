@@ -37,4 +37,14 @@ test.describe('skill pages', () => {
       );
     });
   }
+
+  test('shows the usage line with and without an argument hint', async ({ page }) => {
+    await page.goto('/skills/jg-pause/');
+    await expect(page.locator('[data-skill-usage]')).toHaveText('/jg-pause');
+
+    await page.goto('/skills/jg-execute/');
+    await expect(page.locator('[data-skill-usage]')).toHaveText(
+      '/jg-execute [autonomous] [plan-path] [milestone N]',
+    );
+  });
 });

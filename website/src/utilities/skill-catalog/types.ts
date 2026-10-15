@@ -1,10 +1,10 @@
 import type { CollectionEntry } from 'astro:content';
 
 // workflow stages used to group skills on the landing page
-export type ISkillStage = 'plan' | 'ship' | 'context';
+export type ISkillStage = 'plan' | 'build' | 'ship' | 'context';
 
 // what a skill may change when it runs
-export type ISkillAccess = 'read-only' | 'planning-files' | 'commits-and-pushes';
+export type ISkillAccess = 'read-only' | 'planning-files' | 'changes-code' | 'commits-and-pushes';
 
 // a realistic invocation, written without a host prefix, and what it produces
 export interface ISkillExample {

@@ -33,32 +33,35 @@ npx skills update -p
 ```
 
 ```bash
-npx skills remove jg-plan jg-challenge-plan jg-breakdown jg-review jg-push jg-feedback jg-session
+npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-pause jg-review jg-push jg-feedback jg-session
 ```
 
 Remove the skills by name so other skills in the project stay installed.
 
 ## Skills
 
-| Skill               | What it does                                                                                  | What it may change                                                                |
-| ------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `jg-plan`           | Creates or revises an implementation-ready plan for the change under discussion.              | Writes `plan.md` under `coding-agent-planning/`; removes a stale `milestones.md`. |
-| `jg-challenge-plan` | Challenges a plan before approval and surfaces material risks, gaps, and decisions.           | Nothing.                                                                          |
-| `jg-breakdown`      | Splits a plan into ordered, reviewable milestones when it has real implementation boundaries. | Writes or removes `milestones.md` next to the plan.                               |
-| `jg-review`         | Reviews uncommitted changes, or the current branch against a target, and issues a verdict.    | No files. With a target branch, it may refresh that branch's remote-tracking ref. |
-| `jg-push`           | Commits the complete worktree with a signed-off, signed commit and pushes the current branch. | Stages every change, creates at most one commit, and pushes the current branch.   |
-| `jg-feedback`       | Assesses feedback independently and recommends what to adopt, reject, or adjust.              | Nothing.                                                                          |
-| `jg-session`        | Finds a named Codex or Claude Code session and answers questions about it.                    | Nothing.                                                                          |
+| Skill               | What it does                                                                                  | What it may change                                                                                     |
+| ------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `jg-brainstorm`     | Thinks an idea through with you and recommends a direction before planning.                   | Nothing.                                                                                               |
+| `jg-plan`           | Creates or revises an implementation-ready plan for the change under discussion.              | Writes `plan.md` under `coding-agent-planning/`; removes a stale `milestones.md`.                      |
+| `jg-challenge-plan` | Challenges a plan before approval and surfaces material risks, gaps, and decisions.           | Nothing.                                                                                               |
+| `jg-breakdown`      | Splits a plan into ordered, reviewable milestones when it has real implementation boundaries. | Writes or removes `milestones.md` next to the plan.                                                    |
+| `jg-execute`        | Builds an agreed task, a plan, or its milestones; supervised by default, or `autonomous`.     | Code and milestone status lines. In autonomous mode it also commits and pushes each milestone's files. |
+| `jg-pause`          | Stops at the nearest safe point, reports where things stand, and waits until you continue.    | Nothing.                                                                                               |
+| `jg-review`         | Reviews the current task's uncommitted changes, or the branch against a target.               | No files. With a target branch, it may refresh that branch's remote-tracking ref.                      |
+| `jg-push`           | Commits the current task's files with a signed-off, signed commit and pushes the branch.      | Stages and commits the task's files (or every change without a task) and pushes the current branch.    |
+| `jg-feedback`       | Assesses feedback independently and recommends what to adopt, reject, or adjust.              | Nothing.                                                                                               |
+| `jg-session`        | Finds a named Codex or Claude Code session and answers questions about it.                    | Nothing.                                                                                               |
 
 ## A typical run
 
-1. Talk the change through with your agent, then run `jg-plan`. It turns the discussion into a plan under `coding-agent-planning/` and asks for approval.
-2. `jg-challenge-plan` returns a verdict, any required corrections, and numbered decisions.
-3. `jg-plan` with your answers and the corrections revises the same plan.
-4. `jg-breakdown` writes `milestones.md` when the plan has real milestone boundaries.
-5. A plain message such as "Approved, implement milestone 1" starts the work. Each milestone needs its own approval.
-6. `jg-review` checks the uncommitted change and answers `Ready to commit`, `Not ready`, or `Review incomplete`.
-7. `jg-push` creates a signed-off, signed commit and pushes the current branch.
+1. `jg-brainstorm` thinks the idea through with you and ends with a summary you can plan from.
+2. `jg-plan` turns the discussion into a plan under `coding-agent-planning/` and asks for approval.
+3. Optionally, `jg-challenge-plan` returns a verdict, any required corrections, and numbered decisions, and `jg-plan` with your answers revises the same plan.
+4. Optionally, `jg-breakdown` writes `milestones.md` when the plan has real milestone boundaries.
+5. `jg-execute` builds the next milestone, runs its checks, and stops so you can run `jg-review` and `jg-push` yourself. `jg-execute autonomous` builds every remaining milestone instead, reviewing and pushing each one before starting the next.
+
+Use `jg-pause` at any point to stop the agent at a safe point and pick up later.
 
 ## Website
 
@@ -123,7 +126,7 @@ Until then, the deploy job fails, or the site is served under a path where its r
 
 - Every skill directory name matches the `name` in its `SKILL.md` frontmatter.
 - Every skill is explicit-only in both agents: its frontmatter sets `disable-model-invocation: true`, and its `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`. Keep both when adding a skill.
-- Every skill is self-contained. Its `## Invocation` section holds the rules all skills share, and it never links to sections of a specific `AGENTS.md`. Skills refer to each other by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix.
+- Every skill is self-contained. Its `## Invocation` section holds the rules all skills share, and it never links to sections of a specific `AGENTS.md`. Skills refer to each other by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix. Every skill works on its own: a mention of another skill is only a pointer, and the one runtime dependency is `jg-execute autonomous`, which reads the `jg-review` and `jg-push` `SKILL.md` files from the neighboring folders.
 - The website shares its design tokens, Ubuntu Sans typography, and tooling with Agentic Coding and jesusgraterol.dev. [`docs/asset-attribution.md`](docs/asset-attribution.md) records where its brand mark comes from.
 - Local coding instructions (`AGENTS.md`, `CANDIDATE.md`) and `coding-agent-planning/` are git-ignored and never published.
 - `/docs` is reserved for concise, quickly scannable documentation of essential, durable project concepts and processes. API and HTTP endpoint documentation, if the project ever needs it, belongs outside `/docs`.

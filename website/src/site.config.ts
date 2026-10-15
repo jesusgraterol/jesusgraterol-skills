@@ -6,6 +6,16 @@ import type { ISkillCatalogEntry } from './utilities/skill-catalog/index.ts';
  * catalog and the skill folders disagree.
  */
 export const SKILL_CATALOG = {
+  'jg-brainstorm': {
+    access: 'read-only',
+    example: {
+      invocation: 'jg-brainstorm Should we rate-limit the public API per account?',
+      outcome:
+        'Weighs the options against your codebase, recommends a direction, and lists what is still open.',
+    },
+    order: 1,
+    stage: 'plan',
+  },
   'jg-plan': {
     access: 'planning-files',
     example: {
@@ -13,7 +23,7 @@ export const SKILL_CATALOG = {
       outcome:
         'Turns the change you just discussed into an implementation-ready plan, saves it under coding-agent-planning/, and stops for your approval.',
     },
-    order: 1,
+    order: 2,
     stage: 'plan',
   },
   'jg-challenge-plan': {
@@ -23,7 +33,7 @@ export const SKILL_CATALOG = {
       outcome:
         'Returns a verdict, the corrections the plan needs, and numbered decisions in under 1,000 words.',
     },
-    order: 2,
+    order: 3,
     stage: 'plan',
   },
   'jg-breakdown': {
@@ -33,8 +43,28 @@ export const SKILL_CATALOG = {
       outcome:
         'Writes milestones.md when the plan has real boundaries, or tells you to build it as one scope.',
     },
-    order: 3,
+    order: 4,
     stage: 'plan',
+  },
+  'jg-execute': {
+    access: 'changes-code',
+    example: {
+      invocation: 'jg-execute autonomous',
+      outcome:
+        'Builds each remaining milestone, reviews it until clean, and pushes it before starting the next.',
+    },
+    order: 5,
+    stage: 'build',
+  },
+  'jg-pause': {
+    access: 'read-only',
+    example: {
+      invocation: 'jg-pause',
+      outcome:
+        'Stops at the next safe point, lists what is done and what is half-finished, and waits until you say continue.',
+    },
+    order: 6,
+    stage: 'build',
   },
   'jg-review': {
     access: 'read-only',
@@ -43,7 +73,7 @@ export const SKILL_CATALOG = {
       outcome:
         'Reports findings first, then the checks it ran, and answers Ready to commit, Not ready, or Review incomplete.',
     },
-    order: 4,
+    order: 7,
     stage: 'ship',
   },
   'jg-push': {
@@ -51,9 +81,9 @@ export const SKILL_CATALOG = {
     example: {
       invocation: 'jg-push',
       outcome:
-        'Stages every change, creates one signed-off, signed commit, and pushes only the current branch.',
+        "Commits only this task's files with a signed-off, signed commit and pushes the current branch.",
     },
-    order: 5,
+    order: 8,
     stage: 'ship',
   },
   'jg-feedback': {
@@ -63,7 +93,7 @@ export const SKILL_CATALOG = {
       outcome:
         'Checks each claim against the code and recommends what to adopt, reject, or adjust.',
     },
-    order: 6,
+    order: 9,
     stage: 'context',
   },
   'jg-session': {
@@ -73,7 +103,7 @@ export const SKILL_CATALOG = {
       outcome:
         'Finds the named Codex or Claude Code session and answers from its latest decisions.',
     },
-    order: 7,
+    order: 10,
     stage: 'context',
   },
 } as const satisfies Record<string, ISkillCatalogEntry>;

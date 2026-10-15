@@ -1,5 +1,5 @@
 ---
-import { ArrowUpRight, Eye, FilePenLine, GitCommitHorizontal } from '@lucide/astro';
+import { ArrowUpRight, Code, Eye, FilePenLine, GitCommitHorizontal } from '@lucide/astro';
 
 import { SKILL_ACCESS_LABELS, type ISkill } from '../../utilities/skill-catalog/index.ts';
 
@@ -9,6 +9,7 @@ interface Props {
 
 // icon that signals what each kind of skill may change
 const ACCESS_ICONS = {
+  'changes-code': Code,
   'commits-and-pushes': GitCommitHorizontal,
   'planning-files': FilePenLine,
   'read-only': Eye,
