@@ -18,6 +18,7 @@ export const SKILL_CATALOG = {
           'Weighs the options against your codebase, recommends a direction, and lists what is still open.',
       },
     ],
+    icon: 'lightbulb',
     kind: 'explicit',
     order: 1,
     searchDescription:
@@ -36,6 +37,7 @@ export const SKILL_CATALOG = {
           'Asks about any decision that is yours to make, turns the change you discussed into an implementation-ready plan under coding-agent-planning/, and stops for your approval.',
       },
     ],
+    icon: 'map',
     kind: 'explicit',
     order: 2,
     searchDescription:
@@ -61,6 +63,7 @@ export const SKILL_CATALOG = {
           'Challenges the plan at that path instead of the one in this conversation, with the same verdict, corrections, and decisions.',
       },
     ],
+    icon: 'shield-question-mark',
     kind: 'explicit',
     order: 3,
     searchDescription:
@@ -86,6 +89,7 @@ export const SKILL_CATALOG = {
           'Splits the plan at that path instead of the one in this conversation, writing milestones.md beside it.',
       },
     ],
+    icon: 'list-ordered',
     kind: 'explicit',
     order: 4,
     searchDescription:
@@ -128,6 +132,7 @@ export const SKILL_CATALOG = {
           'Builds milestone 3 of the plan at that path, reviews it until clean, pushes it, and stops.',
       },
     ],
+    icon: 'hammer',
     kind: 'explicit',
     order: 5,
     searchDescription:
@@ -146,6 +151,7 @@ export const SKILL_CATALOG = {
           'Reproduces the bug, narrows it to one cause, and fixes it with a regression test that failed first.',
       },
     ],
+    icon: 'bug',
     kind: 'explicit',
     order: 6,
     searchDescription:
@@ -163,6 +169,7 @@ export const SKILL_CATALOG = {
           'Stops at the next safe point, lists what is done and what is half-finished, and waits until you say continue.',
       },
     ],
+    icon: 'circle-pause',
     kind: 'explicit',
     order: 7,
     searchDescription:
@@ -181,6 +188,7 @@ export const SKILL_CATALOG = {
           'Detects your system and shell, offers a few checked commands with what each does and how risky it is, and runs the one you pick.',
       },
     ],
+    icon: 'terminal',
     kind: 'explicit',
     order: 8,
     searchDescription:
@@ -205,6 +213,7 @@ export const SKILL_CATALOG = {
           'Reviews everything the current branch would merge into main and answers Ready to merge into main, Not ready, or Review incomplete.',
       },
     ],
+    icon: 'file-diff',
     kind: 'explicit',
     order: 9,
     searchDescription:
@@ -223,6 +232,7 @@ export const SKILL_CATALOG = {
           "Commits only this task's files with a signed-off, signed commit and pushes the current branch.",
       },
     ],
+    icon: 'upload',
     kind: 'explicit',
     order: 10,
     searchDescription:
@@ -241,6 +251,7 @@ export const SKILL_CATALOG = {
           'Checks each claim against the code and recommends what to adopt, reject, or adjust.',
       },
     ],
+    icon: 'scale',
     kind: 'explicit',
     order: 11,
     searchDescription:
@@ -259,6 +270,7 @@ export const SKILL_CATALOG = {
           'Finds the named Codex or Claude Code session and answers from its latest decisions.',
       },
     ],
+    icon: 'messages-square',
     kind: 'explicit',
     order: 12,
     searchDescription:
@@ -275,6 +287,7 @@ export const SKILL_CATALOG = {
         request: 'Build a settings page with a profile form and a theme switcher.',
       },
     ],
+    icon: 'tailwindcss',
     kind: 'implicit',
     order: 13,
     searchDescription:
@@ -294,6 +307,7 @@ export const SKILL_CATALOG = {
         request: 'Add a filterable orders table to the dashboard.',
       },
     ],
+    icon: 'react',
     kind: 'implicit',
     order: 14,
     searchDescription:
@@ -313,6 +327,7 @@ export const SKILL_CATALOG = {
         request: 'Add an endpoint that archives a project by its ID.',
       },
     ],
+    icon: 'nestjs',
     kind: 'implicit',
     order: 15,
     searchDescription:
@@ -331,6 +346,7 @@ export const SKILL_CATALOG = {
         request: 'Add a migration that indexes orders by customer and creation date.',
       },
     ],
+    icon: 'database',
     kind: 'implicit',
     order: 16,
     searchDescription:
@@ -350,6 +366,7 @@ export const SKILL_CATALOG = {
         request: "Cache each user's dashboard summary in Redis for five minutes.",
       },
     ],
+    icon: 'redis',
     kind: 'implicit',
     order: 17,
     searchDescription:
@@ -369,6 +386,7 @@ export const SKILL_CATALOG = {
           'Write a script that copies the generated assets into dist and removes the old build.',
       },
     ],
+    icon: 'nodedotjs',
     kind: 'implicit',
     order: 18,
     searchDescription:
@@ -389,6 +407,7 @@ export const SKILL_CATALOG = {
           'Write an entrypoint script for the Docker image that waits for Postgres, then starts the app.',
       },
     ],
+    icon: 'file-terminal',
     kind: 'implicit',
     order: 19,
     searchDescription:
@@ -408,6 +427,7 @@ export const SKILL_CATALOG = {
         request: 'Add a GitHub Actions workflow that runs the tests on every pull request.',
       },
     ],
+    icon: 'workflow',
     kind: 'implicit',
     order: 20,
     searchDescription:
@@ -426,6 +446,7 @@ export const SKILL_CATALOG = {
         request: 'Validate the signup request body and return field errors the form can show.',
       },
     ],
+    icon: 'zod',
     kind: 'implicit',
     order: 21,
     searchDescription:
@@ -444,6 +465,7 @@ export const SKILL_CATALOG = {
         request: 'Add an end-to-end test for the checkout flow.',
       },
     ],
+    icon: 'flask-conical',
     kind: 'implicit',
     order: 22,
     searchDescription:

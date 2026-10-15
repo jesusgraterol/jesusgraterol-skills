@@ -8,6 +8,7 @@ import {
   type ISkill,
 } from '../../utilities/skill-catalog/index.ts';
 import ExternalLink from '../external-link/external-link.astro';
+import SkillIcon from '../skill-icon/skill-icon.astro';
 import TerminalWindow from '../terminal-window/terminal-window.astro';
 
 interface Props {
@@ -75,7 +76,11 @@ const examples =
   </nav>
 
   <header class="mt-10">
-    <p class="eyebrow">{SKILL_STAGES[skill.stage].label}</p>
+    <SkillIcon
+      icon={skill.icon}
+      size="header"
+    />
+    <p class="eyebrow mt-6">{SKILL_STAGES[skill.stage].label}</p>
     <h1 class="mt-4 font-mono text-4xl font-bold tracking-tight wrap-anywhere sm:text-5xl">
       {skill.name}
     </h1>

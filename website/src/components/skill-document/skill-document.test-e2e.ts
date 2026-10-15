@@ -16,6 +16,18 @@ test.describe('skill pages', () => {
 
       await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
 
+      // the header's icon is the only one on the page and stays out of the accessibility tree
+      const icon = page.locator('[data-skill-icon]');
+
+      await expect(icon).toHaveCount(1);
+      await expect(icon).toHaveAttribute('data-skill-icon', catalogEntry.icon);
+      await expect(icon).toHaveAttribute('aria-hidden', 'true');
+      await expect(
+        icon.locator(
+          `svg.lucide-${catalogEntry.icon}, svg[data-skill-brand-mark="${catalogEntry.icon}"]`,
+        ),
+      ).toHaveCount(1);
+
       const instructions = page.locator('[data-skill-instructions]');
 
       if (catalogEntry.kind === 'explicit') {

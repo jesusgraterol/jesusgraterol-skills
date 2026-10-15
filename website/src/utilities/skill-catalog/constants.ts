@@ -23,12 +23,12 @@ export const SKILL_STAGES = {
   implicit: { label: 'Implicit', summary: 'Loaded by your agent when a task touches their stack.' },
 } as const satisfies Record<ISkillStage, { label: string; summary: string }>;
 
-// display labels for what a skill may change
+// display labels for what a skill may change, short enough to fit one line of the narrowest card
 export const SKILL_ACCESS_LABELS = {
   'changes-code': 'Changes code',
-  'changes-code-and-pushes': 'Changes code, pushes when autonomous',
+  'changes-code-and-pushes': 'Changes code, can push',
   'commits-and-pushes': 'Commits and pushes',
   'planning-files': 'Writes planning files',
   'read-only': 'Read-only',
-  'runs-picked-command': 'Runs the command you pick',
+  'runs-picked-command': 'Runs a picked command',
 } as const satisfies Record<ISkillAccess, string>;

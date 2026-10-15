@@ -15,6 +15,31 @@ export type ISkillAccess =
   | 'commits-and-pushes'
   | 'runs-picked-command';
 
+// a Lucide icon that stands for what a skill does, named as Lucide names its `lucide-<name>` class
+export type ISkillLucideIcon =
+  | 'bug'
+  | 'circle-pause'
+  | 'database'
+  | 'file-diff'
+  | 'file-terminal'
+  | 'flask-conical'
+  | 'hammer'
+  | 'lightbulb'
+  | 'list-ordered'
+  | 'map'
+  | 'messages-square'
+  | 'scale'
+  | 'shield-question-mark'
+  | 'terminal'
+  | 'upload'
+  | 'workflow';
+
+// the Simple Icons slug of a technology mark an implicit skill shows for the stack it covers
+export type ISkillBrandMark = 'nestjs' | 'nodedotjs' | 'react' | 'redis' | 'tailwindcss' | 'zod';
+
+// the icon shown beside a skill's name on its card and page
+export type ISkillIcon = ISkillLucideIcon | ISkillBrandMark;
+
 // a realistic invocation, written without a host prefix, and what it produces
 export interface ISkillExample {
   invocation: string;
@@ -55,6 +80,8 @@ interface ISkillCatalogEntryBase {
 export interface IExplicitSkillCatalogEntry extends ISkillCatalogEntryBase {
   access: ISkillAccess;
   examples: ISkillExamples;
+  // explicit skills don't cover a technology, so they never show a technology mark
+  icon: ISkillLucideIcon;
   kind: 'explicit';
   stage: Exclude<ISkillStage, 'implicit'>;
 }
@@ -62,6 +89,11 @@ export interface IExplicitSkillCatalogEntry extends ISkillCatalogEntryBase {
 // a skill the agent loads on its own when a task touches its area
 export interface IImplicitSkillCatalogEntry extends ISkillCatalogEntryBase {
   examples: ISkillTriggerExamples;
+  /*
+   * the mark of the technology it is written for, or a Lucide icon when it covers several
+   * technologies or its mark blurs at card size
+   */
+  icon: ISkillIcon;
   kind: 'implicit';
   stage: 'implicit';
   // one short sentence for the skill's card; the SKILL.md description is a trigger list for agents

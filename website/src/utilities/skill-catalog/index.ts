@@ -1,5 +1,12 @@
 // types
-export type { ISkill, ISkillCatalogEntry, ISkillStage } from './types.ts';
+export type {
+  ISkill,
+  ISkillBrandMark,
+  ISkillCatalogEntry,
+  ISkillIcon,
+  ISkillLucideIcon,
+  ISkillStage,
+} from './types.ts';
 
 // constants
 export { SKILL_ACCESS_LABELS, SKILL_STAGES } from './constants.ts';
