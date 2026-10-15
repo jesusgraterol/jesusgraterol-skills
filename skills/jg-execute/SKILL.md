@@ -38,6 +38,7 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
      - If the branch this run will push to is the repository's default branch, such as `main`, ask the developer to confirm it with your preflight questions.
      - If the branch has unpushed commits, list them with your preflight questions, and publish them only after the developer confirms, by following `jg-push`'s `SKILL.md` with an empty task scope, which only pushes. If the developer doesn't want them published, stop, because every later push would publish them too.
    - If the next milestone already has uncommitted work, list those files, ask the developer to confirm them, and continue from that work instead of redoing it. Confirmed files join the unit's scope.
+   - When repository evidence shows that a milestone marked done no longer meets its acceptance criteria, for example because its work was reverted, list it with your preflight questions and ask whether to reopen it. Never skip work that the evidence shows is missing, and never move a status back on your own.
    - If the next milestone has no uncommitted work and its acceptance criteria already hold, mark it done. Supervised mode then reports and stops; autonomous mode continues with the next unit. A run that names a milestone never moves past it.
    - Ask every question in one message.
 5. **Each unit.**

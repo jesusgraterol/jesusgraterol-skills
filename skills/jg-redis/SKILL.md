@@ -29,6 +29,8 @@ chats:70aab698-313b-42cb-8b43-f2c31d42e398
 chats:70aab698-313b-42cb-8b43-f2c31d42e398:context
 ```
 
+In Redis Cluster, a hash tag in braces, such as `{user:123}:profile`, puts related keys in the same hash slot. The tag is part of the key name, so choose it when the key is designed.
+
 These conventions apply to new keys. Never rename a live key as a side effect of other work: the cached data under the old name is stranded, and instances on the old and new code read different keys during a rollout.
 
 ## Writes and expiry
@@ -42,7 +44,8 @@ Set a key's expiry in the same command that writes it, such as `SET key value EX
 
 ## Round trips and atomicity
 
-- Prefer one `MGET` or `MSET` over a loop of single reads or writes.
+- Prefer one `MGET` or `MSET` over a loop of single reads or writes. `MSET` cannot set an expiry, so for keys that expire, send their `SET … EX` commands together instead, for example with `Promise.all`, so the client pipelines them.
+- In Redis Cluster, multi-key commands such as `MGET` and `MSET`, `MULTI` transactions, and Lua scripts fail with a `CROSSSLOT` error unless every key they touch is in the same hash slot. An explicit `multi()` or `execAsPipeline()` batch also runs on a single node, so keep its keys in one hash slot too. Group keys used together under one hash tag, or split the commands by slot.
 - node-redis pipelines commands issued in the same tick, so send independent commands together, for example with `Promise.all`, instead of awaiting each one in turn.
 - Use `MULTI` only when the commands must apply together. To batch commands without a transaction, use `execAsPipeline()`.
 - For read-modify-write logic that must be atomic, prefer one Lua script over a read, a decision in application code, and a write.
