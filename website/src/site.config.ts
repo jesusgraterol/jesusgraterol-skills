@@ -363,6 +363,24 @@ export const SKILL_CATALOG = {
     whenToUse:
       'It loads on its own when a task touches scripts, CLIs, build tooling, or filesystem code. Call it by name to load it before such a task.',
   },
+  'jg-ci': {
+    examples: [
+      {
+        outcome:
+          'Grants read-only permissions, cancels superseded runs, caches dependencies by the lockfile, sets a timeout on every job, and pins any third-party action to a commit SHA.',
+        request: 'Add a GitHub Actions workflow that runs the tests on every pull request.',
+      },
+    ],
+    kind: 'implicit',
+    order: 18,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps GitHub Actions workflows fast, secure, and reusable whenever a task touches CI.',
+    searchTitle: 'jg-ci: GitHub Actions standards for coding agents',
+    stage: 'implicit',
+    summary: 'Fast, secure, and reusable GitHub Actions workflows for CI and deployments.',
+    whenToUse:
+      'It loads on its own when a task touches GitHub Actions workflows or CI and deployment pipelines. Call it by name to load it before such a task.',
+  },
 } as const satisfies Record<string, ISkillCatalogEntry>;
 
 // skill names in catalog order, used to build the remove command

@@ -35,11 +35,11 @@ Implicit skills load on their own when a task touches their stack, such as a mig
 Run these from your repository's root:
 
 ```bash
-npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts
+npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts jg-ci
 ```
 
 ```bash
-npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts
+npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts jg-ci
 ```
 
 Both commands name the skills, so other skills in the project are left alone.
@@ -64,14 +64,15 @@ Both commands name the skills, so other skills in the project are left alone.
 
 ### Implicit skills
 
-| Skill         | Loads when a task touches                                                        | Written for                    |
-| ------------- | -------------------------------------------------------------------------------- | ------------------------------ |
-| `jg-frontend` | UI, styling, forms, accessibility, motion, or frontend tests.                    | Tailwind CSS 4.3               |
-| `jg-react`    | React components, hooks, state, data loading, or React tests.                    | React 19.2, React Router 7     |
-| `jg-nestjs`   | NestJS modules, controllers, providers, configuration, logging, or NestJS tests. | NestJS 12                      |
-| `jg-postgres` | SQL, migrations, schema names, queries, or transactions.                         | PostgreSQL 18, node-postgres 8 |
-| `jg-redis`    | Redis keys, caching, locks, rate limits, streams, or pub/sub.                    | Redis 8, node-redis 5          |
-| `jg-scripts`  | Developer scripts, CLIs, build tooling, or filesystem code.                      | Node.js 24                     |
+| Skill         | Loads when a task touches                                                                 | Written for                    |
+| ------------- | ----------------------------------------------------------------------------------------- | ------------------------------ |
+| `jg-frontend` | UI, styling, forms, accessibility, motion, or frontend tests.                             | Tailwind CSS 4.3               |
+| `jg-react`    | React components, hooks, state, data loading, or React tests.                             | React 19.2, React Router 7     |
+| `jg-nestjs`   | NestJS modules, controllers, providers, configuration, logging, or NestJS tests.          | NestJS 12                      |
+| `jg-postgres` | SQL, migrations, schema names, queries, or transactions.                                  | PostgreSQL 18, node-postgres 8 |
+| `jg-redis`    | Redis keys, caching, locks, rate limits, streams, or pub/sub.                             | Redis 8, node-redis 5          |
+| `jg-scripts`  | Developer scripts, CLIs, build tooling, or filesystem code.                               | Node.js 24                     |
+| `jg-ci`       | GitHub Actions workflows, reusable workflows, composite actions, or deployment pipelines. | GitHub Actions (October 2026)  |
 
 Each implicit skill states the versions it was written for. Items that need a newer version are marked with it, and apply only when that version or a later one is installed. When an installed version is newer than the one a skill was written for, the agent follows that version's official guidance for the skill's version-specific items, reports any that look outdated, and offers to open an issue here.
 
