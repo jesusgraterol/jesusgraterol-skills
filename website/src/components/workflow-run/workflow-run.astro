@@ -16,12 +16,24 @@ const PLAN_STEPS = [
   { command: 'jg-breakdown', isOptional: true, text: 'Split a large plan into milestones.' },
 ] as const satisfies readonly IWorkflowStep[];
 
-// diagnose a bug whose cause isn't obvious, in either mode
-const DEBUG_STEP = {
-  command: 'jg-debug',
-  isOptional: true,
-  text: "Find a bug's cause, then fix it with a test that fails first.",
-} as const satisfies IWorkflowStep;
+// optional build steps that work in either mode
+const OPTIONAL_BUILD_STEPS = [
+  {
+    command: 'jg-debug',
+    isOptional: true,
+    text: "Find a bug's cause, then fix it test-first.",
+  },
+  {
+    command: 'jg-pause',
+    isOptional: true,
+    text: 'Stop at a safe point, then pick up later.',
+  },
+  {
+    command: 'jg-command',
+    isOptional: true,
+    text: 'Pick a checked command and run it.',
+  },
+] as const satisfies readonly IWorkflowStep[];
 
 // check the change, then publish it
 const SHIP_STEPS = [
@@ -35,13 +47,13 @@ const MODES = {
     command: 'jg-execute',
     label: 'Supervised',
     shipNote: 'You run these when you are ready.',
-    text: 'Builds the next milestone and runs its checks, then stops for you.',
+    text: 'Build and check one milestone, then stop.',
   },
   autonomous: {
     command: 'jg-execute auto',
     label: 'Autonomous',
     shipNote: 'jg-execute runs these after each milestone.',
-    text: 'Builds every remaining milestone, one at a time.',
+    text: 'Build each remaining milestone in turn.',
   },
 } as const;
 
@@ -197,25 +209,29 @@ const AUTONOMOUS_CYCLE = ['Implement', 'Checks', 'Review', 'Fix', 'Push'] as con
               </div>
             </div>
           </li>
-          <li class="relative flex gap-3">
-            <span
-              class="mt-2 size-2.5 shrink-0 rounded-full border-2 border-accent bg-background"
-              aria-hidden="true"
-            ></span>
-            <div class="min-w-0">
-              <div class="flex flex-wrap items-center gap-2">
-                <code
-                  class="rounded-md bg-code px-2 py-0.5 font-mono text-sm font-semibold text-accent"
-                >
-                  {`/${DEBUG_STEP.command}`}
-                </code>
-                <span class="rounded-full border border-border px-2 py-0.5 text-xs text-muted">
-                  Optional
-                </span>
-              </div>
-              <p class="mt-1.5 text-sm leading-6 text-muted">{DEBUG_STEP.text}</p>
-            </div>
-          </li>
+          {
+            OPTIONAL_BUILD_STEPS.map(({ command, isOptional, text }) => (
+              <li class="relative flex gap-3">
+                <span
+                  class="mt-2 size-2.5 shrink-0 rounded-full border-2 border-accent bg-background"
+                  aria-hidden="true"
+                />
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <code class="rounded-md bg-code px-2 py-0.5 font-mono text-sm font-semibold text-accent">
+                      {`/${command}`}
+                    </code>
+                    {isOptional && (
+                      <span class="rounded-full border border-border px-2 py-0.5 text-xs text-muted">
+                        Optional
+                      </span>
+                    )}
+                  </div>
+                  <p class="mt-1.5 text-sm leading-6 text-muted">{text}</p>
+                </div>
+              </li>
+            ))
+          }
         </ol>
       </div>
     </li>

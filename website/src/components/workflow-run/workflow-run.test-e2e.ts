@@ -15,6 +15,8 @@ test.describe('workflow section', () => {
     await expect(cycle).toBeHidden();
     await expect(workflow.getByText('You run these when you are ready.')).toBeVisible();
     await expect(workflow.getByText('/jg-debug', { exact: true })).toBeVisible();
+    await expect(workflow.getByText('/jg-pause', { exact: true })).toBeVisible();
+    await expect(workflow.getByText('/jg-command', { exact: true })).toBeVisible();
 
     await supervised.focus();
     await page.keyboard.press('ArrowRight');
@@ -32,6 +34,8 @@ test.describe('workflow section', () => {
     ]);
     await expect(workflow.getByText('jg-execute runs these after each milestone.')).toBeVisible();
     await expect(workflow.getByText('/jg-debug', { exact: true })).toBeVisible();
+    await expect(workflow.getByText('/jg-pause', { exact: true })).toBeVisible();
+    await expect(workflow.getByText('/jg-command', { exact: true })).toBeVisible();
     await expect(workflow.getByText('You run these when you are ready.')).toBeHidden();
   });
 
