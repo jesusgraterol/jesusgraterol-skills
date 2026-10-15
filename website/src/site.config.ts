@@ -483,6 +483,10 @@ const SKILL_NAMES = Object.keys(SKILL_CATALOG);
 
 // canonical metadata, navigation, and commands for every generated page
 export const SITE_CONFIG = {
+  // Agentic Coding's prompt for refining an existing AGENTS.md
+  agenticCodingRefineUrl: 'https://agenticcoding.jesusgraterol.dev/refine/',
+  // Agentic Coding's neutral AGENTS.md foundation for repositories that have none
+  agenticCodingStartUrl: 'https://agenticcoding.jesusgraterol.dev/start/',
   agenticCodingUrl: 'https://agenticcoding.jesusgraterol.dev/',
   author: {
     name: 'Jesus Graterol',

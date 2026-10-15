@@ -5,6 +5,7 @@ import Credits from '../components/credits/credits.astro';
 import InstallCommand from '../components/install-command/install-command.astro';
 import SessionDemo from '../components/session-demo/session-demo.astro';
 import SkillCard from '../components/skill-card/skill-card.astro';
+import StandardsSection from '../components/standards-section/standards-section.astro';
 import WorkflowRun from '../components/workflow-run/workflow-run.astro';
 import BaseLayout from '../layouts/base-layout.astro';
 import { SITE_CONFIG } from '../site.config.ts';
@@ -170,6 +171,8 @@ const stages = (Object.keys(SKILL_STAGES) as ISkillStage[]).map((stage) => ({
       </div>
     </div>
   </section>
+
+  <StandardsSection />
 
   <Credits />
 </BaseLayout>

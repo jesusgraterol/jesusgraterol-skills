@@ -42,6 +42,8 @@ export const buildLlmsText = (skills: readonly ILlmsSkill[]): string => {
     '',
     `- [Source repository](${SITE_CONFIG.repositoryUrl}): The skill folders, this website, and the issue tracker.`,
     `- [Agentic Coding](${SITE_CONFIG.agenticCodingUrl}): The engineering approach these skills put into practice.`,
+    `- [Start an AGENTS.md](${SITE_CONFIG.agenticCodingStartUrl}): A neutral AGENTS.md foundation for repositories without coding instructions.`,
+    `- [Refine an AGENTS.md](${SITE_CONFIG.agenticCodingRefineUrl}): A prompt that refines existing coding instructions without losing project knowledge.`,
     `- [Author](${SITE_CONFIG.author.url}): More work by ${SITE_CONFIG.author.name}.`,
     '',
   ].join('\n');
