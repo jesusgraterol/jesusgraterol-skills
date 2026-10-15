@@ -9,3 +9,7 @@
 ## Claude Code mark
 
 `website/public/coding-agents/claude-code.svg` is an unchanged copy of the Claude Code mark ([Claude](https://claude.ai/)) from the sibling Agentic Coding website. The hero's example conversation shows it only as the decorative avatar beside the "Claude Code" label. Its presence does not imply endorsement, partnership, or sponsorship. Keep its geometry unchanged and preserve its intrinsic dimensions.
+
+## GitHub mark
+
+The credits section draws GitHub's mark inline from [Primer Octicons](https://github.com/primer/octicons) (`mark-github-16`, MIT). It appears only on the tile beside each link to a GitHub repository. Keep its geometry unchanged.

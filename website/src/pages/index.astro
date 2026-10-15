@@ -1,6 +1,7 @@
 ---
 import { ArrowDown } from '@lucide/astro';
 
+import Credits from '../components/credits/credits.astro';
 import InstallCommand from '../components/install-command/install-command.astro';
 import SessionDemo from '../components/session-demo/session-demo.astro';
 import SkillCard from '../components/skill-card/skill-card.astro';
@@ -126,7 +127,7 @@ const stages = (Object.keys(SKILL_STAGES) as ISkillStage[]).map((stage) => ({
 
   <section
     id="install"
-    class="section-space scroll-mt-16"
+    class="section-space scroll-mt-16 border-b border-border"
     aria-labelledby="install-title"
   >
     <div class="page-shell grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-14">
@@ -168,4 +169,6 @@ const stages = (Object.keys(SKILL_STAGES) as ISkillStage[]).map((stage) => ({
       </div>
     </div>
   </section>
+
+  <Credits />
 </BaseLayout>

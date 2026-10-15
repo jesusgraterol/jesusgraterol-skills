@@ -1,5 +1,5 @@
 ---
-import { GitBranch, Menu } from '@lucide/astro';
+import { GitBranch, Menu, X } from '@lucide/astro';
 
 import { SITE_CONFIG } from '../../site.config.ts';
 import BrandLogo from '../brand-logo/brand-logo.astro';
@@ -50,11 +50,20 @@ import ThemeControl from '../theme-control/theme-control.astro';
     <details class="group relative md:hidden">
       <summary
         class="flex size-10 list-none items-center justify-center rounded-full border border-border-strong marker:content-none"
-        aria-label="Open navigation menu"
+        aria-label="Navigation menu"
       >
+        {
+          /* a menu icon while closed and a close icon while open; the expanded state is announced natively */
+        }
         <Menu
-          class="size-5"
+          class="size-5 group-open:hidden"
           aria-hidden="true"
+          data-menu-icon="open"
+        />
+        <X
+          class="hidden size-5 group-open:block"
+          aria-hidden="true"
+          data-menu-icon="close"
         />
       </summary>
       <div

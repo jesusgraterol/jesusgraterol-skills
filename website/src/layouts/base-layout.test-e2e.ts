@@ -172,16 +172,26 @@ test.describe('production website', () => {
 
     await expect(page.getByRole('link', { name: 'JG Skills home' })).toContainText('JG Skills');
 
-    const menu = page.getByLabel('Open navigation menu');
+    const menu = page.getByLabel('Navigation menu', { exact: true });
+    const mobileNavigation = page.getByRole('navigation', { name: 'Mobile navigation' });
+
+    await expect(menu.locator('[data-menu-icon="open"]')).toBeVisible();
+    await expect(menu.locator('[data-menu-icon="close"]')).toBeHidden();
+
     await menu.focus();
     await page.keyboard.press('Enter');
 
-    const mobileNavigation = page.getByRole('navigation', { name: 'Mobile navigation' });
-
     await expect(mobileNavigation).toBeVisible();
+    await expect(menu.locator('[data-menu-icon="close"]')).toBeVisible();
+    await expect(menu.locator('[data-menu-icon="open"]')).toBeHidden();
     await expect(
       mobileNavigation.getByRole('link', { name: 'Install', exact: true }),
     ).toHaveAttribute('href', '/#install');
+
+    await page.keyboard.press('Enter');
+
+    await expect(mobileNavigation).toBeHidden();
+    await expect(menu.locator('[data-menu-icon="open"]')).toBeVisible();
   });
 
   test('reduced-motion users do not receive animated scrolling or transitions', async ({

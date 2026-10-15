@@ -16,6 +16,13 @@ const PLAN_STEPS = [
   { command: 'jg-breakdown', isOptional: true, text: 'Split a large plan into milestones.' },
 ] as const satisfies readonly IWorkflowStep[];
 
+// diagnose a bug whose cause isn't obvious, in either mode
+const DEBUG_STEP = {
+  command: 'jg-debug',
+  isOptional: true,
+  text: "Find a bug's cause, then fix it with a test that fails first.",
+} as const satisfies IWorkflowStep;
+
 // check the change, then publish it
 const SHIP_STEPS = [
   { command: 'jg-review', isOptional: false, text: 'Check the change before it ships.' },
@@ -123,64 +130,93 @@ const AUTONOMOUS_CYCLE = ['Implement', 'Checks', 'Review', 'Fix', 'Push'] as con
         ></span>
       </div>
       <p class="mt-1 text-sm leading-6 text-muted">Turn the approved plan into verified code.</p>
-      <div class="relative mt-5 flex gap-3">
+      <div class="relative mt-5">
         <span
-          class="mt-2 size-2.5 shrink-0 rounded-full border-2 border-accent bg-background"
+          class="absolute top-2 bottom-2 left-1 w-px bg-border"
           aria-hidden="true"
         ></span>
-        <div class="min-w-0">
-          <code
-            class="rounded-md bg-code px-2 py-0.5 font-mono text-sm font-semibold text-accent group-has-[[data-workflow-mode=autonomous]:checked]/workflow:hidden"
-          >
-            {`/${MODES.supervised.command}`}
-          </code>
-          <code
-            class="hidden rounded-md bg-code px-2 py-0.5 font-mono text-sm font-semibold text-accent group-has-[[data-workflow-mode=autonomous]:checked]/workflow:inline"
-          >
-            {`/${MODES.autonomous.command}`}
-          </code>
-          <p
-            class="mt-1.5 text-sm leading-6 text-muted group-has-[[data-workflow-mode=autonomous]:checked]/workflow:hidden"
-          >
-            {MODES.supervised.text}
-          </p>
-          <div class="hidden group-has-[[data-workflow-mode=autonomous]:checked]/workflow:block">
-            <p class="mt-1.5 text-sm leading-6 text-muted">{MODES.autonomous.text}</p>
-            <p
-              id="workflow-cycle-label"
-              class="mt-4 text-xs font-semibold text-muted"
-            >
-              For each milestone
-            </p>
-            <ol
-              class="mt-2 flex flex-wrap items-center gap-1.5"
-              aria-labelledby="workflow-cycle-label"
-            >
-              {
-                AUTONOMOUS_CYCLE.map((step) => (
-                  <li class="inline-flex items-center gap-1.5">
-                    <span class="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-semibold">
-                      {step}
-                    </span>
-                    <ChevronRight
-                      class="size-3.5 text-muted"
+        <ol class="grid gap-4">
+          <li class="relative flex gap-3">
+            <span
+              class="mt-2 size-2.5 shrink-0 rounded-full border-2 border-accent bg-background"
+              aria-hidden="true"
+            ></span>
+            <div class="min-w-0">
+              <code
+                class="rounded-md bg-code px-2 py-0.5 font-mono text-sm font-semibold text-accent group-has-[[data-workflow-mode=autonomous]:checked]/workflow:hidden"
+              >
+                {`/${MODES.supervised.command}`}
+              </code>
+              <code
+                class="hidden rounded-md bg-code px-2 py-0.5 font-mono text-sm font-semibold text-accent group-has-[[data-workflow-mode=autonomous]:checked]/workflow:inline"
+              >
+                {`/${MODES.autonomous.command}`}
+              </code>
+              <p
+                class="mt-1.5 text-sm leading-6 text-muted group-has-[[data-workflow-mode=autonomous]:checked]/workflow:hidden"
+              >
+                {MODES.supervised.text}
+              </p>
+              <div
+                class="hidden group-has-[[data-workflow-mode=autonomous]:checked]/workflow:block"
+              >
+                <p class="mt-1.5 text-sm leading-6 text-muted">{MODES.autonomous.text}</p>
+                <p
+                  id="workflow-cycle-label"
+                  class="mt-4 text-xs font-semibold text-muted"
+                >
+                  For each milestone
+                </p>
+                <ol
+                  class="mt-2 flex flex-wrap items-center gap-1.5"
+                  aria-labelledby="workflow-cycle-label"
+                >
+                  {
+                    AUTONOMOUS_CYCLE.map((step) => (
+                      <li class="inline-flex items-center gap-1.5">
+                        <span class="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-semibold">
+                          {step}
+                        </span>
+                        <ChevronRight
+                          class="size-3.5 text-muted"
+                          aria-hidden="true"
+                        />
+                      </li>
+                    ))
+                  }
+                  <li
+                    class="inline-flex items-center gap-1.5 rounded-full border border-dashed border-border-strong px-2.5 py-0.5 text-xs font-semibold text-muted"
+                  >
+                    <CornerDownLeft
+                      class="size-3.5"
                       aria-hidden="true"
                     />
+                    Next milestone
                   </li>
-                ))
-              }
-              <li
-                class="inline-flex items-center gap-1.5 rounded-full border border-dashed border-border-strong px-2.5 py-0.5 text-xs font-semibold text-muted"
-              >
-                <CornerDownLeft
-                  class="size-3.5"
-                  aria-hidden="true"
-                />
-                Next milestone
-              </li>
-            </ol>
-          </div>
-        </div>
+                </ol>
+              </div>
+            </div>
+          </li>
+          <li class="relative flex gap-3">
+            <span
+              class="mt-2 size-2.5 shrink-0 rounded-full border-2 border-accent bg-background"
+              aria-hidden="true"
+            ></span>
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <code
+                  class="rounded-md bg-code px-2 py-0.5 font-mono text-sm font-semibold text-accent"
+                >
+                  {`/${DEBUG_STEP.command}`}
+                </code>
+                <span class="rounded-full border border-border px-2 py-0.5 text-xs text-muted">
+                  Optional
+                </span>
+              </div>
+              <p class="mt-1.5 text-sm leading-6 text-muted">{DEBUG_STEP.text}</p>
+            </div>
+          </li>
+        </ol>
       </div>
     </li>
 

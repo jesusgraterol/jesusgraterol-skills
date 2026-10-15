@@ -1,15 +1,18 @@
 ---
-import { ExternalLink as ExternalLinkIcon } from '@lucide/astro';
+import { ArrowUpRight, ExternalLink as ExternalLinkIcon } from '@lucide/astro';
 
 interface Props {
   class?: string | undefined;
+  // pins an up-right arrow to the top-right corner of the nearest positioned card instead of
+  // showing the inline new-tab icon; for links that cover a whole card
+  cornerArrow?: boolean | undefined;
   href: string;
 }
 
 // spoken after the link text so screen reader users know the link opens a new tab
 const NEW_TAB_NOTICE = ' (opens in a new tab)';
 
-const { class: className, href } = Astro.props;
+const { class: className, cornerArrow = false, href } = Astro.props;
 ---
 
 <a
@@ -17,9 +20,19 @@ const { class: className, href } = Astro.props;
   href={href}
   target="_blank"
   rel="noreferrer"
-  ><slot /><ExternalLinkIcon
-    class="ml-1 inline-block size-3.5 shrink-0 align-[-0.125em]"
-    aria-hidden="true"
-    data-external-icon
-  /><span class="sr-only">{NEW_TAB_NOTICE}</span></a
+  ><slot />{
+    cornerArrow ? (
+      <ArrowUpRight
+        class="absolute top-5 right-5 size-4 text-muted"
+        aria-hidden="true"
+        data-external-icon
+      />
+    ) : (
+      <ExternalLinkIcon
+        class="ml-1 inline-block size-3.5 shrink-0 align-[-0.125em]"
+        aria-hidden="true"
+        data-external-icon
+      />
+    )
+  }<span class="sr-only">{NEW_TAB_NOTICE}</span></a
 >
