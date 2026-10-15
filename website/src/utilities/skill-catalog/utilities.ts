@@ -1,7 +1,21 @@
 import { SITE_CONFIG } from '../../site.config.ts';
 import { SEARCH_TEXT_LIMITS } from '../seo/index.ts';
 
-import { EXPLICIT_ONLY_OPENAI_POLICY, SKILL_CATALOG_ERROR_MESSAGES } from './constants.ts';
+import {
+  EXPLICIT_ONLY_OPENAI_POLICY,
+  IMPLICIT_OPENAI_POLICY,
+  SKILL_CATALOG_ERROR_MESSAGES,
+} from './constants.ts';
+import type { ISkillKind } from './types.ts';
+
+// the frontmatter flag and Codex policy each kind of skill must ship
+const INVOCATION_SETTINGS = {
+  explicit: { disableModelInvocation: true, policy: EXPLICIT_ONLY_OPENAI_POLICY },
+  implicit: { disableModelInvocation: undefined, policy: IMPLICIT_OPENAI_POLICY },
+} as const satisfies Record<
+  ISkillKind,
+  { disableModelInvocation: true | undefined; policy: string }
+>;
 
 /**
  * Asserts that a skill's frontmatter name matches the directory it is installed from.
@@ -17,15 +31,29 @@ export const assertSkillName = (directoryName: string, frontmatterName: string):
 };
 
 /**
- * Asserts that a skill's Codex policy disables implicit invocation, whatever its line endings.
- * @param skillName The skill whose policy is checked.
+ * Asserts that a skill's frontmatter flag and Codex policy match its catalog kind, whatever the
+ * policy's line endings: explicit skills disable model invocation in both agents, and implicit
+ * skills omit the flag and allow implicit invocation.
+ * @param skillName The skill whose settings are checked.
+ * @param kind The skill's kind in the site catalog.
+ * @param disableModelInvocation The `disable-model-invocation` value in its SKILL.md frontmatter.
  * @param policyText The contents of the skill's agents/openai.yaml.
  * @throws
- * - Skill does not ship the explicit-only Codex policy
+ * - Skill invocation settings do not match its catalog kind
  */
-export const assertExplicitOnlyPolicy = (skillName: string, policyText: string): void => {
-  if (policyText.replaceAll('\r\n', '\n') !== EXPLICIT_ONLY_OPENAI_POLICY) {
-    throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.ImplicitInvocationAllowed}: ${skillName}`);
+export const assertInvocationSettings = (
+  skillName: string,
+  kind: ISkillKind,
+  disableModelInvocation: true | undefined,
+  policyText: string,
+): void => {
+  const expected = INVOCATION_SETTINGS[kind];
+
+  if (
+    disableModelInvocation !== expected.disableModelInvocation ||
+    policyText.replaceAll('\r\n', '\n') !== expected.policy
+  ) {
+    throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.InvocationMismatch}: ${skillName}`);
   }
 };
 

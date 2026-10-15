@@ -37,7 +37,8 @@ const stages = (Object.keys(SKILL_STAGES) as ISkillStage[]).map((stage) => ({
         </h1>
         <p class="lede mt-7">
           Brainstorm, plan, build, review, and ship changes with the skills professional software
-          developers use on real projects. Each one runs only when you call it.
+          developers use on real projects. Workflow skills run only when you call them. Implicit
+          skills load on their own when a task touches their stack.
         </p>
         <div class="mt-8">
           <InstallCommand
@@ -76,8 +77,8 @@ const stages = (Object.keys(SKILL_STAGES) as ISkillStage[]).map((stage) => ({
         One skill for each step you control.
       </h2>
       <p class="lede mt-5">
-        Each skill states exactly what it may change and defers general engineering standards to
-        your repository's coding instructions.
+        Explicit skills state exactly what they may change. Implicit skills add the stack-specific
+        standards your agent needs on top of your repository's coding instructions.
       </p>
       <div class="mt-12 grid gap-12">
         {

@@ -8,7 +8,7 @@ import { SKILL_CATALOG_ERROR_MESSAGES } from './constants.ts';
 import type { ISkill } from './types.ts';
 import {
   assertCatalogCoverage,
-  assertExplicitOnlyPolicy,
+  assertInvocationSettings,
   assertSearchMetadata,
   assertSkillName,
   buildSourceUrl,
@@ -20,13 +20,13 @@ const isCatalogName = (name: string): name is keyof typeof SKILL_CATALOG =>
 
 /**
  * Loads every skill under the repository's skills directory, merged with its catalog entry.
- * Fails the build when a skill folder and the site disagree, a skill could be invoked
- * implicitly by Codex, or its search metadata would be cut off in search results.
+ * Fails the build when a skill folder and the site disagree, a skill's invocation settings do not
+ * match its kind, or its search metadata would be cut off in search results.
  * @returns A promise that resolves to the skills in catalog order.
  * @throws
  * - Skill name does not match its directory
  * - Skill catalog does not match the skill folders
- * - Skill does not ship the explicit-only Codex policy
+ * - Skill invocation settings do not match its catalog kind
  * - Skill search metadata is outside its limits
  */
 export const loadSkills = async (): Promise<ISkill[]> => {
@@ -42,13 +42,18 @@ export const loadSkills = async (): Promise<ISkill[]> => {
     entries.map(async (entry): Promise<ISkill> => {
       const policyPath = resolve(dirname(entry.filePath ?? ''), 'agents', 'openai.yaml');
 
-      assertExplicitOnlyPolicy(entry.id, await readFile(policyPath, 'utf8'));
-
       if (!isCatalogName(entry.id)) {
         throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.CatalogMismatch}: ${entry.id}`);
       }
 
       const catalogEntry = SKILL_CATALOG[entry.id];
+
+      assertInvocationSettings(
+        entry.id,
+        catalogEntry.kind,
+        entry.data['disable-model-invocation'],
+        await readFile(policyPath, 'utf8'),
+      );
 
       assertSearchMetadata(entry.id, catalogEntry.searchTitle, catalogEntry.searchDescription);
 

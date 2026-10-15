@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest';
 
 import {
   assertCatalogCoverage,
-  assertExplicitOnlyPolicy,
+  assertInvocationSettings,
   assertSearchMetadata,
   assertSkillName,
   buildSourceUrl,
@@ -25,29 +25,48 @@ describe('assertSkillName', () => {
   });
 });
 
-describe('assertExplicitOnlyPolicy', () => {
+describe('assertInvocationSettings', () => {
+  const explicitPolicy = 'policy:\n  allow_implicit_invocation: false\n';
+  const implicitPolicy = 'policy:\n  allow_implicit_invocation: true\n';
+
   test.each([
-    ['LF line endings', 'policy:\n  allow_implicit_invocation: false\n'],
+    ['an explicit skill with LF line endings', 'explicit', true, explicitPolicy],
     [
-      'CRLF line endings from a Windows checkout',
-      'policy:\r\n  allow_implicit_invocation: false\r\n',
+      'an explicit skill with CRLF line endings from a Windows checkout',
+      'explicit',
+      true,
+      explicitPolicy.replaceAll('\n', '\r\n'),
     ],
-  ])('accepts the explicit-only policy with %s', (_caseName, policyText) => {
-    expect(() => assertExplicitOnlyPolicy('jg-push', policyText)).not.toThrow();
+    ['an implicit skill with LF line endings', 'implicit', undefined, implicitPolicy],
+    [
+      'an implicit skill with CRLF line endings from a Windows checkout',
+      'implicit',
+      undefined,
+      implicitPolicy.replaceAll('\n', '\r\n'),
+    ],
+  ] as const)('accepts %s', (_caseName, kind, disableModelInvocation, policyText) => {
+    expect(() =>
+      assertInvocationSettings('jg-push', kind, disableModelInvocation, policyText),
+    ).not.toThrow();
   });
 
   test.each([
-    ['implicit invocation allowed', 'policy:\n  allow_implicit_invocation: true\n'],
-    ['the policy key missing', 'interface:\n  display_name: jg-push\n'],
-    ['an empty file', ''],
+    ['an explicit skill that allows implicit invocation', 'explicit', true, implicitPolicy],
+    ['an explicit skill without the frontmatter flag', 'explicit', undefined, explicitPolicy],
+    ['an implicit skill that disables implicit invocation', 'implicit', undefined, explicitPolicy],
+    ['an implicit skill with the explicit-only frontmatter flag', 'implicit', true, implicitPolicy],
+    ['the policy key missing', 'explicit', true, 'interface:\n  display_name: jg-push\n'],
+    ['an empty policy file', 'implicit', undefined, ''],
     [
       'extra settings beside the policy',
-      'policy:\n  allow_implicit_invocation: false\ninterface:\n  display_name: jg-push\n',
+      'explicit',
+      true,
+      `${explicitPolicy}interface:\n  display_name: jg-push\n`,
     ],
-  ])('rejects a policy with %s', (_caseName, policyText) => {
-    expect(() => assertExplicitOnlyPolicy('jg-push', policyText)).toThrow(
-      'Skill does not ship the explicit-only Codex policy: jg-push',
-    );
+  ] as const)('rejects %s', (_caseName, kind, disableModelInvocation, policyText) => {
+    expect(() =>
+      assertInvocationSettings('jg-push', kind, disableModelInvocation, policyText),
+    ).toThrow('Skill invocation settings do not match its catalog kind: jg-push');
   });
 });
 

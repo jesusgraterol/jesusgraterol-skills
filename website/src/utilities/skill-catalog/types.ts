@@ -1,7 +1,10 @@
 import type { CollectionEntry } from 'astro:content';
 
-// workflow stages used to group skills on the landing page
-export type ISkillStage = 'plan' | 'build' | 'ship' | 'context';
+// how a skill starts: only when the developer invokes it, or on its own when a task needs it
+export type ISkillKind = 'explicit' | 'implicit';
+
+// workflow stages used to group skills on the landing page; implicit skills share one group
+export type ISkillStage = 'plan' | 'build' | 'ship' | 'context' | 'implicit';
 
 // what a skill may change when it runs
 export type ISkillAccess =
@@ -27,25 +30,52 @@ export type ISkillExamples =
   | readonly [ISkillExample]
   | readonly [ISkillCaseExample, ISkillCaseExample, ...ISkillCaseExample[]];
 
-// site-owned presentation data for one skill; the skill folder owns everything else
-export interface ISkillCatalogEntry {
-  access: ISkillAccess;
-  examples: ISkillExamples;
+// a realistic developer request that loads an implicit skill, and what the skill adds to the work
+export interface ISkillTriggerExample {
+  outcome: string;
+  request: string;
+}
+
+// one or more requests that load an implicit skill
+export type ISkillTriggerExamples = readonly [ISkillTriggerExample, ...ISkillTriggerExample[]];
+
+// presentation data every skill has, whatever its kind
+interface ISkillCatalogEntryBase {
   order: number;
   // search result description, 70 to 160 characters
   searchDescription: string;
   // search result title, at most 60 characters and starting with the skill name
   searchTitle: string;
-  stage: ISkillStage;
   // one or two vendor-neutral sentences on when to reach for the skill
   whenToUse: string;
 }
 
-// one skill merged from its SKILL.md entry and its catalog entry
-export interface ISkill extends ISkillCatalogEntry {
+// a skill that runs only when the developer invokes it by name
+export interface IExplicitSkillCatalogEntry extends ISkillCatalogEntryBase {
+  access: ISkillAccess;
+  examples: ISkillExamples;
+  kind: 'explicit';
+  stage: Exclude<ISkillStage, 'implicit'>;
+}
+
+// a skill the agent loads on its own when a task touches its area
+export interface IImplicitSkillCatalogEntry extends ISkillCatalogEntryBase {
+  examples: ISkillTriggerExamples;
+  kind: 'implicit';
+  stage: 'implicit';
+}
+
+// site-owned presentation data for one skill; the skill folder owns everything else
+export type ISkillCatalogEntry = IExplicitSkillCatalogEntry | IImplicitSkillCatalogEntry;
+
+// what the skill folder contributes to a skill
+interface ISkillSource {
   argumentHint: string | undefined;
   description: string;
   entry: CollectionEntry<'skills'>;
   name: string;
   sourceUrl: string;
 }
+
+// one skill merged from its SKILL.md entry and its catalog entry
+export type ISkill = ISkillCatalogEntry & ISkillSource;

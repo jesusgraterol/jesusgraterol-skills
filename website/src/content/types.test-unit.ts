@@ -24,12 +24,17 @@ describe('SkillFrontmatterSchema', () => {
     expect(SkillFrontmatterSchema.parse(withoutArgumentHint)).toStrictEqual(withoutArgumentHint);
   });
 
+  test('accepts implicit-skill frontmatter, which omits the explicit-only flag', () => {
+    const implicitFrontmatter = {
+      description: 'PostgreSQL standards the agent loads when a task touches SQL or migrations.',
+      name: 'jg-postgres',
+    };
+
+    expect(SkillFrontmatterSchema.parse(implicitFrontmatter)).toStrictEqual(implicitFrontmatter);
+  });
+
   test.each([
     ['model invocation enabled', { ...VALID_FRONTMATTER, 'disable-model-invocation': false }],
-    [
-      'the explicit-only flag missing',
-      { ...VALID_FRONTMATTER, 'disable-model-invocation': undefined },
-    ],
     ['an unknown key', { ...VALID_FRONTMATTER, 'user-invocable': true }],
     ['a name without the jg- prefix', { ...VALID_FRONTMATTER, name: 'plan' }],
     ['an uppercase name', { ...VALID_FRONTMATTER, name: 'jg-Plan' }],

@@ -18,6 +18,7 @@ export const SKILL_CATALOG = {
           'Weighs the options against your codebase, recommends a direction, and lists what is still open.',
       },
     ],
+    kind: 'explicit',
     order: 1,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that weighs options against your codebase and recommends a direction before you plan.',
@@ -35,6 +36,7 @@ export const SKILL_CATALOG = {
           'Asks about any decision that is yours to make, turns the change you discussed into an implementation-ready plan under coding-agent-planning/, and stops for your approval.',
       },
     ],
+    kind: 'explicit',
     order: 2,
     searchDescription:
       'An explicit-only agent skill that turns the change you discussed with Claude Code or Codex into an implementation-ready plan you approve.',
@@ -59,6 +61,7 @@ export const SKILL_CATALOG = {
           'Challenges the plan at that path instead of the one in this conversation, with the same verdict, corrections, and decisions.',
       },
     ],
+    kind: 'explicit',
     order: 3,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that challenges a plan before approval and surfaces material risks, gaps, and decisions.',
@@ -83,6 +86,7 @@ export const SKILL_CATALOG = {
           'Splits the plan at that path instead of the one in this conversation, writing milestones.md beside it.',
       },
     ],
+    kind: 'explicit',
     order: 4,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that splits a plan into ordered milestones you can build and review one at a time.',
@@ -124,6 +128,7 @@ export const SKILL_CATALOG = {
           'Builds milestone 3 of the plan at that path, reviews it until clean, pushes it, and stops.',
       },
     ],
+    kind: 'explicit',
     order: 5,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that builds a plan's milestones, supervised by default or autonomously with review and push.",
@@ -141,6 +146,7 @@ export const SKILL_CATALOG = {
           'Reproduces the bug, narrows it to one cause, and fixes it with a regression test that failed first.',
       },
     ],
+    kind: 'explicit',
     order: 6,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that reproduces a bug, finds its cause, and fixes it with a test that fails first.',
@@ -157,6 +163,7 @@ export const SKILL_CATALOG = {
           'Stops at the next safe point, lists what is done and what is half-finished, and waits until you say continue.',
       },
     ],
+    kind: 'explicit',
     order: 7,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that stops the agent at the nearest safe point, reports where things stand, and waits.',
@@ -181,6 +188,7 @@ export const SKILL_CATALOG = {
           'Reviews everything the current branch would merge into main and answers Ready to merge into main, Not ready, or Review incomplete.',
       },
     ],
+    kind: 'explicit',
     order: 8,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that reviews a task's changes against its plan, or a branch, and issues a readiness verdict.",
@@ -198,6 +206,7 @@ export const SKILL_CATALOG = {
           "Commits only this task's files with a signed-off, signed commit and pushes the current branch.",
       },
     ],
+    kind: 'explicit',
     order: 9,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that commits only the current task's files with a signed-off, signed commit and pushes.",
@@ -215,6 +224,7 @@ export const SKILL_CATALOG = {
           'Checks each claim against the code and recommends what to adopt, reject, or adjust.',
       },
     ],
+    kind: 'explicit',
     order: 10,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that checks feedback against the evidence and recommends what to adopt, reject, or adjust.',
@@ -232,6 +242,7 @@ export const SKILL_CATALOG = {
           'Finds the named Codex or Claude Code session and answers from its latest decisions.',
       },
     ],
+    kind: 'explicit',
     order: 11,
     searchDescription:
       'An explicit-only agent skill that finds a named Claude Code or Codex session and answers questions from its latest decisions and state.',
