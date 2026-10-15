@@ -32,7 +32,7 @@ export const SKILL_CATALOG = {
       {
         invocation: 'jg-plan',
         outcome:
-          'Turns the change you just discussed into an implementation-ready plan, saves it under coding-agent-planning/, and stops for your approval.',
+          'Asks about any decision that is yours to make, turns the change you discussed into an implementation-ready plan under coding-agent-planning/, and stops for your approval.',
       },
     ],
     order: 2,
@@ -172,7 +172,7 @@ export const SKILL_CATALOG = {
         invocation: 'jg-review',
         label: 'Task changes',
         outcome:
-          'Reports findings first, then the checks it ran, and answers Ready to commit, Not ready, or Review incomplete.',
+          "Reviews the task's changes, and how they follow the plan when you are building one, then answers Ready to commit, Not ready, or Review incomplete.",
       },
       {
         invocation: 'jg-review main',
@@ -183,7 +183,7 @@ export const SKILL_CATALOG = {
     ],
     order: 8,
     searchDescription:
-      "An explicit-only agent skill for Claude Code and Codex that reviews the current task's changes or a branch and issues a readiness verdict.",
+      "An explicit-only agent skill for Claude Code and Codex that reviews a task's changes against its plan, or a branch, and issues a readiness verdict.",
     searchTitle: 'jg-review: Code review for Claude Code and Codex',
     stage: 'ship',
     whenToUse:

@@ -26,7 +26,7 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
    - The plan is the one named in the invocation, otherwise the current plan in this conversation. If its directory contains `milestones.md`, the units are its milestones; otherwise the whole plan is one unit.
    - Without a plan file, a task agreed in this conversation is one unit. Restate its scope in a few lines before starting.
    - When the invocation names a milestone, run only that milestone. Otherwise, supervised mode runs the next unfinished milestone or the single unit, and autonomous mode runs every remaining milestone or the single unit.
-   - A milestone is finished once it has a `**Status:** done` line directly under its heading. Never remove a status line.
+   - The status line directly under each milestone heading is `**Status:** pending`, `**Status:** in progress`, or `**Status:** done`; a milestone without one is pending. A milestone is finished once it is done. Unfinished milestones run in order, except that one in progress comes first. Move a status only forward, and never remove one.
    - If the target is ambiguous, ask one question and stop.
 3. **Authority.** Invoking this skill approves running those units: their implementation, their checks, and their status lines in `milestones.md`. In autonomous mode it also approves reviewing and pushing each unit. This skill never deletes plan files.
 4. **Preflight.** Before changing anything:
@@ -38,24 +38,25 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
      - If the branch this run will push to is the repository's default branch, such as `main`, ask the developer to confirm it with your preflight questions.
      - If the branch has unpushed commits, list them with your preflight questions, and publish them only after the developer confirms, by following `jg-push`'s `SKILL.md` with an empty task scope, which only pushes. If the developer doesn't want them published, stop, because every later push would publish them too.
    - If the next milestone already has uncommitted work, list those files, ask the developer to confirm them, and continue from that work instead of redoing it. Confirmed files join the unit's scope.
-   - If the next milestone has no uncommitted work and its acceptance criteria already hold, write its status line. Supervised mode then reports and stops; autonomous mode continues with the next unit. A run that names a milestone never moves past it.
+   - If the next milestone has no uncommitted work and its acceptance criteria already hold, mark it done. Supervised mode then reports and stops; autonomous mode continues with the next unit. A run that names a milestone never moves past it.
    - Ask every question in one message.
 5. **Each unit.**
+   - When the unit is a pending milestone, mark it in progress before changing anything else.
    - Implement it following the plan and the repository's coding instructions (such as `AGENTS.md` or `CLAUDE.md`).
    - Run the checks the plan lists for it. When it lists none, run the repository's tests for the affected boundary. Fix the failures the work caused.
    - Before calling the unit finished, check each of its acceptance criteria, or what was agreed for a task, against evidence. Where you can, run the changed behavior itself; passing tests alone don't show it works.
    - The files the unit changed, plus any the developer confirmed, are its task scope for review and push.
    - Clean up as `## Invocation` describes before reviewing.
-6. **Supervised mode.** Run the unit. When it is a milestone and its acceptance criteria are met, write its status line. Then stop and report the files changed, the checks and their results, anything left undone, and the next commands: `jg-review`, `jg-push`, or `jg-execute` for the next milestone. Do not review, commit, or push.
+6. **Supervised mode.** Run the unit. When it is a milestone and its acceptance criteria are met, mark it done. Then stop and report the files changed, the checks and their results, anything left undone, and the next commands: `jg-review`, `jg-push`, or `jg-execute` for the next milestone. Do not review, commit, or push.
 7. **Autonomous mode.** For each unit, in order:
    1. Run it.
-   2. Follow `jg-review`'s `SKILL.md` on the unit's scope, including files changed by review fixes. Fix the blocking findings and review again until it reports `Ready to commit`; list non-blocking findings in the report instead of fixing them.
+   2. Follow `jg-review`'s `SKILL.md` on the unit's scope, including files changed by review fixes, treating the unit as finished. Fix the blocking findings and review again until it reports `Ready to commit`; list non-blocking findings in the report instead of fixing them.
    3. When review fixes changed the unit, recheck its acceptance criteria, then follow `jg-push`'s `SKILL.md` on the same scope.
-   4. When the unit is a milestone, write its status line. Report the commit and continue with the next unit.
+   4. When the unit is a milestone, mark it done. Report the commit and continue with the next unit.
 
    Reuse a passing check whose inputs haven't changed instead of rerunning slow suites on every review pass.
 8. **Stopping.** In either mode, stop and report when the work needs the developer:
-   - a decision or a review finding you shouldn't settle alone
+   - a decision or a review finding you shouldn't settle alone, including one the review says needs the developer's decision
    - a change to the agreed scope
    - a destructive action the plan doesn't call for
    - a check that cannot run
@@ -64,5 +65,5 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
    - a merge conflict, or a rejected or failed push
    - changes in scope that nobody can account for
 
-   Never weaken a test, check, or finding to get past it. A stopped unit has no status line, so the next run picks it up through preflight.
-9. **Output.** Report each unit as it finishes: its files, checks, review rounds, commit, and push, plus the decisions you made on your own, each with its reason, and anything you noticed but left alone because it was outside the scope. End with a short summary of the completed units, where the run stopped and why, and anything left uncommitted or running. Where planning files are tracked, status edits are not part of any unit's scope, so list them as uncommitted. This output replaces any general completion summary.
+   Never weaken a test, check, or finding to get past it. A stopped milestone stays in progress, so the next run picks it up through preflight.
+9. **Output.** Report each unit as it finishes: its files, checks, review rounds, commit, and push, plus the decisions you made on your own, each with its reason, and anything you noticed but left alone because it was outside the scope. End with a short summary of the completed units, each milestone's status, where the run stopped and why, and anything left uncommitted or running. Where planning files are tracked, status edits are not part of any unit's scope, so list them as uncommitted. This output replaces any general completion summary.
