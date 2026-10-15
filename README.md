@@ -47,13 +47,13 @@ Both commands name the skills, so other skills in the project are left alone.
 | Skill               | What it does                                                                                  | What it may change                                                                                     |
 | ------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `jg-brainstorm`     | Thinks an idea through with you and recommends a direction before planning.                   | Nothing.                                                                                               |
-| `jg-plan`           | Creates or revises an implementation-ready plan for the change under discussion.              | Writes `plan.md` under `coding-agent-planning/`; removes a stale `milestones.md`.                      |
+| `jg-plan`           | Settles your decisions with you, then creates or revises an implementation-ready plan.        | Writes `plan.md` under `coding-agent-planning/`; removes a stale `milestones.md`.                      |
 | `jg-challenge-plan` | Challenges a plan before approval and surfaces material risks, gaps, and decisions.           | Nothing.                                                                                               |
 | `jg-breakdown`      | Splits a plan into ordered, reviewable milestones when it has real implementation boundaries. | Writes or removes `milestones.md` next to the plan.                                                    |
 | `jg-execute`        | Builds an agreed task, a plan, or its milestones; supervised by default, or `autonomous`.     | Code and milestone status lines. In autonomous mode it also commits and pushes each milestone's files. |
 | `jg-debug`          | Reproduces a bug, finds its cause, and fixes it with a regression test that fails first.      | Code, a regression test, and temporary logging it removes. Never commits.                              |
 | `jg-pause`          | Stops at the nearest safe point, reports where things stand, and waits until you continue.    | Nothing.                                                                                               |
-| `jg-review`         | Reviews the current task's uncommitted changes, or the branch against a target.               | No files. With a target branch, it may refresh that branch's remote-tracking ref.                      |
+| `jg-review`         | Reviews the task's changes and how they follow its plan, or the branch against a target.      | No files. With a target branch, it may refresh that branch's remote-tracking ref.                      |
 | `jg-push`           | Commits the current task's files with a signed-off, signed commit and pushes the branch.      | Stages and commits the task's files (or every change without a task) and pushes the current branch.    |
 | `jg-feedback`       | Assesses feedback independently and recommends what to adopt, reject, or adjust.              | Nothing.                                                                                               |
 | `jg-session`        | Finds a named Codex or Claude Code session and answers questions about it.                    | Nothing.                                                                                               |
@@ -61,10 +61,10 @@ Both commands name the skills, so other skills in the project are left alone.
 ## A typical run
 
 1. `jg-brainstorm` thinks the idea through with you and ends with a summary you can plan from.
-2. `jg-plan` turns the discussion into a plan under `coding-agent-planning/` and asks for approval.
+2. `jg-plan` asks about any decision that is yours to make, then turns the discussion into a plan under `coding-agent-planning/` and asks for approval. When the idea isn't clear enough to plan, it points you back to `jg-brainstorm`.
 3. Optionally, `jg-challenge-plan` returns a verdict, any required corrections, and numbered decisions, and `jg-plan` with your answers revises the same plan.
-4. Optionally, `jg-breakdown` writes `milestones.md` when the plan has real milestone boundaries.
-5. `jg-execute` builds the next milestone, runs its checks, and stops so you can run `jg-review` and `jg-push` yourself. `jg-execute autonomous` builds every remaining milestone instead, reviewing and pushing each one before starting the next.
+4. Optionally, `jg-breakdown` writes `milestones.md` when the plan has real milestone boundaries, with a status line under each milestone: pending, in progress, or done.
+5. `jg-execute` builds the next milestone, runs its checks, and stops so you can run `jg-review` and `jg-push` yourself. `jg-review` checks the change against the plan and the milestone it belongs to, as well as the code. `jg-execute autonomous` builds every remaining milestone instead, reviewing and pushing each one before starting the next.
 
 Use `jg-pause` at any point to stop the agent at a safe point and pick up later. Use `jg-debug` when something breaks and the cause isn't obvious.
 
