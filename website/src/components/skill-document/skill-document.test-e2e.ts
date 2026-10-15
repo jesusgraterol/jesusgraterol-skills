@@ -50,6 +50,8 @@ test.describe('skill pages', () => {
         );
 
         await expect(page.locator('[data-skill-usage]')).toHaveText('Loads automatically');
+        // the page opens with the card's summary, not the agent-facing trigger list
+        await expect(page.locator('[data-skill-lede]')).toHaveText(catalogEntry.summary);
         await expect(page.getByText('May change', { exact: true })).toHaveCount(0);
         await expect(page.getByRole('heading', { level: 2, name: 'When it loads' })).toBeVisible();
         // exact text, because the copy buttons copy it verbatim

@@ -1,6 +1,6 @@
 ---
 name: jg-debug
-description: Find the cause of a bug before fixing it, then fix it with a regression test.
+description: Find the cause of a bug before fixing it, then fix it with a regression test that fails first.
 argument-hint: '[bug or symptom]'
 disable-model-invocation: true
 ---

@@ -1,5 +1,5 @@
 ---
-name: jg-scripts
+name: jg-node
 description: Portable, safe developer scripts and filesystem code. Use when writing, reviewing, or planning developer scripts, CLIs, build tooling, process spawning, filesystem code, path handling, or archive extraction.
 ---
 
@@ -21,7 +21,7 @@ The agent loads this skill on its own when a task touches its area. This skill's
 
 ## Portability and safety
 
-For developer-facing scripts, this skill's portability rules are a specific exception to the codebase-pattern and repository-tooling precedence rules in the repository's coding instructions. Unless the task contract or an explicit repository platform contract in documentation or configuration limits the supported host platforms, treat Windows, macOS, and Linux as supported. Preserve non-portable legacy scripts when they are outside the authorized scope, but do not extend them merely because they already exist.
+For developer-facing scripts, this skill's portability rules are a specific exception to the codebase-pattern and repository-tooling precedence rules in the repository's coding instructions. Unless the task contract or an explicit repository platform contract in documentation or configuration limits the supported host platforms, treat Windows, macOS, and Linux as supported. Code that runs only on Linux because of where it runs, such as a container entrypoint, a server job, or a CI step, is limited to Linux by that context, and shell scripts for it follow jg-bash. Preserve non-portable legacy scripts when they are outside the authorized scope, but do not extend them merely because they already exist.
 
 For scripts and filesystem code:
 

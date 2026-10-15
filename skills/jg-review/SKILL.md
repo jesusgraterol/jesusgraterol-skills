@@ -1,6 +1,6 @@
 ---
 name: jg-review
-description: Review the current task's uncommitted changes and how they follow its plan, or the current branch against a target, and issue a readiness verdict. Read-only.
+description: Review the task's changes against its plan, or the branch against a target, and give a verdict.
 argument-hint: '[target-branch]'
 disable-model-invocation: true
 ---

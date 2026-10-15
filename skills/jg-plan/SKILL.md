@@ -1,6 +1,6 @@
 ---
 name: jg-plan
-description: Ask about the decisions that are yours, then create or revise an implementation-ready plan for the change under discussion and save it for approval.
+description: Ask about the decisions that are yours, then write an implementation-ready plan for approval.
 argument-hint: '[task or amendments]'
 disable-model-invocation: true
 ---

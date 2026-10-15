@@ -35,11 +35,11 @@ Implicit skills load on their own when a task touches their stack, such as a mig
 Run these from your repository's root:
 
 ```bash
-npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-command jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts jg-ci
+npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-command jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-node jg-bash jg-ci
 ```
 
 ```bash
-npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-command jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-scripts jg-ci
+npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-command jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-node jg-bash jg-ci
 ```
 
 Both commands name the skills, so other skills in the project are left alone.
@@ -65,15 +65,16 @@ Both commands name the skills, so other skills in the project are left alone.
 
 ### Implicit skills
 
-| Skill         | Loads when a task touches                                                                 | Written for                    |
-| ------------- | ----------------------------------------------------------------------------------------- | ------------------------------ |
-| `jg-frontend` | UI, styling, forms, accessibility, motion, or frontend tests.                             | Tailwind CSS 4.3               |
-| `jg-react`    | React components, hooks, state, data loading, or React tests.                             | React 19.2, React Router 7     |
-| `jg-nestjs`   | NestJS modules, controllers, providers, configuration, logging, or NestJS tests.          | NestJS 12                      |
-| `jg-postgres` | SQL, migrations, schema names, queries, or transactions.                                  | PostgreSQL 18, node-postgres 8 |
-| `jg-redis`    | Redis keys, caching, locks, rate limits, streams, or pub/sub.                             | Redis 8, node-redis 5          |
-| `jg-scripts`  | Developer scripts, CLIs, build tooling, or filesystem code.                               | Node.js 24                     |
-| `jg-ci`       | GitHub Actions workflows, reusable workflows, composite actions, or deployment pipelines. | GitHub Actions (October 2026)  |
+| Skill         | Loads when a task touches                                                                           | Written for                    |
+| ------------- | --------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `jg-frontend` | UI, styling, forms, accessibility, motion, or frontend tests.                                       | Tailwind CSS 4.3               |
+| `jg-react`    | React components, hooks, state, data loading, or React tests.                                       | React 19.2, React Router 7     |
+| `jg-nestjs`   | NestJS modules, controllers, providers, configuration, logging, or NestJS tests.                    | NestJS 12                      |
+| `jg-postgres` | SQL, migrations, schema names, queries, or transactions.                                            | PostgreSQL 18, node-postgres 8 |
+| `jg-redis`    | Redis keys, caching, locks, rate limits, streams, or pub/sub.                                       | Redis 8, node-redis 5          |
+| `jg-node`     | Developer scripts, CLIs, build tooling, or filesystem code.                                         | Node.js 24                     |
+| `jg-bash`     | Shell scripts, container entrypoints, Dockerfile `RUN` steps, CI `run:` steps, or Makefile recipes. | Bash 5.3, POSIX `sh`           |
+| `jg-ci`       | GitHub Actions workflows, reusable workflows, composite actions, or deployment pipelines.           | GitHub Actions (October 2026)  |
 
 Each implicit skill states the versions it was written for. Items that need a newer version are marked with it, and apply only when that version or a later one is installed. When an installed version is newer than the one a skill was written for, the agent follows that version's official guidance for the skill's version-specific items, reports any that look outdated, and offers to open an issue here.
 
@@ -109,7 +110,7 @@ npm run dev
 | `npm run format`          | Format the website files.                                                                           |
 | `npm run assets:generate` | Regenerate the committed open-graph image from its HTML template.                                   |
 
-The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill's frontmatter flag or Codex policy doesn't match its kind in the catalog, or when a skill's search title or description would be cut off in search results. When you add a skill, add its catalog entry with its kind, an example invocation (or, for an implicit skill, an example request that loads it and a one-sentence card summary), a search title of at most 60 characters that starts with the skill name, a search description of 70 to 160 characters, and a short note on when to use it.
+The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill's frontmatter flag or Codex policy doesn't match its kind in the catalog, or when a skill's search title or description would be cut off in search results. When you add, rename, or remove a skill, follow [`docs/skill-changes.md`](docs/skill-changes.md).
 
 ### Deployment
 
@@ -151,6 +152,7 @@ Until then, the deploy job fails, or the site is served under a path where its r
 - Every skill directory name matches the `name` in its `SKILL.md` frontmatter.
 - Explicit skills are explicit-only in both agents: their frontmatter sets `disable-model-invocation: true`, and their `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`. Implicit skills omit the flag and set `policy.allow_implicit_invocation: true`. The site catalog's `kind` must match, or the build fails.
 - Every skill is self-contained and never links to sections of a specific `AGENTS.md`. Explicit skills share the rules in their `## Invocation` section. Implicit skills share their `## Application` section, which sets how their rules rank against the repository's coding instructions and conventions. Skills refer to each other by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix. Every skill works on its own: a mention of another skill is only a pointer, and the one runtime dependency is `jg-execute auto`, which reads the `jg-review` and `jg-push` `SKILL.md` files from the neighboring folders.
+- Adding, renaming, or removing a skill follows [`docs/skill-changes.md`](docs/skill-changes.md), which lists every place to update.
 - Website links show where they lead: `ArrowDown` for a section on the same page, `ArrowRight` (or `ArrowLeft` going back) for another page on the site, and the `external-link` component, which adds a screen-reader note plus an inline new-tab icon, or an up-right arrow in the corner when the link covers a whole card, for other sites.
 - The website shares its design tokens, Ubuntu Sans typography, and tooling with Agentic Coding and jesusgraterol.dev. [`docs/asset-attribution.md`](docs/asset-attribution.md) records where its brand marks come from.
 - Local coding instructions (`AGENTS.md`, `CANDIDATE.md`) and `coding-agent-planning/` are git-ignored and never published.

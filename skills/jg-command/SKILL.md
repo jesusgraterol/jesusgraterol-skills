@@ -1,6 +1,6 @@
 ---
 name: jg-command
-description: Turn a plain-language task into a few checked shell commands for your machine, explain each one, and run the one you pick.
+description: Turn a task into a few checked shell commands, explain each one, and run the one you pick.
 argument-hint: '<task>'
 disable-model-invocation: true
 ---

@@ -1,6 +1,6 @@
 ---
 name: jg-brainstorm
-description: Think an idea through before planning, with options, tradeoffs, and a recommended direction. Read-only.
+description: Think an idea through before planning, with options, tradeoffs, and a recommended direction.
 argument-hint: '[idea or question]'
 disable-model-invocation: true
 ---

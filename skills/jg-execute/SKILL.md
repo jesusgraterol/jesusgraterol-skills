@@ -1,6 +1,6 @@
 ---
 name: jg-execute
-description: Execute an agreed task, a plan, or its milestones. Supervised by default; autonomous adds a review and push after each milestone.
+description: Build an agreed task or plan, supervised by default, or with auto to review and push each milestone.
 argument-hint: '[auto] [plan-path] [milestone N]'
 disable-model-invocation: true
 ---

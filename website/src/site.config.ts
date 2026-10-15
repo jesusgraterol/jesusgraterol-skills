@@ -282,7 +282,7 @@ export const SKILL_CATALOG = {
     searchTitle: 'jg-frontend: Frontend standards for coding agents',
     stage: 'implicit',
     summary:
-      'Accessible, responsive, light- and dark-themed UI built on your design system and Tailwind CSS.',
+      'Accessibility, responsive layout, themes, forms, motion, and design-system reuse for Tailwind CSS.',
     whenToUse:
       'It loads on its own when a task touches UI, styling, forms, or frontend tests. Call it by name to load it before such a task.',
   },
@@ -301,7 +301,7 @@ export const SKILL_CATALOG = {
     searchTitle: 'jg-react: React standards for coding agents',
     stage: 'implicit',
     summary:
-      'Component organization, render performance, React 19 APIs, and user-focused React tests.',
+      'Component organization, render performance, React 19 APIs, and user-focused tests for React.',
     whenToUse:
       'It loads on its own when a task touches React components, hooks, state, or tests. Call it by name to load it before such a task.',
   },
@@ -319,7 +319,7 @@ export const SKILL_CATALOG = {
       'An implicit agent skill for Claude Code and Codex that applies NestJS module, validation, logging, lifecycle, and test standards whenever a task touches Nest.',
     searchTitle: 'jg-nestjs: NestJS standards for coding agents',
     stage: 'implicit',
-    summary: 'Modules, schema validation, configuration, logging, lifecycle, and NestJS tests.',
+    summary: 'Modules, schema validation, configuration, logging, lifecycle, and tests for NestJS.',
     whenToUse:
       'It loads on its own when a task touches NestJS modules, controllers, providers, or tests. Call it by name to load it before such a task.',
   },
@@ -360,7 +360,7 @@ export const SKILL_CATALOG = {
     whenToUse:
       'It loads on its own when a task touches Redis keys, caching, locks, or queues. Call it by name to load it before such a task.',
   },
-  'jg-scripts': {
+  'jg-node': {
     examples: [
       {
         outcome:
@@ -372,13 +372,33 @@ export const SKILL_CATALOG = {
     kind: 'implicit',
     order: 18,
     searchDescription:
-      'An implicit agent skill for Claude Code and Codex that keeps scripts, CLIs, and filesystem code portable and safe on Windows, macOS, and Linux.',
-    searchTitle: 'jg-scripts: Portable scripts for coding agents',
+      'An implicit agent skill for Claude Code and Codex that keeps Node.js scripts, CLIs, and filesystem code portable and safe on Windows, macOS, and Linux.',
+    searchTitle: 'jg-node: Portable Node.js scripts for coding agents',
     stage: 'implicit',
     summary:
-      'Portable, safe developer scripts, CLIs, and filesystem code for Windows, macOS, and Linux.',
+      'Cross-platform paths, safe filesystem access, processes, and CLIs for Node.js scripts.',
     whenToUse:
       'It loads on its own when a task touches scripts, CLIs, build tooling, or filesystem code. Call it by name to load it before such a task.',
+  },
+  'jg-bash': {
+    examples: [
+      {
+        outcome:
+          "Writes it in POSIX sh so it runs without bash, quotes every variable, fails with clear messages, and execs the app so it gets the container's stop signals.",
+        request:
+          'Write an entrypoint script for the Docker image that waits for Postgres, then starts the app.',
+      },
+    ],
+    kind: 'implicit',
+    order: 19,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps bash and sh scripts on Linux safe, consistent, and checked whenever a task touches shell.',
+    searchTitle: 'jg-bash: Bash script standards for coding agents',
+    stage: 'implicit',
+    summary:
+      'Shell choice, script structure, quoting, safety, and verification for bash and sh on Linux.',
+    whenToUse:
+      'It loads on its own when a task touches shell scripts, Dockerfile RUN steps, or CI run steps. Call it by name to load it before such a task.',
   },
   'jg-ci': {
     examples: [
@@ -389,12 +409,12 @@ export const SKILL_CATALOG = {
       },
     ],
     kind: 'implicit',
-    order: 19,
+    order: 20,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that keeps GitHub Actions workflows fast, secure, and reusable whenever a task touches CI.',
     searchTitle: 'jg-ci: GitHub Actions standards for coding agents',
     stage: 'implicit',
-    summary: 'Fast, secure, and reusable GitHub Actions workflows for CI and deployments.',
+    summary: 'Permissions, timeouts, caching, concurrency, and action pinning for GitHub Actions.',
     whenToUse:
       'It loads on its own when a task touches GitHub Actions workflows or CI and deployment pipelines. Call it by name to load it before such a task.',
   },
