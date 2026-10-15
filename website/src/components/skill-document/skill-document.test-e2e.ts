@@ -53,7 +53,7 @@ test.describe('skill pages', () => {
 
       await expect(page.getByRole('link', { name: 'View SKILL.md on GitHub' })).toHaveAttribute(
         'href',
-        `https://github.com/jesusgraterol/jesusgraterol-skills/blob/main/skills/${name}/SKILL.md`,
+        `https://github.com/jesusgraterol/jg-skills/blob/main/skills/${name}/SKILL.md`,
       );
       await expect(page.getByRole('link', { name: 'All skills' })).toHaveAttribute(
         'href',

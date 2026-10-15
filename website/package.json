@@ -1,5 +1,5 @@
 {
-  "name": "jesusgraterol-skills-website",
+  "name": "jg-skills-website",
   "version": "1.0.0",
   "description": "Install, browse, and learn the battle-tested jg skills for coding agents.",
   "author": "Jesus Graterol",
@@ -9,10 +9,10 @@
   "homepage": "https://jg-skills.jesusgraterol.dev",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jesusgraterol/jesusgraterol-skills.git"
+    "url": "git+https://github.com/jesusgraterol/jg-skills.git"
   },
   "bugs": {
-    "url": "https://github.com/jesusgraterol/jesusgraterol-skills/issues"
+    "url": "https://github.com/jesusgraterol/jg-skills/issues"
   },
   "engines": {
     "node": "^24.15.0",

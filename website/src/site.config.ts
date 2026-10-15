@@ -190,7 +190,7 @@ export const SITE_CONFIG = {
   },
   // project-scoped commands, run from the repository root
   commands: {
-    install: 'npx skills add jesusgraterol/jesusgraterol-skills --skill "*" -y',
+    install: 'npx skills add jesusgraterol/jg-skills --skill "*" -y',
     remove: `npx skills remove ${SKILL_NAMES.join(' ')}`,
     update: 'npx skills update -p',
   },
@@ -212,7 +212,7 @@ export const SITE_CONFIG = {
     locale: 'en_US',
     width: 1200,
   },
-  repositoryUrl: 'https://github.com/jesusgraterol/jesusgraterol-skills',
+  repositoryUrl: 'https://github.com/jesusgraterol/jg-skills',
   themeColors: {
     dark: '#1e2939',
     light: '#fefdfb',
