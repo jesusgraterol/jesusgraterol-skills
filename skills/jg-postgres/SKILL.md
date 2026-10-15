@@ -16,7 +16,7 @@ The agent loads this skill on its own when a task touches its area. This skill's
 
 ## PostgreSQL naming conventions
 
-This subsection governs application-owned PostgreSQL object and SQL-file names, overriding general filesystem naming where applicable.
+This section governs application-owned PostgreSQL object and SQL-file names, overriding general filesystem naming where applicable.
 
 ### Scope
 
@@ -185,8 +185,8 @@ If classification ambiguity materially affects compatibility, security, integrit
 - When an application-facing contract requires `camelCase`, map the `snake_case` database row in application code through a focused transformer.
 - Before adding SQL casts solely to shape application values, inspect the active database driver's type-parser configuration and relevant integration tests.
 - Do not cast top-level `BIGINT`/`INT8` IDs or foreign keys to `text` for JavaScript strings when the driver already returns safe strings, e.g. node-postgres’s default `INT8` parser.
-- Retain SQL text conversion when representation must survive before driver parsing, including `BIGINT` inside server-built `json`/`jsonb` and exact `NUMERIC` otherwise parsed imprecisely.
-- For new/changed PostgreSQL reads/writes, inspect affected access patterns and existing indexes. Index creation, adjustment, replacement, or removal with material benefits supported by repository/workload evidence, existing telemetry, or safe representative query plans is in-scope supporting work, not an optional related improvement, and needs no separate scope confirmation. Implement only through the migration workflow below, and report it as a high-impact change in the plan or completion summary.
+- Retain SQL text conversion when representation must survive before driver parsing, including `BIGINT` and exact `NUMERIC` inside server-built `json`/`jsonb`, which the driver parses with `JSON.parse`.
+- For new/changed PostgreSQL reads/writes, inspect affected access patterns and existing indexes. Index creation, adjustment, replacement, or removal with material benefits supported by repository/workload evidence, existing telemetry, or safe representative query plans counts as supporting work for the change, not an optional related improvement, when the repository's coding instructions treat it as in scope; otherwise recommend it instead of making it. Implement it only through the migration workflow below, and report the schema change in the plan or completion summary.
 - Design indexes for actual filters, joins, ordering, conflicts, and uniqueness, considering selectivity, key order, predicates, included columns, write amplification, storage, locking, and migration cost. Avoid speculative/redundant/duplicate indexes. Before replacement/removal, establish no constraint/invariant dependence and continued query coverage; absent code references do not prove disuse. Recommend rather than change when repository/workload evidence cannot establish safe removal.
 - Do not run `EXPLAIN ANALYZE` on mutating, lock-heavy, or potentially expensive production/shared queries without explicit authorization. Prefer sufficient plain `EXPLAIN`, existing telemetry, or representative local/test data.
 - Prefer simple queries over complex ones.
@@ -219,7 +219,7 @@ For an `_tx` record, commit the balance mutation and the state that prevents rea
 - Expand capacity or accepted formats before deploying code that may persist new values. Do not narrow storage or rely on a new format before all affected writers and readers are compatible.
 - Backfill and normalize data intentionally, deterministically, and idempotently before tightening constraints.
 - For eligible PostgreSQL foreign-key and check constraints, use `NOT VALID` when appropriate, make existing rows compliant, and run `VALIDATE CONSTRAINT` separately. Use the repository's established low-lock or concurrent pattern for other high-cost schema operations.
-- Avoid destructive schema changes unless explicitly requested and safely planned. Do not drop columns, tables, constraints, or data without a clear migration strategy and explicit approval. An index may be replaced or removed without separate scope confirmation when it directly supports an in-scope query change, a properly documented migration system exists, repository evidence shows the old index is redundant or obsolete, it does not back a constraint or durable invariant, retained query paths remain adequately covered, and the migration is safe and reversible. Otherwise, report the recommendation without changing the schema.
+- Avoid destructive schema changes unless explicitly requested and safely planned. Do not drop columns, tables, constraints, or data without a clear migration strategy and explicit approval. Where index work counts as supporting work, an index may be replaced or removed without separate scope confirmation when it directly supports an in-scope query change, a properly documented migration system exists, repository evidence shows the old index is redundant or obsolete, it does not back a constraint or durable invariant, retained query paths remain adequately covered, and the migration is safe and reversible. Otherwise, report the recommendation without changing the schema.
 - Consider rollback implications, deployment ordering, table size, write traffic, lock duration, nullability, defaults, and constraint-validation cost.
 - Apply index changes intentionally and consider query patterns, uniqueness, write overhead, and migration cost.
 - Keep migrations deterministic and independent of application runtime state.

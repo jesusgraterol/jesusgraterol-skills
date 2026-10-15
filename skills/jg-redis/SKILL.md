@@ -37,7 +37,7 @@ Set a key's expiry in the same command that writes it, such as `SET key value EX
 
 ## Reading and scanning
 
-- Never use `KEYS` outside a throwaway local instance: it blocks the server while it walks the whole keyspace. Use `SCAN` with `MATCH` and `COUNT`, or node-redis `scanIterator`, which yields batches of keys in node-redis 5 that you can pass straight to `mGet` or `unlink`.
+- Never use `KEYS` outside a throwaway local instance: it blocks the server while it walks the whole keyspace. Use `SCAN` with `MATCH` and `COUNT`, or node-redis `scanIterator`, which yields batches of keys in node-redis 5 that you can pass to `mGet` or `unlink` after skipping empty batches.
 - Prefer `UNLINK` over `DEL` for large or many values, so the memory is reclaimed in the background instead of blocking the server.
 
 ## Round trips and atomicity
@@ -49,13 +49,13 @@ Set a key's expiry in the same command that writes it, such as `SET key value EX
 
 ## Data structures
 
-- Use a hash for an object whose fields are read or updated separately. (7.4+) Give individual fields their own expiry with `HEXPIRE` instead of splitting them into separate keys only to expire them.
+- Use a hash for an object whose fields are read or updated separately. (7.4+) Give individual fields their own expiry with `HEXPIRE` instead of splitting them into separate keys only to expire them. (8.0+) Write fields and their expiry together with `HSETEX`, because `HSET` on a field clears its expiry.
 - Use a sorted set for rankings, time windows, and sliding rate limits.
 - Use a stream with consumer groups when messages must survive a restart or a slow consumer, and acknowledge each message after it is processed. Use pub/sub only for fire-and-forget messages that may be lost.
 
 ## Locks
 
-- Take a lock with `SET key token NX PX milliseconds`, using a random token, and release it only when the stored token still matches, in one Lua script, so one holder never releases another's lock.
+- Take a lock with `SET key token NX PX milliseconds`, using a random token, and release it only when the stored token still matches, in one Lua script or, (8.4+), with `DELEX key IFEQ token`, so one holder never releases another's lock.
 - A Redis lock is advisory and can expire mid-operation. When correctness depends on mutual exclusion, such as for value-bearing changes, rely on PostgreSQL transactions, row locks, or constraints instead.
 
 ## node-redis 5

@@ -63,6 +63,8 @@ export interface IImplicitSkillCatalogEntry extends ISkillCatalogEntryBase {
   examples: ISkillTriggerExamples;
   kind: 'implicit';
   stage: 'implicit';
+  // one short sentence for the skill's card; the SKILL.md description is a trigger list for agents
+  summary: string;
 }
 
 // site-owned presentation data for one skill; the skill folder owns everything else

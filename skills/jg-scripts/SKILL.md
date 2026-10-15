@@ -16,7 +16,7 @@ The agent loads this skill on its own when a task touches its area. This skill's
 
 ## Portability and safety
 
-This skill's portability rules are a specific exception to the codebase-pattern and repository-tooling precedence rules in the repository's coding instructions for developer-facing scripts. Unless the task contract or an explicit repository platform contract in documentation or configuration limits the supported host platforms, treat Windows, macOS, and Linux as supported. Preserve non-portable legacy scripts when they are outside the authorized scope, but do not extend them merely because they already exist.
+For developer-facing scripts, this skill's portability rules are a specific exception to the codebase-pattern and repository-tooling precedence rules in the repository's coding instructions. Unless the task contract or an explicit repository platform contract in documentation or configuration limits the supported host platforms, treat Windows, macOS, and Linux as supported. Preserve non-portable legacy scripts when they are outside the authorized scope, but do not extend them merely because they already exist.
 
 For scripts and filesystem code:
 
@@ -39,9 +39,9 @@ Before finishing a filesystem or script change, run existing Windows and POSIX v
 
 - Import built-in modules with the `node:` prefix, such as `node:fs/promises`.
 - In ES modules, resolve script-relative paths from `import.meta.dirname` instead of rebuilding `__dirname` from `import.meta.url`.
-- Parse command-line flags with `util.parseArgs` instead of slicing `process.argv` by hand. Its default strict mode rejects unknown options.
+- Parse command-line flags with `util.parseArgs` instead of slicing `process.argv` by hand. Its default strict mode rejects unknown options, and positional arguments unless `allowPositionals: true` is set.
 - To check that a target stays inside a trusted root, resolve both and compute `path.relative(root, target)`. Accept the target only when the result is not absolute and is neither `..` nor starts with `..` followed by `path.sep`. An empty result means the target is the root itself.
-- When other processes read a file in place, write it atomically: write a temporary file in the same directory, then `rename` it over the target, so a reader never sees a partial file.
+- When other processes read a file in place, write it atomically: write a temporary file in the same directory, then `rename` it over the target, so a reader never sees a partial file. On Windows, retry the rename on `EPERM` or `EACCES`, which another process holding the file open can cause.
 - Stream large files with `pipeline` from `node:stream/promises` instead of reading them whole. It forwards errors and closes every stream in the chain.
 - Set `process.exitCode = 1` and return instead of calling `process.exit(1)`, so pending output and cleanup can finish.
 - Give network calls and spawned processes a deadline by passing `AbortSignal.timeout(milliseconds)` as their `signal`.

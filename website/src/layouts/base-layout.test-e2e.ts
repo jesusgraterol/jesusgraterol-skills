@@ -132,12 +132,18 @@ test.describe('production website', () => {
       );
     }
 
-    // implicit skills show how they load where explicit skills show what they may change
-    await expect(
-      page
-        .locator('[data-skill-card]')
-        .filter({ has: page.getByRole('link', { name: 'jg-postgres', exact: true }) }),
-    ).toContainText('Loads on its own');
+    // implicit skills show how they load where explicit skills show what they may change, and a
+    // short summary instead of their agent-facing description
+    for (const [name, catalogEntry] of Object.entries(SKILL_CATALOG)) {
+      if (catalogEntry.kind === 'implicit') {
+        const card = page
+          .locator('[data-skill-card]')
+          .filter({ has: page.getByRole('link', { name, exact: true }) });
+
+        await expect(card).toContainText('Loads on its own');
+        await expect(card.locator('[data-skill-summary]')).toHaveText(catalogEntry.summary);
+      }
+    }
   });
 
   test('theme preference persists across reloads', async ({ page }) => {

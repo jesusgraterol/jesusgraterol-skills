@@ -73,7 +73,7 @@ Both commands name the skills, so other skills in the project are left alone.
 | `jg-redis`    | Redis keys, caching, locks, rate limits, streams, or pub/sub.                    | Redis 8, node-redis 5          |
 | `jg-scripts`  | Developer scripts, CLIs, build tooling, or filesystem code.                      | Node.js 24                     |
 
-Each implicit skill states the versions it was written for. Items that need a newer version are marked with it, and apply only when that version is installed.
+Each implicit skill states the versions it was written for. Items that need a newer version are marked with it, and apply only when that version or a later one is installed.
 
 ## A typical run
 
@@ -107,7 +107,7 @@ npm run dev
 | `npm run format`          | Format the website files.                                                                           |
 | `npm run assets:generate` | Regenerate the committed open-graph image from its HTML template.                                   |
 
-The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill's frontmatter flag or Codex policy doesn't match its kind in the catalog, or when a skill's search title or description would be cut off in search results. When you add a skill, add its catalog entry with its kind, an example invocation (or, for an implicit skill, an example request that loads it), a search title of at most 60 characters that starts with the skill name, a search description of 70 to 160 characters, and a short note on when to use it.
+The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill's frontmatter flag or Codex policy doesn't match its kind in the catalog, or when a skill's search title or description would be cut off in search results. When you add a skill, add its catalog entry with its kind, an example invocation (or, for an implicit skill, an example request that loads it and a one-sentence card summary), a search title of at most 60 characters that starts with the skill name, a search description of 70 to 160 characters, and a short note on when to use it.
 
 ### Deployment
 

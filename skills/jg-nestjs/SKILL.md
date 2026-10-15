@@ -46,7 +46,7 @@ class GoalsController {
 }
 ```
 
-- (12+) Validate `@Body()`, `@Query()`, and `@Param()` input by passing a Zod schema as `{ schema }`, with `StandardSchemaValidationPipe` registered, for example through `app.useGlobalPipes`. The same schema then feeds the OpenAPI document, so validation and documentation cannot drift apart.
+- (12+) Validate `@Body()`, `@Query()`, and `@Param()` input by passing a Zod schema as `{ schema }`, with `StandardSchemaValidationPipe` registered, for example through `app.useGlobalPipes`. With `@nestjs/swagger` and Zod 4.2 or later, or a configured `standardSchemaConverter`, the same schema also feeds the OpenAPI document, so validation and documentation cannot drift apart.
 - (12+) Give `ConfigModule` a Zod `validationSchema`, so invalid configuration stops the application at startup instead of failing on first use.
 
 ## NestJS logging
@@ -55,7 +55,7 @@ In NestJS projects:
 
 - Import `Logger` from `@nestjs/common`.
 - Do not use direct `console.log`, `console.error`, `console.warn`, or similar calls.
-- Use the appropriate `Logger` method: `log`, `error`, `warn`, `debug`, or `verbose`.
+- Use the appropriate `Logger` method: `log`, `error`, `warn`, `debug`, `verbose`, or `fatal`.
 - In services, define a private readonly logger with the service class name as context.
 
 ```ts
@@ -75,7 +75,7 @@ class MyService {
 
 ## Lifecycle and providers
 
-- Call `app.enableShutdownHooks()` in applications that hold connections, and close pools, queues, and consumers in `onModuleDestroy` or `beforeApplicationShutdown`. (12+) Lifecycle hooks run by module hierarchy level, so do not rely on the order between sibling modules.
+- Call `app.enableShutdownHooks()` in applications that hold connections, and close pools, queues, and consumers in `onModuleDestroy` or `beforeApplicationShutdown`. (12+) Within a module, a provider's lifecycle hooks run after those of the providers it depends on, and teardown runs in reverse. Do not rely on the order between providers at the same level or between sibling modules.
 - Prefer default singleton providers. A request-scoped provider makes every provider that injects it request-scoped too, so the whole chain is rebuilt on each request. Use `AsyncLocalStorage` when code needs request context.
 - Keep the repository's module format, CommonJS or ESM, when adding files or packages.
 

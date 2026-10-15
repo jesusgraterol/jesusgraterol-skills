@@ -51,7 +51,7 @@ When building UI:
 - Use correct native elements before falling back to `role`.
 - Use ARIA only when needed and ensure it is correct.
 - Specify image dimensions explicitly when appropriate.
-- Meet WCAG 2.2 AA, including targets of at least 24 by 24 CSS pixels and focus indicators that sticky headers, footers, or overlays never cover.
+- Meet WCAG 2.2 AA, including targets of at least 24 by 24 CSS pixels, or spaced as its target-size exceptions allow, and a focused component that sticky headers, footers, or overlays never hide entirely.
 
 ```html
 <button type="button">
@@ -89,7 +89,7 @@ Before creating or materially changing a form, inspect existing forms, shared co
 - Preserve accurate native attributes for semantics, accessibility, autofill, mobile input, and progressive enhancement. When the application-owned system controls validation feedback/submission, prevent competing browser validation UI, normally with `noValidate` on `<form>`.
 - Align client validation with authoritative application/server contracts; it improves UX but never replaces trusted-server validation.
 - Set `autocomplete` tokens, `inputmode`, and `enterkeyhint` on inputs, so browsers can autofill them and mobile keyboards match the field.
-- (Tailwind 4.1+) Prefer the `user-invalid:` variant over `invalid:` for error styling, so a field shows its error only after the user has interacted with it.
+- (4.1+) Prefer the `user-invalid:` variant over `invalid:` for error styling, so a field shows its error only after the user has interacted with it.
 
 ### Form placeholder guidance
 

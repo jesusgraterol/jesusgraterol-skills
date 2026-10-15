@@ -264,6 +264,8 @@ export const SKILL_CATALOG = {
       'An implicit agent skill for Claude Code and Codex that keeps UI work accessible, responsive, themed, and on your design system whenever a task touches it.',
     searchTitle: 'jg-frontend: Frontend standards for coding agents',
     stage: 'implicit',
+    summary:
+      'Accessible, responsive, light- and dark-themed UI built on your design system and Tailwind CSS.',
     whenToUse:
       'It loads on its own when a task touches UI, styling, forms, or frontend tests. Call it by name to load it before such a task.',
   },
@@ -281,6 +283,8 @@ export const SKILL_CATALOG = {
       'An implicit agent skill for Claude Code and Codex that applies React 19 APIs, render-performance rules, and testing standards whenever a task touches React.',
     searchTitle: 'jg-react: React standards for coding agents',
     stage: 'implicit',
+    summary:
+      'Component organization, render performance, React 19 APIs, and user-focused React tests.',
     whenToUse:
       'It loads on its own when a task touches React components, hooks, state, or tests. Call it by name to load it before such a task.',
   },
@@ -298,6 +302,7 @@ export const SKILL_CATALOG = {
       'An implicit agent skill for Claude Code and Codex that applies NestJS module, validation, logging, lifecycle, and test standards whenever a task touches Nest.',
     searchTitle: 'jg-nestjs: NestJS standards for coding agents',
     stage: 'implicit',
+    summary: 'Modules, schema validation, configuration, logging, lifecycle, and NestJS tests.',
     whenToUse:
       'It loads on its own when a task touches NestJS modules, controllers, providers, or tests. Call it by name to load it before such a task.',
   },
@@ -315,6 +320,8 @@ export const SKILL_CATALOG = {
       'An implicit agent skill for Claude Code and Codex that applies PostgreSQL naming, constraint, query, and migration standards whenever a task touches SQL.',
     searchTitle: 'jg-postgres: PostgreSQL standards for coding agents',
     stage: 'implicit',
+    summary:
+      'Naming, constraints, queries, transactions, indexes, and safe migrations for PostgreSQL.',
     whenToUse:
       'It loads on its own when a task touches PostgreSQL schemas, queries, or migrations. Call it by name to load it before such a task.',
   },
@@ -332,6 +339,7 @@ export const SKILL_CATALOG = {
       'An implicit agent skill for Claude Code and Codex that applies Redis key, expiry, scanning, and locking standards whenever a task touches Redis.',
     searchTitle: 'jg-redis: Redis standards for coding agents',
     stage: 'implicit',
+    summary: 'Key names, expiry, scanning, round trips, data structures, and locks for Redis.',
     whenToUse:
       'It loads on its own when a task touches Redis keys, caching, locks, or queues. Call it by name to load it before such a task.',
   },
@@ -350,6 +358,8 @@ export const SKILL_CATALOG = {
       'An implicit agent skill for Claude Code and Codex that keeps scripts, CLIs, and filesystem code portable and safe on Windows, macOS, and Linux.',
     searchTitle: 'jg-scripts: Portable scripts for coding agents',
     stage: 'implicit',
+    summary:
+      'Portable, safe developer scripts, CLIs, and filesystem code for Windows, macOS, and Linux.',
     whenToUse:
       'It loads on its own when a task touches scripts, CLIs, build tooling, or filesystem code. Call it by name to load it before such a task.',
   },

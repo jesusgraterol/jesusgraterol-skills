@@ -64,11 +64,11 @@ For non-obvious performance tradeoffs, prioritize correctness/readability and th
 
 - (19+) Pass `ref` as a regular prop instead of wrapping a component in `forwardRef`.
 - (19+) Render a context with `<SomeContext value={…}>` instead of `<SomeContext.Provider value={…}>`.
-- Load data through the router's loaders or the project's established query layer, not by fetching inside `useEffect`.
+- Prefer loading data through the router's loaders or the project's established query layer, where the project has one, over fetching inside `useEffect`.
 - (19+) Where the project has no established form system, prefer `<form action={…}>` with `useActionState` and `useFormStatus` for submissions, and `useOptimistic` for optimistic updates.
-- (19.2+) Move non-reactive logic that an effect calls into `useEffectEvent` instead of leaving dependencies out of the array. It needs `eslint-plugin-react-hooks` 6 or later, so the linter does not add the event to the dependencies.
+- (19.2+) Move non-reactive logic that an effect calls into `useEffectEvent` instead of leaving dependencies out of the array. It needs `eslint-plugin-react-hooks` 6.1 or later, so the linter does not add the event to the dependencies.
 - (19.2+) Keep the state of hidden UI, such as inactive tabs, with `<Activity mode="hidden">` instead of unmounting it or hiding it while its effects keep running.
-- (19+) Pass async functions to `startTransition` for non-urgent updates that wait on work.
+- (19+) Pass async functions to `startTransition` for non-urgent updates that wait on work, and wrap state updates that follow an `await` in another `startTransition`.
 - Place Suspense and error boundaries per route or per meaningful section, rather than only around the whole app or around every component.
 
 ## React testing
