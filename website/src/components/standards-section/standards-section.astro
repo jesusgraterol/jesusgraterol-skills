@@ -2,6 +2,8 @@
 import { FilePlus, Link2, PencilRuler } from '@lucide/astro';
 
 import { SITE_CONFIG } from '../../site.config.ts';
+import AgenticCodingMark from '../agentic-coding-mark/agentic-coding-mark.astro';
+import BrandMark from '../brand-mark/brand-mark.astro';
 import ExternalLink from '../external-link/external-link.astro';
 
 // one starting point on Agentic Coding, chosen by whether the repository already has an AGENTS.md
@@ -71,9 +73,15 @@ const toDestination = (href: string): { host: string; path: string } => {
         aria-label="How AGENTS.md and jg-skills fit together"
         data-standards-strip
       >
-        <li class="rounded-xl bg-primary p-5 text-primary-foreground shadow-raised">
-          <code class="font-mono text-base font-bold">AGENTS.md</code>
-          <span class="mt-1 block text-sm text-accent-on-primary">Sets the standards</span>
+        {/* each item carries the mark of the project that provides it */}
+        <li
+          class="flex items-center gap-4 rounded-xl bg-primary p-5 text-primary-foreground shadow-raised"
+        >
+          <AgenticCodingMark class="size-10 shrink-0" />
+          <div class="min-w-0">
+            <code class="font-mono text-base font-bold">AGENTS.md</code>
+            <span class="mt-1 block text-sm text-accent-on-primary">Sets the standards</span>
+          </div>
         </li>
         <li
           class="flex flex-col items-center justify-center text-muted sm:flex-row"
@@ -90,9 +98,14 @@ const toDestination = (href: string): { host: string; path: string } => {
           </span>
           <span class="h-3 w-px bg-border-strong sm:h-px sm:w-4"></span>
         </li>
-        <li class="rounded-xl border border-border bg-surface p-5 shadow-surface">
-          <code class="font-mono text-base font-bold">jg-skills</code>
-          <span class="mt-1 block text-sm text-muted">Runs the workflow</span>
+        <li
+          class="flex items-center gap-4 rounded-xl border border-border bg-surface p-5 shadow-surface"
+        >
+          <BrandMark class="size-10 shrink-0" />
+          <div class="min-w-0">
+            <code class="font-mono text-base font-bold">jg-skills</code>
+            <span class="mt-1 block text-sm text-muted">Runs the workflow</span>
+          </div>
         </li>
       </ol>
     </div>
