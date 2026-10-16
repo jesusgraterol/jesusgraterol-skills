@@ -43,6 +43,13 @@ These conventions apply to new keys. Never rename a live key as a side effect of
 
 Set a key's expiry in the same command that writes it, such as `SET key value EX seconds`, not in a separate `EXPIRE` afterwards that a crash can skip.
 
+## Memory, eviction, and caching
+
+- Eviction is configured per server, so a policy that suits a cache endangers everything else stored there. When locks, rate limits, replay-protection keys, or sessions share the instance, propose `noeviction` or a separate cache instance, never an `allkeys-*` or `volatile-*` policy, which can drop those keys under memory pressure. `maxmemory 0` means no limit.
+- Under `noeviction`, a full server rejects writes. Skip a failed cache write and carry on, but fail closed when a security write, such as a lock, a rate-limit counter, or a replay key, fails.
+- Prefer capping the size of each cached entry, so one large value can't fill the server.
+- Prefer coalescing concurrent cache misses for the same key within a process: share one in-flight load per key, and delete it once it settles, so a failure isn't kept. When the numbers justify it, cap the number of callers waiting on one load.
+
 ## Reading and scanning
 
 - Never use `KEYS` outside a throwaway local instance: it blocks the server while it walks the whole keyspace. Use `SCAN` with `MATCH` and `COUNT`, or node-redis `scanIterator`, which yields batches of keys in node-redis 5 that you can pass to `mGet` or `unlink` after skipping empty batches.
@@ -72,3 +79,5 @@ Set a key's expiry in the same command that writes it, such as `SET key value EX
 - Close a client with `close()`, which waits for pending replies, or `destroy()`, which drops them. They replace `quit()` and `disconnect()`.
 - Give subscribers their own connection, for example from `client.duplicate()`, so a subscription never blocks ordinary commands.
 - Use `createClientPool()` for blocking commands, such as `BLPOP` or `XREADGROUP` with `BLOCK`, and for transactions that need a connection to themselves.
+- Always attach an `error` listener to every client, including each one from `duplicate()`, which doesn't copy listeners. A client without one crashes the process on its first error.
+- Prefer `disableOfflineQueue: true` on clients that send non-idempotent commands, so a command issued while disconnected is rejected instead of queued and sent later. (5.6+) The `commandOptions.timeout` option limits only how long a command waits before it is written to the socket, not the round trip.

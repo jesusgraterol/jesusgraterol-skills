@@ -46,7 +46,7 @@ Do not mirror every API, DTO, Zod, provider, or user-input rule in PostgreSQL. B
 
 If classification ambiguity materially affects compatibility, security, integrity, or schema evolution, ask one focused question before implementing. Migrations, automation, or coding assistance do not justify stricter constraints; persisted-data integrity must justify each. Flexibility never overrides security, privacy, integrity, authorization, or production correctness.
 
-- Use column types as storage envelopes with deliberate headroom, especially for external identifiers/payloads, not exact current provider maxima. Bound headroom where unbounded values risk index size, performance, abuse, or operations.
+- Use column types as storage envelopes with deliberate headroom, especially for external identifiers/payloads, not exact current provider maxima. Bound headroom where unbounded values risk index size, performance, abuse, or operations. Size an encrypted or encoded column from the plaintext maximum plus the encoding's worst-case growth, never from the lengths of observed ciphertext.
 - For external identifiers, prefer stable `NOT NULL`, universally valid non-empty checks, required uniqueness, and generous capacity. Keep current provider length/format policy in integration/API validation unless a durable database invariant.
 - For `json`/`jsonb`, enforce only structures PostgreSQL relies on (e.g. object/array). Keep exact keys, evolving values, defaults, and compatibility normalization in application schemas unless queries or durable invariants depend on them.
 - Enforce exact ranges, allowed values, and uniqueness for security/durable business semantics, including authorization boundaries, singleton privileged roles, non-negative balances, and valid value-bearing transaction states.
@@ -81,3 +81,16 @@ If classification ambiguity materially affects compatibility, security, integrit
 - With node-postgres, run single statements through the pool. Check out a client with `pool.connect()` only for a transaction or session state, and always release it in `finally`, so a failure never leaks a connection.
 
 For an `_tx` record, commit the balance mutation and the state that prevents reapplication in the same database transaction when both are stored in PostgreSQL. A retry or duplicate delivery must resolve to the already-applied result without changing the balance again.
+
+### Connections and timeouts
+
+- Give the pool a `connectionTimeoutMillis`, so a request waiting for a free connection fails instead of hanging, and set `idle_in_transaction_session_timeout`, so a session left open inside a transaction can't hold its locks indefinitely.
+- Set a default `statement_timeout`, with a lower `lock_timeout`, in the pool's connection config, so every session starts with both.
+- node-postgres's `query_timeout` only stops the client from waiting; the server keeps running the query. Set it above the server's `statement_timeout`, and when it fires on a checked-out client, release that client with `release(true)`, so the pool destroys it instead of reusing it.
+- Raise limits for known heavy work only inside its transaction, with `SET LOCAL` or `set_config(…, true)`, never with a plain `SET`, which outlives the transaction on a pooled connection.
+- Treat a client-side timeout, or a connection lost during `COMMIT`, as an unknown outcome: read the state back, or rely on idempotency, before retrying.
+- (17+) Set `transaction_timeout` above the per-transaction budgets, as a backstop.
+- Never set `idle_session_timeout` for the roles a pool connects as, because the server then closes idle pooled connections.
+- Register `pool.on('error')` for errors on idle clients, and `client.on('error')` while a client is checked out, because an unhandled `error` event crashes the process.
+- Prefer transaction-scoped advisory locks, `pg_advisory_xact_lock`, which release when the transaction ends, over session-level locks, which can outlive a failure on a pooled connection.
+- Keep the pool's `max`, times the processes per service, times the services sharing the database, below `max_connections` minus the reserved slots. Propose server-side changes, such as raising `max_connections` or adding a connection pooler, instead of making them.

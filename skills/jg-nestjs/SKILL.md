@@ -81,6 +81,11 @@ class GoalsController {
 
 - (12+) Validate `@Body()`, `@Query()`, and `@Param()` input by passing a Zod schema as `{ schema }`, with `StandardSchemaValidationPipe` registered, for example through `app.useGlobalPipes`. With `@nestjs/swagger` and Zod 4.2 or later, or a configured `standardSchemaConverter`, the same schema also feeds the OpenAPI document, so validation and documentation cannot drift apart.
 - (12+) Give `ConfigModule` a Zod `validationSchema`, so invalid configuration stops the application at startup instead of failing on first use.
+- Verify webhook signatures over the raw request bytes, never over a re-serialized parsed body: create the application with `rawBody: true` and read `req.rawBody` through `RawBodyRequest`, or use a `raw()` body parser on the webhook route only, and give the parser an explicit body `limit`.
+- Send `Cache-Control: no-store` on responses that carry credentials, tokens, capability URLs, or personal data, and prefer it for every API that browsers call. Decide it by what the response contains, not by whether a guard protects the route.
+- Set Express's `trust proxy` to the exact number of proxy hops or the proxies' addresses, never `true`, which trusts the left-most `X-Forwarded-For` entry that a client can forge.
+- A custom throttler `getTracker` must group IPv6 addresses by subnet itself, such as by /64. (`@nestjs/throttler` 6.7+) Only the built-in tracker groups them, and the package exports `normalizeIp()` for custom trackers.
+- With several replicas, propose shared throttler storage, such as Redis, instead of the default in-memory storage, which counts each process separately.
 
 ## NestJS logging
 
@@ -111,6 +116,12 @@ class MyService {
 - Call `app.enableShutdownHooks()` in applications that hold connections, and close pools, queues, and consumers in `onModuleDestroy` or `beforeApplicationShutdown`. (12+) Within a module, a provider's lifecycle hooks run after those of the providers it depends on, and teardown runs in reverse. Do not rely on the order between providers at the same level or between sibling modules.
 - Prefer default singleton providers. A request-scoped provider makes every provider that injects it request-scoped too, so the whole chain is rebuilt on each request. Use `AsyncLocalStorage` when code needs request context.
 - Keep the repository's module format, CommonJS or ESM, when adding files or packages.
+
+## Scheduled jobs
+
+- `@Interval()` runs on `setInterval`: its first run comes one interval after startup, runs can overlap, and `@nestjs/schedule` clears it only in `beforeApplicationShutdown`. Keep the guards inside the method: skip a run while the previous one is active, and start no run once shutdown begins. Await the active run in `onModuleDestroy`. For `@Cron()`, (`@nestjs/schedule` 5.0.1+) `waitForCompletion: true` skips ticks while a run is active.
+- Bound each run to a batch of the oldest due rows, and isolate failures between its stages, so one failing stage doesn't stop the others.
+- `@nestjs/schedule` runs its jobs in every replica. Run each job in one designated process, or behind a lock shared by all replicas. For the lock, propose the official `@nestjs/locks` (0.0.3, pre-1.0) with a shared store, rather than adding it; its default in-memory store doesn't coordinate replicas.
 
 ## NestJS test module lifecycle
 

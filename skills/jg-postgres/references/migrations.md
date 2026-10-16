@@ -13,6 +13,8 @@
 - Consider rollback implications, deployment ordering, table size, write traffic, lock duration, nullability, defaults, and constraint-validation cost.
 - Apply index changes intentionally and consider query patterns, uniqueness, write overhead, and migration cost.
 - Keep migrations deterministic and independent of application runtime state.
+- Never edit a migration that has run anywhere other than your own local database; change the schema with a new migration instead.
+- When the repository keeps a fresh-install schema, such as a schema dump or an init script, change it together with the migrations, so new and upgraded databases end up the same.
 - Name every new application-owned PostgreSQL object according to the PostgreSQL naming conventions of this skill. Do not rely on generated names or identifier truncation.
 - Set a short `lock_timeout` before DDL on tables in active use, so a migration that cannot get its lock fails fast instead of queueing every other query behind it.
 - Create indexes on tables in active use with `CREATE INDEX CONCURRENTLY`. It cannot run inside a transaction block, so use the migration tool's mechanism for a non-transactional migration. When it fails, drop the invalid index it leaves behind before retrying.
