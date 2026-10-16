@@ -7,6 +7,7 @@ import {
   EXPLICIT_ONLY_OPENAI_POLICY,
   IMPLICIT_OPENAI_POLICY,
   SHARED_SECTION_HEADINGS,
+  TASK_SCOPE_HEADING,
   SKILL_CATALOG_ERROR_MESSAGES,
   SKILL_FILE_BYTE_BUDGET,
 } from './constants.ts';
@@ -203,6 +204,30 @@ export const assertSharedSections = (skills: readonly ISkillDocument[]): void =>
   if (differing.length > 0) {
     throw new Error(
       `${SKILL_CATALOG_ERROR_MESSAGES.SharedSectionMismatch}: ${differing.toSorted().join(', ')}`,
+    );
+  }
+};
+
+/**
+ * Asserts that every skill carrying a `## Task scope` section carries the same one, because
+ * jg-push reuses a jg-review verdict only when both computed the scope and its fingerprint alike.
+ * @param skills The name, kind, and SKILL.md body of every skill.
+ * @throws
+ * - Skill Task scope section differs from the other skills that carry one
+ */
+export const assertTaskScopeSections = (skills: readonly ISkillDocument[]): void => {
+  const sections = skills.flatMap(({ body, name }) => {
+    const section = extractSection(body, TASK_SCOPE_HEADING);
+
+    return section === undefined ? [] : [{ name, section }];
+  });
+
+  if (new Set(sections.map(({ section }) => section)).size > 1) {
+    throw new Error(
+      `${SKILL_CATALOG_ERROR_MESSAGES.TaskScopeMismatch}: ${sections
+        .map(({ name }) => name)
+        .toSorted()
+        .join(', ')}`,
     );
   }
 };

@@ -17,6 +17,7 @@ import {
   assertSearchMetadata,
   assertSharedSections,
   assertSkillName,
+  assertTaskScopeSections,
   assertVersionLine,
   buildSourceUrl,
 } from './utilities.ts';
@@ -75,6 +76,7 @@ const loadReferencesBySkill = async (): Promise<Map<string, ISkillReference[]>> 
  * - Skill reference file mentions another reference file
  * - Skill file is larger than its size budget
  * - Skill shared section differs from the other skills of its kind
+ * - Skill Task scope section differs from the other skills that carry one
  */
 export const loadSkills = async (): Promise<ISkill[]> => {
   const entries = await getCollection('skills');
@@ -152,9 +154,10 @@ export const loadSkills = async (): Promise<ISkill[]> => {
     }),
   );
 
-  assertSharedSections(
-    skills.map(({ entry, kind, name }) => ({ body: entry.body ?? '', kind, name })),
-  );
+  const documents = skills.map(({ entry, kind, name }) => ({ body: entry.body ?? '', kind, name }));
+
+  assertSharedSections(documents);
+  assertTaskScopeSections(documents);
 
   return skills.toSorted((first, second) => first.order - second.order);
 };

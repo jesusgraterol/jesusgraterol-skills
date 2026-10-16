@@ -21,6 +21,7 @@ export const SKILL_CATALOG_ERROR_MESSAGES = {
   ReferenceUnmentioned: 'Skill reference file is not mentioned in its SKILL.md',
   SectionLink: 'Skill links to a section of another document',
   SharedSectionMismatch: 'Skill shared section differs from the other skills of its kind',
+  TaskScopeMismatch: 'Skill Task scope section differs from the other skills that carry one',
 } as const;
 
 /*
@@ -34,6 +35,9 @@ export const SHARED_SECTION_HEADINGS = {
   explicit: 'Invocation',
   implicit: 'Application',
 } as const satisfies Record<ISkillKind, string>;
+
+// the section jg-review and jg-push copy word for word, so a review verdict and a push agree on scope
+export const TASK_SCOPE_HEADING = 'Task scope';
 
 /*
  * the two lines an implicit skill may change in its shared Application section: the area sentence,
