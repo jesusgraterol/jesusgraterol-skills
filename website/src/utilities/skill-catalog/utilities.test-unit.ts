@@ -6,7 +6,11 @@ import {
   assertCatalogCoverage,
   assertFileBudget,
   assertInvocationSettings,
+  assertNoOrphanedReferences,
+  assertNoRawHtml,
   assertNoSectionLinks,
+  assertReferenceFiles,
+  assertReferencePathForm,
   assertReferenceIsLeaf,
   assertReferences,
   assertSearchMetadata,
@@ -16,7 +20,9 @@ import {
   assertVersionLine,
   buildSourceUrl,
   extractReferencePaths,
+  extractReferenceMentions,
   extractSection,
+  groupReferencesBySkill,
 } from './utilities.ts';
 
 // a shared explicit section, followed by the workflow each skill writes for itself
@@ -432,6 +438,122 @@ describe('extractReferencePaths', () => {
   });
 });
 
+describe('extractReferenceMentions', () => {
+  test('lists every references/ path a document writes, valid or not', () => {
+    expect(
+      extractReferenceMentions(
+        [
+          'Read `references/naming.md`, then references/Errors.md.',
+          'Also see `./references/api/errors.md` and `references/error_codes.md`.',
+          'Ignore `skills/jg-review/references/checks.md`.',
+        ].join('\n'),
+      ),
+    ).toStrictEqual([
+      './references/api/errors.md',
+      'references/Errors.md',
+      'references/error_codes.md',
+      'references/naming.md',
+    ]);
+  });
+});
+
+describe('assertReferencePathForm', () => {
+  test('accepts a kebab-case Markdown file directly inside references/', () => {
+    expect(() => assertReferencePathForm('jg-postgres', 'references/naming.md')).not.toThrow();
+  });
+
+  test.each([
+    'references/Naming.md',
+    'references/error_codes.md',
+    'references/api/errors.md',
+    './references/naming.md',
+    'references/check.ts',
+  ])('assertReferencePathForm(%s) -> throws', (path) => {
+    expect(() => assertReferencePathForm('jg-postgres', path)).toThrow(
+      `Skill names a reference path that is not a kebab-case Markdown file in references/: jg-postgres (${path})`,
+    );
+  });
+});
+
+describe('assertReferenceFiles', () => {
+  test('accepts kebab-case Markdown files at the top of references/', () => {
+    expect(() => assertReferenceFiles('jg-postgres', ['migrations.md', 'naming.md'])).not.toThrow();
+    expect(() => assertReferenceFiles('jg-react', [])).not.toThrow();
+  });
+
+  test('names every nested, uppercase, or non-Markdown entry', () => {
+    expect(() =>
+      assertReferenceFiles('jg-postgres', [
+        'naming.md',
+        'sub',
+        'sub/extra.md',
+        'Notes.md',
+        'diagram.png',
+      ]),
+    ).toThrow(
+      'Skill references folder holds a nested or non-Markdown file: jg-postgres (references/Notes.md, references/diagram.png, references/sub, references/sub/extra.md)',
+    );
+  });
+});
+
+describe('groupReferencesBySkill', () => {
+  test('groups reference entries by skill folder, in code-point path order', () => {
+    const groups = groupReferencesBySkill([
+      { id: 'jg-postgres/references/naming' },
+      { id: 'jg-react/references/client-data' },
+      { id: 'jg-postgres/references/migrations' },
+    ]);
+
+    expect([...groups.keys()]).toStrictEqual(['jg-postgres', 'jg-react']);
+    expect(groups.get('jg-postgres')?.map(({ path }) => path)).toStrictEqual([
+      'references/migrations.md',
+      'references/naming.md',
+    ]);
+  });
+});
+
+describe('assertNoOrphanedReferences', () => {
+  const groups = new Map([['jg-gone', [{ path: 'references/naming.md' }]]]);
+
+  test('accepts references whose folder has a SKILL.md', () => {
+    expect(() => assertNoOrphanedReferences(['jg-gone'], groups)).not.toThrow();
+  });
+
+  test('names the folder and files of references without a SKILL.md', () => {
+    expect(() => assertNoOrphanedReferences(['jg-react'], groups)).toThrow(
+      'Skill reference file is not mentioned in its SKILL.md: jg-gone (references/naming.md)',
+    );
+  });
+});
+
+describe('assertNoRawHtml', () => {
+  test('accepts markup shown as code, and autolinks', () => {
+    const body = [
+      'Use a native `<dialog>` with ``<button type="button">`` inside.',
+      '',
+      '```html',
+      '<img src="/logo.png" alt="Logo" />',
+      '```',
+      '',
+      'See <https://example.com> and compare a < b.',
+    ].join('\n');
+
+    expect(() => assertNoRawHtml({ body, name: 'jg-frontend' })).not.toThrow();
+  });
+
+  test.each([
+    ['an HTML element', 'Use a native <dialog> here.', '<dialog'],
+    ['a closing tag', 'Text</div> more.', '</d'],
+    ['a comment', 'Hidden <!-- note --> text.', '<!'],
+    ['a script link', 'Click [here](javascript:alert(1)).', ']('],
+    ['a placeholder that would vanish', 'Run jg-<skill> with arguments.', '<skill'],
+  ])('rejects %s', (_caseName, body, excerpt) => {
+    expect(() => assertNoRawHtml({ body, name: 'jg-frontend/references/forms.md' })).toThrow(
+      `Skill file contains raw HTML or a script link outside code: jg-frontend/references/forms.md (${excerpt}`,
+    );
+  });
+});
+
 describe('assertReferences', () => {
   const body = buildImplicitBody().concat(
     '- Before a migration, read `references/migrations.md`.\n',
@@ -496,6 +618,35 @@ describe('assertReferenceIsLeaf', () => {
       ),
     ).toThrow(
       'Skill reference file mentions another reference file: jg-postgres (references/migrations.md)',
+    );
+  });
+
+  test('rejects a reference that names a malformed reference path', () => {
+    expect(() =>
+      assertReferenceIsLeaf(
+        'jg-postgres',
+        'references/migrations.md',
+        'See `references/api/naming.md` for names.',
+      ),
+    ).toThrow(
+      'Skill reference file mentions another reference file: jg-postgres (references/migrations.md)',
+    );
+  });
+});
+
+describe('assertReferences with a malformed mention', () => {
+  test('rejects a SKILL.md that names a reference outside the supported form', () => {
+    expect(() =>
+      assertReferences(
+        {
+          body: buildImplicitBody().concat('- Before naming, read `references/Naming.md`.\n'),
+          kind: 'implicit',
+          name: 'jg-postgres',
+        },
+        [],
+      ),
+    ).toThrow(
+      'Skill names a reference path that is not a kebab-case Markdown file in references/: jg-postgres (references/Naming.md)',
     );
   });
 });

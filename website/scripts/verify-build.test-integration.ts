@@ -128,6 +128,23 @@ describe('static build artifact', () => {
         ),
     ],
     [
+      'missing fragment target',
+      `Fragment link has no matching element ID in ${SKILL_PAGE}: #main-content -> ${SKILL_PAGE}`,
+      async (buildDirectory) =>
+        replaceBuildFileText(buildDirectory, SKILL_PAGE, ' id="main-content"', ''),
+    ],
+    [
+      'duplicate element ID',
+      `Page repeats an element ID in ${SKILL_PAGE}: main-content`,
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          SKILL_PAGE,
+          '</body>',
+          '<span id="main-content"></span></body>',
+        ),
+    ],
+    [
       'missing skill page',
       'Missing skill page: skills/jg-push/index.html',
       async (buildDirectory) => rm(resolveBuildFile(buildDirectory, 'skills/jg-push/index.html')),

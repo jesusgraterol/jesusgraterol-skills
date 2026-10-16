@@ -51,9 +51,12 @@
   - an implicit skill has no version line
   - a skill or reference file links to a section of a document, or names another skill with a `/` or `$` prefix
   - a skill names a reference file that doesn't exist, or has a reference file it never names
+  - a skill names a reference path that isn't a kebab-case Markdown file directly in `references/`, or its `references/` folder holds a nested or non-Markdown file
+  - a skill or reference file contains raw HTML or a `javascript:` link outside code
   - an explicit skill has reference files, or a reference names another reference
   - a `SKILL.md` or reference file is larger than 20,480 bytes
   - a skill page is missing one of its reference files
+  - a page links to a fragment with no matching ID, or repeats an element ID
 
   The type check fails on a missing or mismatched icon.
 

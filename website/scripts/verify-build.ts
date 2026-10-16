@@ -14,10 +14,12 @@ const VERIFY_BUILD_ERROR_MESSAGES = {
   BrokenInternalLink: 'Broken internal link',
   BrokenInternalLlmsTextLink: 'Broken internal llms.txt link',
   CanonicalUrlMissingFromSitemap: 'Canonical URL is missing from the sitemap',
+  DuplicateElementId: 'Page repeats an element ID',
   IncompleteSkillItemList: 'Home page item list does not list every skill',
   InvalidLlmsTextStructure: 'llms.txt does not follow the required project index structure',
   InvalidStructuredData: 'Invalid structured data',
   InvalidStructuredDataGraph: 'Structured data graph is invalid',
+  MissingFragmentTarget: 'Fragment link has no matching element ID',
   MissingOrDuplicatePageDescription: 'Missing or duplicate page description',
   MissingOrDuplicatePageTitle: 'Missing or duplicate page title',
   MissingRequiredMetadata: 'Missing required metadata',
@@ -132,6 +134,10 @@ const resolveInternalArtifact = (href: string): string => {
   return `${path.replace(/^\//u, '').replace(/\/$/u, '')}/index.html`;
 };
 
+/** Lists the element IDs a generated HTML page declares, in document order. */
+const listElementIds = (html: string): string[] =>
+  [...html.matchAll(/\sid="([^"]+)"/gu)].map((match) => match[1] ?? '');
+
 /** Resolves a generated HTML artifact to its canonical public URL. */
 const resolveCanonicalUrl = (htmlPath: string): string => {
   if (htmlPath === 'index.html') return new URL('/', SITE_CONFIG.url).toString();
@@ -220,7 +226,9 @@ const extractStructuredDataEntities = (
  * - Home page item list does not list every skill
  * - Breadcrumb hierarchy is incomplete
  * - Skill page is missing its source code entity
+ * - Page repeats an element ID
  * - Broken internal link
+ * - Fragment link has no matching element ID
  * - The custom 404 page must remain excluded from search indexes
  * - llms.txt does not follow the required project index structure
  * - Broken internal llms.txt link
@@ -273,6 +281,22 @@ export const verifyBuild = async (
   }
 
   const htmlFiles = buildFiles.filter((filePath) => filePath.endsWith('.html'));
+  // every page's element IDs, so fragment links can be checked against the page they point to
+  const idsByPage = new Map<string, string[]>();
+
+  for (const htmlPath of htmlFiles) {
+    const ids = listElementIds(await readFile(resolve(buildDirectory, htmlPath), 'utf8'));
+    const duplicateId = ids.find((id, index) => ids.indexOf(id) !== index);
+
+    if (duplicateId !== undefined) {
+      throw new Error(
+        `${VERIFY_BUILD_ERROR_MESSAGES.DuplicateElementId} in ${htmlPath}: ${duplicateId}`,
+      );
+    }
+
+    idsByPage.set(htmlPath, ids);
+  }
+
   const publicHtmlFiles = htmlFiles.filter((filePath) => filePath !== '404.html');
   const descriptions = new Set<string>();
   const titles = new Set<string>();
@@ -450,13 +474,35 @@ export const verifyBuild = async (
     );
 
     for (const href of internalLinks) {
-      if (href.startsWith('/#')) continue;
-
       const artifactPath = resolveInternalArtifact(href);
 
       if (!buildFiles.includes(artifactPath)) {
         throw new Error(
           `${VERIFY_BUILD_ERROR_MESSAGES.BrokenInternalLink} in ${htmlPath}: ${href} -> ${artifactPath}`,
+        );
+      }
+    }
+
+    // same-page links like #install, and links into another page like /#install or /skills/x/#y
+    const fragmentLinks = [
+      ...[...html.matchAll(/href="#([^"]+)"/gu)].map((match) => ({
+        fragment: match[1] ?? '',
+        href: `#${match[1] ?? ''}`,
+        targetPath: htmlPath,
+      })),
+      ...internalLinks
+        .filter((href) => href.includes('#'))
+        .map((href) => ({
+          fragment: href.slice(href.indexOf('#') + 1),
+          href,
+          targetPath: resolveInternalArtifact(href),
+        })),
+    ];
+
+    for (const { fragment, href, targetPath } of fragmentLinks) {
+      if (!idsByPage.get(targetPath)?.includes(decodeURIComponent(fragment))) {
+        throw new Error(
+          `${VERIFY_BUILD_ERROR_MESSAGES.MissingFragmentTarget} in ${htmlPath}: ${href} -> ${targetPath}`,
         );
       }
     }

@@ -24,6 +24,21 @@ const PREFIXED_SKILL_REFERENCE_PATTERN = /(?:^|[\s`('"])([/$]jg-[a-z0-9-]+)/mu;
 // a reference file named by its path inside the skill folder, but not a path into another folder
 const REFERENCE_PATH_PATTERN = /(?<![\w./-])references\/[a-z0-9]+(?:-[a-z0-9]+)*\.md(?![\w-])/gu;
 
+// any path written inside a skill's references folder, valid or not, so a malformed one fails
+const REFERENCE_MENTION_PATTERN =
+  /(?<![\w./-])(?:\.\/)?references\/[^\s`'"()[\]<>,;]*[^\s`'"()[\]<>,;.:!?]/gu;
+
+// the one form a reference file may take: a kebab-case Markdown file directly inside references/
+const REFERENCE_FILE_PATTERN = /^references\/[a-z0-9]+(?:-[a-z0-9]+)*\.md$/u;
+
+// fenced code blocks and inline code spans, where markup is shown as literal text
+const FENCED_CODE_PATTERN = /^ {0,3}(`{3,}|~{3,})[^\n]*\n[\s\S]*?^ {0,3}\1[`~]*[ \t]*$/gmu;
+const INLINE_CODE_PATTERN = /(`+)(?:(?!\1)[\s\S])+?\1/gu;
+
+// raw HTML, apart from autolinks such as <https://example.com>, and Markdown links that run script
+const RAW_HTML_PATTERN = /<(?!(?:https?|mailto):)(?:[A-Za-z][\w-]*|\/[A-Za-z]|!)/u;
+const SCRIPT_LINK_PATTERN = /\]\(\s*javascript:/iu;
+
 // the frontmatter flag and Codex policy each kind of skill must ship
 const INVOCATION_SETTINGS = {
   explicit: { disableModelInvocation: true, policy: EXPLICIT_ONLY_OPENAI_POLICY },
@@ -301,6 +316,118 @@ export const extractReferencePaths = (body: string): string[] =>
   [...new Set(body.match(REFERENCE_PATH_PATTERN) ?? [])].toSorted();
 
 /**
+ * Lists every path a skill document writes inside its references folder, including malformed ones
+ * such as nested, uppercase, or non-Markdown paths, so the build can reject them.
+ * @param body The text of a SKILL.md or reference file.
+ * @returns The distinct mentioned paths in sorted order.
+ */
+export const extractReferenceMentions = (body: string): string[] =>
+  [...new Set(body.match(REFERENCE_MENTION_PATTERN) ?? [])].toSorted();
+
+/**
+ * Asserts that a reference path takes the one form the site renders and the size budget covers: a
+ * kebab-case Markdown file directly inside references/.
+ * @param skillName The skill that names the path.
+ * @param path The path as written, such as references/migrations.md.
+ * @throws
+ * - Skill names a reference path that is not a kebab-case Markdown file in references/
+ */
+export const assertReferencePathForm = (skillName: string, path: string): void => {
+  if (!REFERENCE_FILE_PATTERN.test(path)) {
+    throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.ReferencePathInvalid}: ${skillName} (${path})`);
+  }
+};
+
+/**
+ * Asserts that a skill's references folder holds only kebab-case Markdown files at its top level,
+ * because nested and non-Markdown files are installed with the skill but never rendered or checked.
+ * @param skillName The skill that owns the folder.
+ * @param relativePaths Every file and directory under references/, relative to it, with `/`
+ * separators, as a recursive listing returns them.
+ * @throws
+ * - Skill references folder holds a nested or non-Markdown file
+ */
+export const assertReferenceFiles = (skillName: string, relativePaths: readonly string[]): void => {
+  const invalid = relativePaths
+    .map((path) => `references/${path}`)
+    .filter((path) => !REFERENCE_FILE_PATTERN.test(path))
+    .toSorted();
+
+  if (invalid.length > 0) {
+    throw new Error(
+      `${SKILL_CATALOG_ERROR_MESSAGES.ReferenceFileInvalid}: ${skillName} (${invalid.join(', ')})`,
+    );
+  }
+};
+
+/**
+ * Groups reference files by the skill directory they belong to, in code-point path order, the same
+ * order the build verification lists them in.
+ * @param entries Reference entries whose IDs read like jg-postgres/references/naming.
+ * @returns Each skill's references with their paths inside the skill folder, keyed by skill name.
+ */
+export const groupReferencesBySkill = <T extends { id: string }>(
+  entries: readonly T[],
+): Map<string, { entry: T; path: string }[]> => {
+  const referencesBySkill = new Map<string, { entry: T; path: string }[]>();
+
+  for (const entry of entries) {
+    const [skillName = '', ...pathSegments] = entry.id.split('/');
+    const references = referencesBySkill.get(skillName) ?? [];
+
+    references.push({ entry, path: `${pathSegments.join('/')}.md` });
+    referencesBySkill.set(skillName, references);
+  }
+
+  referencesBySkill.forEach((references) =>
+    references.sort((first, second) => (first.path < second.path ? -1 : 1)),
+  );
+
+  return referencesBySkill;
+};
+
+/**
+ * Asserts that every reference file belongs to a skill folder with a SKILL.md, because a reference
+ * in a folder without one can never be read by an agent.
+ * @param skillNames The names of the skills that have a SKILL.md.
+ * @param referencesBySkill Each folder's reference paths, keyed by folder name.
+ * @throws
+ * - Skill reference file is not mentioned in its SKILL.md
+ */
+export const assertNoOrphanedReferences = (
+  skillNames: readonly string[],
+  referencesBySkill: ReadonlyMap<string, readonly { path: string }[]>,
+): void => {
+  const orphanedSkill = [...referencesBySkill.keys()].find((name) => !skillNames.includes(name));
+
+  if (orphanedSkill !== undefined) {
+    const orphanedPaths = (referencesBySkill.get(orphanedSkill) ?? []).map(({ path }) => path);
+
+    throw new Error(
+      `${SKILL_CATALOG_ERROR_MESSAGES.ReferenceUnmentioned}: ${orphanedSkill} (${orphanedPaths.join(', ')})`,
+    );
+  }
+};
+
+/**
+ * Asserts that a skill file contains no raw HTML or script links outside code, because the site
+ * renders skill Markdown without sanitizing it: a stray tag hides or reshapes the page, and a
+ * `javascript:` link would run in readers' browsers.
+ * @param document The file's name, such as jg-react or jg-react/references/client-data.md, and
+ * its text.
+ * @throws
+ * - Skill file contains raw HTML or a script link outside code
+ */
+export const assertNoRawHtml = ({ body, name }: Pick<ISkillDocument, 'body' | 'name'>): void => {
+  const prose = body.replace(FENCED_CODE_PATTERN, '').replace(INLINE_CODE_PATTERN, '');
+  const match = RAW_HTML_PATTERN.exec(prose) ?? SCRIPT_LINK_PATTERN.exec(prose);
+
+  if (match) {
+    throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.RawHtmlInMarkdown}: ${name} (${match[0]})`);
+  }
+};
+
+/**
  * Asserts that a skill's reference files and its SKILL.md agree: only implicit skills have them,
  * every reference SKILL.md names exists, and every reference file is named, so the agent can
  * find each one and none sits unused.
@@ -308,6 +435,7 @@ export const extractReferencePaths = (body: string): string[] =>
  * @param referencePaths The paths of the skill's reference files, such as references/naming.md.
  * @throws
  * - Explicit skill has reference files
+ * - Skill names a reference path that is not a kebab-case Markdown file in references/
  * - Skill mentions a reference file that does not exist
  * - Skill reference file is not mentioned in its SKILL.md
  */
@@ -318,6 +446,8 @@ export const assertReferences = (
   if (kind === 'explicit' && referencePaths.length > 0) {
     throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.ExplicitSkillReferences}: ${name}`);
   }
+
+  extractReferenceMentions(body).forEach((path) => assertReferencePathForm(name, path));
 
   const mentioned = extractReferencePaths(body);
   const missing = mentioned.filter((path) => !referencePaths.includes(path));
@@ -346,7 +476,7 @@ export const assertReferences = (
  * - Skill reference file mentions another reference file
  */
 export const assertReferenceIsLeaf = (skillName: string, path: string, body: string): void => {
-  if (extractReferencePaths(body).length > 0) {
+  if (extractReferenceMentions(body).length > 0) {
     throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.NestedReference}: ${skillName} (${path})`);
   }
 };

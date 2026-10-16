@@ -7,6 +7,7 @@ import {
   SKILL_STAGES,
   type ISkill,
 } from '../../utilities/skill-catalog/index.ts';
+import { SITE_CONFIG } from '../../site.config.ts';
 import ExternalLink from '../external-link/external-link.astro';
 import SkillIcon from '../skill-icon/skill-icon.astro';
 import TerminalWindow from '../terminal-window/terminal-window.astro';
@@ -24,7 +25,6 @@ const { Content } = await render(skill.entry);
 const references = await Promise.all(
   skill.references.map(async ({ entry, path }) => ({
     Content: (await render(entry)).Content,
-    id: `reference-${path.replace(/^references\//u, '').replace(/\.md$/u, '')}`,
     path,
   })),
 );
@@ -69,7 +69,7 @@ const examples =
         <a
           class="underline-offset-4 hover:text-foreground hover:underline"
           href="/"
-          >JG Skills</a
+          >{SITE_CONFIG.name}</a
         >
         <span aria-hidden="true">/</span>
       </li>
@@ -251,10 +251,9 @@ const examples =
           <p class="mt-2 text-sm leading-6 text-muted">
             The agent reads each file only when its task needs it, as SKILL.md says.
           </p>
-          {references.map(({ Content: ReferenceContent, id, path }) => (
+          {references.map(({ Content: ReferenceContent, path }) => (
             <div
               class="mt-6"
-              id={id}
               data-skill-reference={path}
             >
               <p class="font-mono text-sm font-semibold wrap-anywhere text-foreground">{path}</p>

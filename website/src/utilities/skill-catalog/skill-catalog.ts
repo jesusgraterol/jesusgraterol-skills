@@ -1,17 +1,22 @@
-import { readFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { readdir, readFile } from 'node:fs/promises';
+import { dirname, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { root } from 'astro:config/server';
 import { getCollection } from 'astro:content';
 
 import { SKILL_CATALOG } from '../../site.config.ts';
 
 import { SKILL_CATALOG_ERROR_MESSAGES } from './constants.ts';
-import type { ISkill, ISkillReference } from './types.ts';
+import type { ISkill } from './types.ts';
 import {
   assertBareSkillReferences,
   assertCatalogCoverage,
   assertFileBudget,
   assertInvocationSettings,
+  assertNoOrphanedReferences,
+  assertNoRawHtml,
   assertNoSectionLinks,
+  assertReferenceFiles,
   assertReferenceIsLeaf,
   assertReferences,
   assertSearchMetadata,
@@ -20,37 +25,37 @@ import {
   assertTaskScopeSections,
   assertVersionLine,
   buildSourceUrl,
+  groupReferencesBySkill,
 } from './utilities.ts';
 
 /** Narrows a skill directory name to a catalog key. */
 const isCatalogName = (name: string): name is keyof typeof SKILL_CATALOG =>
   Object.hasOwn(SKILL_CATALOG, name);
 
+// the website project root, which content entry file paths are relative to, whatever the working directory
+const PROJECT_ROOT = fileURLToPath(root);
+
+/** Resolves a content entry's file path against the project root. */
+const resolveEntryPath = (filePath: string | undefined, ...segments: string[]): string =>
+  resolve(PROJECT_ROOT, filePath ?? '', ...segments);
+
 /** Reads a content file's size in bytes, failing loudly when the file cannot be read. */
 const readFileBytes = async (filePath: string | undefined): Promise<number> =>
-  (await readFile(resolve(filePath ?? ''))).byteLength;
+  (await readFile(resolveEntryPath(filePath))).byteLength;
 
-/**
- * Groups reference files by the skill directory they belong to, in path order.
- * @returns A promise that resolves to each skill's references, keyed by its directory name.
- */
-const loadReferencesBySkill = async (): Promise<Map<string, ISkillReference[]>> => {
-  const referencesBySkill = new Map<string, ISkillReference[]>();
+/** Lists everything under a skill's references folder, or nothing when it has none. */
+const listReferenceFolder = async (skillDirectory: string): Promise<string[]> => {
+  try {
+    const paths = await readdir(resolve(skillDirectory, 'references'), { recursive: true });
 
-  for (const entry of await getCollection('skillReferences')) {
-    const [skillName = '', ...pathSegments] = entry.id.split('/');
-    const references = referencesBySkill.get(skillName) ?? [];
+    return paths.map((path) => path.split(sep).join('/'));
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+      return [];
+    }
 
-    references.push({ entry, path: `${pathSegments.join('/')}.md` });
-    referencesBySkill.set(skillName, references);
+    throw error;
   }
-
-  // code-point order, the same order the build verification lists reference files in
-  referencesBySkill.forEach((references) =>
-    references.sort((first, second) => (first.path < second.path ? -1 : 1)),
-  );
-
-  return referencesBySkill;
 };
 
 /**
@@ -74,13 +79,16 @@ const loadReferencesBySkill = async (): Promise<Map<string, ISkillReference[]>> 
  * - Skill mentions a reference file that does not exist
  * - Skill reference file is not mentioned in its SKILL.md
  * - Skill reference file mentions another reference file
+ * - Skill names a reference path that is not a kebab-case Markdown file in references/
+ * - Skill references folder holds a nested or non-Markdown file
+ * - Skill file contains raw HTML or a script link outside code
  * - Skill file is larger than its size budget
  * - Skill shared section differs from the other skills of its kind
  * - Skill Task scope section differs from the other skills that carry one
  */
 export const loadSkills = async (): Promise<ISkill[]> => {
   const entries = await getCollection('skills');
-  const referencesBySkill = await loadReferencesBySkill();
+  const referencesBySkill = groupReferencesBySkill(await getCollection('skillReferences'));
 
   entries.forEach((entry) => assertSkillName(entry.id, entry.data.name));
   assertCatalogCoverage(
@@ -88,22 +96,15 @@ export const loadSkills = async (): Promise<ISkill[]> => {
     Object.keys(SKILL_CATALOG),
   );
 
-  // reference files in a folder without a SKILL.md can never be read by an agent
-  const orphanedSkill = [...referencesBySkill.keys()].find(
-    (skillName) => !entries.some(({ id }) => id === skillName),
+  assertNoOrphanedReferences(
+    entries.map(({ id }) => id),
+    referencesBySkill,
   );
-
-  if (orphanedSkill !== undefined) {
-    const orphanedPaths = (referencesBySkill.get(orphanedSkill) ?? []).map(({ path }) => path);
-
-    throw new Error(
-      `${SKILL_CATALOG_ERROR_MESSAGES.ReferenceUnmentioned}: ${orphanedSkill} (${orphanedPaths.join(', ')})`,
-    );
-  }
 
   const skills = await Promise.all(
     entries.map(async (entry): Promise<ISkill> => {
-      const policyPath = resolve(dirname(entry.filePath ?? ''), 'agents', 'openai.yaml');
+      const skillDirectory = dirname(resolveEntryPath(entry.filePath));
+      const policyPath = resolve(skillDirectory, 'agents', 'openai.yaml');
 
       if (!isCatalogName(entry.id)) {
         throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.CatalogMismatch}: ${entry.id}`);
@@ -126,6 +127,8 @@ export const loadSkills = async (): Promise<ISkill[]> => {
       assertVersionLine(document);
       assertNoSectionLinks(document);
       assertBareSkillReferences(document);
+      assertNoRawHtml(document);
+      assertReferenceFiles(entry.id, await listReferenceFolder(skillDirectory));
       assertReferences(
         document,
         references.map(({ path }) => path),
@@ -139,6 +142,7 @@ export const loadSkills = async (): Promise<ISkill[]> => {
         assertReferenceIsLeaf(entry.id, reference.path, referenceBody);
         assertNoSectionLinks(referenceDocument);
         assertBareSkillReferences(referenceDocument);
+        assertNoRawHtml(referenceDocument);
         assertFileBudget(entry.id, reference.path, await readFileBytes(reference.entry.filePath));
       }
 
