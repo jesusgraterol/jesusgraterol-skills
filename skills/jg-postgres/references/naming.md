@@ -2,6 +2,17 @@
 
 This section governs application-owned PostgreSQL object and SQL-file names, overriding general filesystem naming where applicable.
 
+Contents:
+
+- Scope
+- Core rules
+- Relations, columns, and routines, with the durable transaction table suffix
+- Table abbreviations in owned-object names
+- Constraints and indexes
+- Triggers, policies, sequences, and statistics
+- Roles, SQL query naming, result shapes, and SQL files
+- Validation
+
 ### Scope
 
 Apply these rules to new application-owned PostgreSQL objects and objects intentionally renamed by the requested change.
