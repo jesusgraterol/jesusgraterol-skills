@@ -17,7 +17,6 @@ export const SKILL_CATALOG_ERROR_MESSAGES = {
   NameMismatch: 'Skill name does not match its directory',
   NestedReference: 'Skill reference file mentions another reference file',
   PrefixedSkillReference: 'Skill refers to another skill with a / or $ prefix',
-  RawHtmlInMarkdown: 'Skill file contains raw HTML or a script link outside code',
   ReferenceFileInvalid: 'Skill references folder holds a nested or non-Markdown file',
   ReferenceMissing: 'Skill mentions a reference file that does not exist',
   ReferencePathInvalid:
@@ -26,6 +25,8 @@ export const SKILL_CATALOG_ERROR_MESSAGES = {
   SectionLink: 'Skill links to a section of another document',
   SharedSectionMismatch: 'Skill shared section differs from the other skills of its kind',
   TaskScopeMismatch: 'Skill Task scope section differs from the other skills that carry one',
+  UnsafeMarkup:
+    'Skill file renders markup that Markdown does not produce, an event handler, or a URL with a disallowed scheme',
 } as const;
 
 /*

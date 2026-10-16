@@ -13,6 +13,13 @@ const BUILD_DIRECTORY = resolve(websiteRoot, 'dist');
 const TEMPORARY_ROOT_PREFIX = 'jg-skills-verify-build-';
 const STRUCTURED_DATA_PATTERN = /<script type="application\/ld\+json">[^<]+<\/script>/u;
 const SKILL_PAGE = 'skills/jg-plan/index.html';
+// a skill page whose last rendered Markdown box holds a reference file
+const REFERENCE_PAGE = 'skills/jg-frontend/index.html';
+const SKILL_MARKDOWN_OPENER = /<div\b[^>]*\sdata-skill-markdown>/u;
+const LAST_SKILL_MARKDOWN_OPENER =
+  /<div\b[^>]*\sdata-skill-markdown>(?![\s\S]*data-skill-markdown)/u;
+const UNSAFE_SKILL_CONTENT =
+  'Skill page content holds markup that Markdown does not produce, an event handler, or a URL with a disallowed scheme';
 
 // contracts for minimally corrupted build fixtures
 type IBuildMutation = (buildDirectory: string) => Promise<void>;
@@ -313,6 +320,64 @@ describe('static build artifact', () => {
           'data-skill-reference="references/migrations.md"',
           'data-skill-reference="references/removed.md"',
         ),
+    ],
+    [
+      'a skill page without its Markdown markers',
+      `Skill page does not mark each Markdown file it renders: ${SKILL_PAGE}`,
+      async (buildDirectory) =>
+        replaceBuildFileText(buildDirectory, SKILL_PAGE, /\sdata-skill-markdown/gu, ''),
+    ],
+    // the rendered forms of Markdown that once passed the source check: a script between stray
+    // backticks, an event handler, and entity-encoded and reference-style script links
+    [
+      'a script element in skill instructions',
+      `${UNSAFE_SKILL_CONTENT} in ${SKILL_PAGE}: <script> element`,
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          SKILL_PAGE,
+          SKILL_MARKDOWN_OPENER,
+          '$&<p>Use `this</p>\n<script>window.__probe=1</script>\n<p>and` that.</p>',
+        ),
+    ],
+    [
+      'an event handler in skill instructions',
+      `${UNSAFE_SKILL_CONTENT} in ${SKILL_PAGE}: onerror attribute`,
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          SKILL_PAGE,
+          SKILL_MARKDOWN_OPENER,
+          '$&<p><img src=x onerror=alert(1)></p>',
+        ),
+    ],
+    [
+      'an entity-encoded script link in skill instructions',
+      `${UNSAFE_SKILL_CONTENT} in ${SKILL_PAGE}: href="&#106;avascript:alert(1)"`,
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          SKILL_PAGE,
+          SKILL_MARKDOWN_OPENER,
+          '$&<p><a href="&#106;avascript:alert(1)">encoded</a></p>',
+        ),
+    ],
+    [
+      'a script link in a reference file',
+      `${UNSAFE_SKILL_CONTENT} in ${REFERENCE_PAGE}: href="javascript:alert(3)"`,
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          REFERENCE_PAGE,
+          LAST_SKILL_MARKDOWN_OPENER,
+          '$&<p><a href="javascript:alert(3)">reference</a></p>',
+        ),
+    ],
+    [
+      'an event handler outside skill content',
+      'Page holds an event handler or a URL with a disallowed scheme in index.html: onload attribute',
+      async (buildDirectory) =>
+        replaceBuildFileText(buildDirectory, 'index.html', '<body', '<body onload="alert(1)"'),
     ],
     [
       'missing skill source code entity',

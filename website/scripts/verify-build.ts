@@ -3,6 +3,11 @@ import { extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { SITE_CONFIG } from '../src/site.config.ts';
+import {
+  decodeHtmlEntities,
+  findUnsafeAttributes,
+  findUnsafeMarkup,
+} from '../src/utilities/rendered-html/index.ts';
 import { SEARCH_TEXT_LIMITS } from '../src/utilities/seo/index.ts';
 
 const websiteRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -35,6 +40,10 @@ const VERIFY_BUILD_ERROR_MESSAGES = {
   SearchIndexableNotFoundPage: 'The custom 404 page must remain excluded from search indexes',
   CanonicalOnNotFoundPage: 'The custom 404 page must not name a canonical URL',
   StructuredDataDoesNotMatchPage: 'Structured data does not match the canonical page',
+  UnmarkedSkillContent: 'Skill page does not mark each Markdown file it renders',
+  UnsafePageMarkup: 'Page holds an event handler or a URL with a disallowed scheme',
+  UnsafeSkillContent:
+    'Skill page content holds markup that Markdown does not produce, an event handler, or a URL with a disallowed scheme',
 } as const;
 const REQUIRED_BUILD_PATHS = [
   'index.html',
@@ -47,17 +56,8 @@ const REQUIRED_BUILD_PATHS = [
   'sitemap-index.xml',
 ] as const;
 
-// named entities Astro may emit in titles and attribute values
-const NAMED_HTML_ENTITIES = { amp: '&', apos: "'", gt: '>', lt: '<', quot: '"' } as const;
-
-/** Decodes HTML entities so text lengths are measured as readers see them. */
-const decodeHtmlEntities = (input: string): string =>
-  input.replace(/&(#x[\da-f]+|#\d+|amp|apos|gt|lt|quot);/giu, (_match, entity: string) => {
-    if (/^#x/iu.test(entity)) return String.fromCodePoint(Number.parseInt(entity.slice(2), 16));
-    if (entity.startsWith('#')) return String.fromCodePoint(Number.parseInt(entity.slice(1), 10));
-
-    return NAMED_HTML_ENTITIES[entity.toLowerCase() as keyof typeof NAMED_HTML_ENTITIES];
-  });
+// the attribute a skill page puts on each box that holds one rendered Markdown file
+const SKILL_MARKDOWN_ATTRIBUTE = 'data-skill-markdown';
 
 /** Checks whether a decoded meta description fits search results. */
 const isDescriptionInRange = (description: string): boolean => {
@@ -136,6 +136,30 @@ const resolveInternalArtifact = (href: string): string => {
   return `${path.replace(/^\//u, '').replace(/\/$/u, '')}/index.html`;
 };
 
+/** Lists the inner HTML of every div that carries a marker attribute, in document order. */
+const listMarkedDivContents = (html: string, attribute: string): string[] => {
+  const openerPattern = new RegExp(
+    `<div\\b[^>]*\\s${escapeRegularExpression(attribute)}(?=[\\s=>])[^>]*>`,
+    'gu',
+  );
+
+  return [...html.matchAll(openerPattern)].map((opener) => {
+    const start = opener.index + opener[0].length;
+    const divTagPattern = /<(\/?)div\b[^>]*>/gu;
+    let depth = 1;
+
+    divTagPattern.lastIndex = start;
+
+    for (let tag = divTagPattern.exec(html); tag; tag = divTagPattern.exec(html)) {
+      depth += tag[1] ? -1 : 1;
+
+      if (depth === 0) return html.slice(start, tag.index);
+    }
+
+    return html.slice(start);
+  });
+};
+
 /** Lists the element IDs a generated HTML page declares, in document order. */
 const listElementIds = (html: string): string[] =>
   [...html.matchAll(/\sid="([^"]+)"/gu)].map((match) => match[1] ?? '');
@@ -205,8 +229,8 @@ const extractStructuredDataEntities = (
 };
 
 /**
- * Verifies required routes, one page per skill with every reference file it ships, metadata,
- * internal links, and production-build exclusions.
+ * Verifies required routes, one page per skill with every reference file it ships, safe skill
+ * content and page markup, metadata, internal links, and production-build exclusions.
  * @param buildDirectory The static artifact directory to inspect.
  * @param skillsDirectory The repository directory whose skill folders each need a page.
  * @returns A promise that resolves when the artifact satisfies the project contract.
@@ -218,6 +242,10 @@ const extractStructuredDataEntities = (
  * - Production build contains a test file
  * - Missing skill page
  * - Skill page is missing a reference file
+ * - Skill page does not mark each Markdown file it renders
+ * - Skill page content holds markup that Markdown does not produce, an event handler, or a URL
+ *   with a disallowed scheme
+ * - Page holds an event handler or a URL with a disallowed scheme
  * - Missing required metadata
  * - Missing or duplicate page description
  * - Missing or duplicate page title
@@ -268,9 +296,6 @@ export const verifyBuild = async (
 
   for (const name of skillNames) {
     const referencePaths = await listSkillReferencePaths(skillsDirectory, name);
-
-    if (referencePaths.length === 0) continue;
-
     const pagePath = `skills/${name}/index.html`;
     const pageHtml = await readFile(resolve(buildDirectory, pagePath), 'utf8');
     const missingReference = referencePaths.find(
@@ -282,6 +307,23 @@ export const verifyBuild = async (
         `${VERIFY_BUILD_ERROR_MESSAGES.MissingSkillReference}: ${pagePath} (${missingReference})`,
       );
     }
+
+    // the page's SKILL.md and each of its reference files, as rendered
+    const markdownContents = listMarkedDivContents(pageHtml, SKILL_MARKDOWN_ATTRIBUTE);
+
+    if (markdownContents.length !== referencePaths.length + 1) {
+      throw new Error(`${VERIFY_BUILD_ERROR_MESSAGES.UnmarkedSkillContent}: ${pagePath}`);
+    }
+
+    const unsafeContent = markdownContents
+      .map((content) => findUnsafeMarkup(content))
+      .find((problem) => problem !== undefined);
+
+    if (unsafeContent !== undefined) {
+      throw new Error(
+        `${VERIFY_BUILD_ERROR_MESSAGES.UnsafeSkillContent} in ${pagePath}: ${unsafeContent}`,
+      );
+    }
   }
 
   const htmlFiles = buildFiles.filter((filePath) => filePath.endsWith('.html'));
@@ -289,7 +331,16 @@ export const verifyBuild = async (
   const idsByPage = new Map<string, string[]>();
 
   for (const htmlPath of htmlFiles) {
-    const ids = listElementIds(await readFile(resolve(buildDirectory, htmlPath), 'utf8'));
+    const html = await readFile(resolve(buildDirectory, htmlPath), 'utf8');
+    const unsafeMarkup = findUnsafeAttributes(html);
+
+    if (unsafeMarkup !== undefined) {
+      throw new Error(
+        `${VERIFY_BUILD_ERROR_MESSAGES.UnsafePageMarkup} in ${htmlPath}: ${unsafeMarkup}`,
+      );
+    }
+
+    const ids = listElementIds(html);
     const duplicateId = ids.find((id, index) => ids.indexOf(id) !== index);
 
     if (duplicateId !== undefined) {

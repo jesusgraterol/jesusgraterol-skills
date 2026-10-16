@@ -238,6 +238,7 @@ const examples =
     <div
       class="article-content mt-6 rounded-xl border border-border bg-surface px-5 py-6 text-base shadow-surface sm:px-8 sm:py-8 [&_h2]:mt-10 [&_h2]:pt-6 [&_h2]:text-xl [&_h2:first-child]:mt-0 [&_h2:first-child]:border-t-0 [&_h2:first-child]:pt-0"
       data-skill-instructions
+      data-skill-markdown
     >
       <Content />
     </div>
@@ -257,7 +258,10 @@ const examples =
               data-skill-reference={path}
             >
               <p class="font-mono text-sm font-semibold wrap-anywhere text-foreground">{path}</p>
-              <div class="article-content mt-3 rounded-xl border border-border bg-surface px-5 py-6 text-base shadow-surface sm:px-8 sm:py-8 [&_h2]:mt-10 [&_h2]:pt-6 [&_h2]:text-xl [&_h2:first-child]:mt-0 [&_h2:first-child]:border-t-0 [&_h2:first-child]:pt-0">
+              <div
+                class="article-content mt-3 rounded-xl border border-border bg-surface px-5 py-6 text-base shadow-surface sm:px-8 sm:py-8 [&_h2]:mt-10 [&_h2]:pt-6 [&_h2]:text-xl [&_h2:first-child]:mt-0 [&_h2:first-child]:border-t-0 [&_h2:first-child]:pt-0"
+                data-skill-markdown
+              >
                 <ReferenceContent />
               </div>
             </div>

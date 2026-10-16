@@ -1,4 +1,5 @@
 import { SITE_CONFIG } from '../../site.config.ts';
+import { findUnsafeMarkup } from '../rendered-html/index.ts';
 import { SEARCH_TEXT_LIMITS } from '../seo/index.ts';
 
 import {
@@ -30,14 +31,6 @@ const REFERENCE_MENTION_PATTERN =
 
 // the one form a reference file may take: a kebab-case Markdown file directly inside references/
 const REFERENCE_FILE_PATTERN = /^references\/[a-z0-9]+(?:-[a-z0-9]+)*\.md$/u;
-
-// fenced code blocks and inline code spans, where markup is shown as literal text
-const FENCED_CODE_PATTERN = /^ {0,3}(`{3,}|~{3,})[^\n]*\n[\s\S]*?^ {0,3}\1[`~]*[ \t]*$/gmu;
-const INLINE_CODE_PATTERN = /(`+)(?:(?!\1)[\s\S])+?\1/gu;
-
-// raw HTML, apart from autolinks such as <https://example.com>, and Markdown links that run script
-const RAW_HTML_PATTERN = /<(?!(?:https?|mailto):)(?:[A-Za-z][\w-]*|\/[A-Za-z]|!)/u;
-const SCRIPT_LINK_PATTERN = /\]\(\s*javascript:/iu;
 
 // the frontmatter flag and Codex policy each kind of skill must ship
 const INVOCATION_SETTINGS = {
@@ -410,20 +403,21 @@ export const assertNoOrphanedReferences = (
 };
 
 /**
- * Asserts that a skill file contains no raw HTML or script links outside code, because the site
- * renders skill Markdown without sanitizing it: a stray tag hides or reshapes the page, and a
- * `javascript:` link would run in readers' browsers.
- * @param document The file's name, such as jg-react or jg-react/references/client-data.md, and
- * its text.
+ * Asserts that a skill file's rendered HTML holds only markup Markdown produces, with no event
+ * handler or URL whose scheme is not http, https, or mailto, because the site renders skill Markdown without sanitizing it: a stray tag
+ * hides or reshapes the page, and a script would run in readers' browsers. The rendered output is
+ * checked, rather than the source, so no Markdown syntax or character encoding can slip past it.
+ * @param name The file's name, such as jg-react or jg-react/references/client-data.md.
+ * @param html The file's rendered HTML, or undefined when the content layer did not render it.
  * @throws
- * - Skill file contains raw HTML or a script link outside code
+ * - Skill file renders markup that Markdown does not produce, an event handler, or a URL with a
+ *   disallowed scheme
  */
-export const assertNoRawHtml = ({ body, name }: Pick<ISkillDocument, 'body' | 'name'>): void => {
-  const prose = body.replace(FENCED_CODE_PATTERN, '').replace(INLINE_CODE_PATTERN, '');
-  const match = RAW_HTML_PATTERN.exec(prose) ?? SCRIPT_LINK_PATTERN.exec(prose);
+export const assertSafeMarkup = (name: string, html: string | undefined): void => {
+  const problem = html === undefined ? 'not rendered' : findUnsafeMarkup(html);
 
-  if (match) {
-    throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.RawHtmlInMarkdown}: ${name} (${match[0]})`);
+  if (problem !== undefined) {
+    throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.UnsafeMarkup}: ${name} (${problem})`);
   }
 };
 

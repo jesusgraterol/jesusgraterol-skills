@@ -53,11 +53,11 @@
   - a skill or reference file links to a section of a document, or names another skill with a `/` or `$` prefix
   - a skill names a reference file that doesn't exist, or has a reference file it never names
   - a skill names a reference path that isn't a kebab-case Markdown file directly in `references/`, or its `references/` folder holds a nested or non-Markdown file
-  - a skill or reference file contains raw HTML or a `javascript:` link outside code
+  - a skill or reference file renders an element Markdown doesn't produce, a comment, an event handler, or a URL whose scheme isn't `http`, `https`, or `mailto`
   - an explicit skill has reference files, or a reference names another reference
   - a `SKILL.md` or reference file is larger than 20,480 bytes
   - a skill page is missing one of its reference files
-  - a page links to a fragment with no matching ID, or repeats an element ID
+  - a page links to a fragment with no matching ID, repeats an element ID, or holds an event handler or a URL with any other scheme
   - `robots.txt` doesn't name the sitemap index, or the 404 page names a canonical URL
 
   The type check fails on a missing or mismatched icon.

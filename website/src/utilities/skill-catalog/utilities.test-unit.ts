@@ -7,12 +7,12 @@ import {
   assertFileBudget,
   assertInvocationSettings,
   assertNoOrphanedReferences,
-  assertNoRawHtml,
   assertNoSectionLinks,
   assertReferenceFiles,
   assertReferencePathForm,
   assertReferenceIsLeaf,
   assertReferences,
+  assertSafeMarkup,
   assertSearchMetadata,
   assertSharedSections,
   assertSkillName,
@@ -526,30 +526,24 @@ describe('assertNoOrphanedReferences', () => {
   });
 });
 
-describe('assertNoRawHtml', () => {
-  test('accepts markup shown as code, and autolinks', () => {
-    const body = [
-      'Use a native `<dialog>` with ``<button type="button">`` inside.',
-      '',
-      '```html',
-      '<img src="/logo.png" alt="Logo" />',
-      '```',
-      '',
-      'See <https://example.com> and compare a < b.',
-    ].join('\n');
-
-    expect(() => assertNoRawHtml({ body, name: 'jg-frontend' })).not.toThrow();
+describe('assertSafeMarkup', () => {
+  test('accepts the markup Markdown produces', () => {
+    expect(() =>
+      assertSafeMarkup('jg-frontend', '<p>Use a native <code>&lt;dialog&gt;</code>.</p>'),
+    ).not.toThrow();
   });
 
   test.each([
-    ['an HTML element', 'Use a native <dialog> here.', '<dialog'],
-    ['a closing tag', 'Text</div> more.', '</d'],
-    ['a comment', 'Hidden <!-- note --> text.', '<!'],
-    ['a script link', 'Click [here](javascript:alert(1)).', ']('],
-    ['a placeholder that would vanish', 'Run jg-<skill> with arguments.', '<skill'],
-  ])('rejects %s', (_caseName, body, excerpt) => {
-    expect(() => assertNoRawHtml({ body, name: 'jg-frontend/references/forms.md' })).toThrow(
-      `Skill file contains raw HTML or a script link outside code: jg-frontend/references/forms.md (${excerpt}`,
+    ['raw HTML', '<p>Use a native <dialog> here.</p>', '<dialog> element'],
+    [
+      'a script link',
+      '<p><a href="javascript:alert(1)">here</a></p>',
+      'href="javascript:alert(1)"',
+    ],
+    ['a file the content layer did not render', undefined, 'not rendered'],
+  ])('rejects %s', (_caseName, html, problem) => {
+    expect(() => assertSafeMarkup('jg-frontend/references/forms.md', html)).toThrow(
+      `Skill file renders markup that Markdown does not produce, an event handler, or a URL with a disallowed scheme: jg-frontend/references/forms.md (${problem})`,
     );
   });
 });

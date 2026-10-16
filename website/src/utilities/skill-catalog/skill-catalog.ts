@@ -14,11 +14,11 @@ import {
   assertFileBudget,
   assertInvocationSettings,
   assertNoOrphanedReferences,
-  assertNoRawHtml,
   assertNoSectionLinks,
   assertReferenceFiles,
   assertReferenceIsLeaf,
   assertReferences,
+  assertSafeMarkup,
   assertSearchMetadata,
   assertSharedSections,
   assertSkillName,
@@ -65,7 +65,8 @@ const listReferenceFolder = async (skillDirectory: string): Promise<string[]> =>
  * results, its shared section drifts from the other skills of its kind, an implicit skill has no
  * version line, a skill or reference file links to a section of a document or names another skill
  * with a / or $ prefix, a skill's reference files and its SKILL.md disagree, a reference names
- * another reference, or a skill file exceeds the size budget.
+ * another reference, a skill file renders markup Markdown does not produce, an event handler, or
+ * a URL with a disallowed scheme, or a skill file exceeds the size budget.
  * @returns A promise that resolves to the skills in catalog order.
  * @throws
  * - Skill name does not match its directory
@@ -81,7 +82,8 @@ const listReferenceFolder = async (skillDirectory: string): Promise<string[]> =>
  * - Skill reference file mentions another reference file
  * - Skill names a reference path that is not a kebab-case Markdown file in references/
  * - Skill references folder holds a nested or non-Markdown file
- * - Skill file contains raw HTML or a script link outside code
+ * - Skill file renders markup that Markdown does not produce, an event handler, or a URL with a
+ *   disallowed scheme
  * - Skill file is larger than its size budget
  * - Skill shared section differs from the other skills of its kind
  * - Skill Task scope section differs from the other skills that carry one
@@ -127,7 +129,7 @@ export const loadSkills = async (): Promise<ISkill[]> => {
       assertVersionLine(document);
       assertNoSectionLinks(document);
       assertBareSkillReferences(document);
-      assertNoRawHtml(document);
+      assertSafeMarkup(entry.id, entry.rendered?.html);
       assertReferenceFiles(entry.id, await listReferenceFolder(skillDirectory));
       assertReferences(
         document,
@@ -142,7 +144,7 @@ export const loadSkills = async (): Promise<ISkill[]> => {
         assertReferenceIsLeaf(entry.id, reference.path, referenceBody);
         assertNoSectionLinks(referenceDocument);
         assertBareSkillReferences(referenceDocument);
-        assertNoRawHtml(referenceDocument);
+        assertSafeMarkup(referenceDocument.name, reference.entry.rendered?.html);
         assertFileBudget(entry.id, reference.path, await readFileBytes(reference.entry.filePath));
       }
 
