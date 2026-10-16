@@ -55,6 +55,7 @@
   - a skill page is missing one of its reference files
 
   The type check fails on a missing or mismatched icon.
+
 - **New or changed triggers.** Check that an implicit skill loads in Claude Code and Codex.
   - Use a throwaway Git repository with every implicit skill folder, references included, copied whole into `.claude/skills/` and `.agents/skills/`, and stub `CLAUDE.md` and `AGENTS.md` files holding one neutral line, with no index and no instruction to run tests.
   - Run requests that should load the skill, plus two unrelated ones, in both agents and read-only: `claude -p "<request>" --output-format stream-json --verbose --max-turns 10 --no-session-persistence --permission-mode plan`, and `codex exec --json --ephemeral --sandbox read-only -C <repository> "<request>"`.
