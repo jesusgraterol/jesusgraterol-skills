@@ -418,6 +418,46 @@ export const SKILL_CATALOG = {
     whenToUse:
       'It loads on its own when a task touches Node.js scripts, CLIs, build tooling, or filesystem code. Call it by name to load it before such a task.',
   },
+  'jg-npm-package': {
+    examples: [
+      {
+        outcome:
+          'Adds an exports subpath with types first, tests the packed tarball in a temporary project, and releases a minor with trusted publishing.',
+        request: 'Add a browser entry point to the date utilities package and release it.',
+      },
+    ],
+    icon: 'package',
+    kind: 'implicit',
+    order: 20,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps package exports, dependency ranges, tarball tests, and npm releases correct and safe.',
+    searchTitle: 'jg-npm-package: npm package standards for coding agents',
+    stage: 'implicit',
+    summary:
+      'Exports, dependency ranges, tarball tests, versioning, and trusted publishing for npm packages.',
+    whenToUse:
+      "It loads on its own when a task touches a published package's manifest, build output, tests, or release. Call it by name to load it before such a task.",
+  },
+  'jg-monorepo': {
+    examples: [
+      {
+        outcome:
+          'Declares it as a workspace dependency and a task input, so changing it re-runs the right tests without stale cache hits.',
+        request: 'Add a shared Vitest config package and use it in every app.',
+      },
+    ],
+    icon: 'folder-tree',
+    kind: 'implicit',
+    order: 21,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps Turborepo task graphs, cache keys, and pnpm workspace dependencies correct.',
+    searchTitle: 'jg-monorepo: Turborepo and pnpm workspace standards',
+    stage: 'implicit',
+    summary:
+      'Task graphs, cache inputs, filters, and workspace dependencies for Turborepo and pnpm.',
+    whenToUse:
+      'It loads on its own when a task touches turbo.json, pnpm-workspace.yaml, or workspace packages. Call it by name to load it before such a task.',
+  },
   'jg-bash': {
     examples: [
       {
@@ -429,7 +469,7 @@ export const SKILL_CATALOG = {
     ],
     icon: 'file-terminal',
     kind: 'implicit',
-    order: 20,
+    order: 22,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that keeps bash and sh scripts on Linux safe, consistent, and checked whenever a task touches shell.',
     searchTitle: 'jg-bash: Bash script standards for coding agents',
@@ -449,7 +489,7 @@ export const SKILL_CATALOG = {
     ],
     icon: 'workflow',
     kind: 'implicit',
-    order: 21,
+    order: 23,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that keeps GitHub Actions workflows fast, secure, and reusable whenever a task touches CI.',
     searchTitle: 'jg-ci: GitHub Actions standards for coding agents',
@@ -469,7 +509,7 @@ export const SKILL_CATALOG = {
     ],
     icon: 'zod',
     kind: 'implicit',
-    order: 22,
+    order: 24,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that applies Zod 4 schema, strictness, and error standards whenever a task validates data.',
     searchTitle: 'jg-zod: Zod 4 validation standards for coding agents',
@@ -488,7 +528,7 @@ export const SKILL_CATALOG = {
     ],
     icon: 'flask-conical',
     kind: 'implicit',
-    order: 23,
+    order: 25,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that keeps Vitest and Playwright tests deterministic and fast whenever a task touches tests.',
     searchTitle: 'jg-testing: Vitest and Playwright standards for agents',
