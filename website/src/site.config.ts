@@ -26,7 +26,7 @@ export const SKILL_CATALOG = {
     searchTitle: 'jg-brainstorm: Brainstorm ideas with Claude Code and Codex',
     stage: 'plan',
     whenToUse:
-      'Use it when you have an idea or a question and want to settle the approach before writing a plan.',
+      'Use it when you have an idea or a question and want to settle the approach before planning or building it.',
   },
   'jg-plan': {
     access: 'planning-files',
@@ -114,6 +114,12 @@ export const SKILL_CATALOG = {
           'Builds each remaining milestone, reviews it until clean, and pushes it before starting the next.',
       },
       {
+        invocation: 'jg-execute',
+        label: 'Agreed task',
+        outcome:
+          'Builds a small change agreed in this conversation without a plan file, restating its scope first, then runs its checks and stops so you can review and push it.',
+      },
+      {
         invocation: `jg-execute ${EXAMPLE_PLAN_PATH}`,
         label: 'Named plan',
         outcome:
@@ -136,11 +142,11 @@ export const SKILL_CATALOG = {
     kind: 'explicit',
     order: 5,
     searchDescription:
-      "An explicit-only agent skill for Claude Code and Codex that builds a plan's milestones, supervised by default or autonomously with review and push.",
-    searchTitle: 'jg-execute: Build plans supervised or autonomously',
+      "An explicit-only agent skill for Claude Code and Codex that builds an agreed task or a plan's milestones, supervised or autonomously with review and push.",
+    searchTitle: 'jg-execute: Build tasks and plans supervised or autonomously',
     stage: 'build',
     whenToUse:
-      'Use it once a plan is approved: on its own to build the next milestone and stop, or with auto to build, review, and push every remaining milestone.',
+      'Use it once a plan is approved, or right after the discussion for a small, settled change. On its own it builds the next milestone or the change and stops; with auto it also reviews and pushes each one.',
   },
   'jg-debug': {
     access: 'changes-code',

@@ -32,6 +32,13 @@ Reply conversationally and in proportion to the question; a simple follow-up get
 - Judge claims, the developer's and your own earlier ones alike, by evidence rather than confidence, repetition, or authority, and separate verified facts from judgment. Accept valid corrections and push back on unsupported claims, but do not manufacture objections.
 - Ask only questions whose answers would change the direction, in one numbered list, each with your recommended answer so a plain yes accepts it. Look facts up yourself instead of asking for them.
 
-When the developer says the idea is settled or asks for a summary, write a **Ready for jg-plan** summary in the conversation: the goal, the chosen approach, constraints, exclusions, and open decisions, marking which choices the developer made and which are your own defaults. The next step is invoking `jg-plan`. Do not write the summary to a file.
+When the developer says the idea is settled or asks for a summary, write a **Ready to build** summary in the conversation: the goal, the chosen approach, constraints, exclusions, and open decisions, marking which choices the developer made and which are your own defaults. Do not write the summary to a file. End it with the next step you recommend, and name the other one as the alternative:
+
+- `jg-execute` when all of these hold, stating the approach as the exact change and how to check it, because the summary is the task `jg-execute` builds:
+  - the idea is one focused change that touches a few files
+  - no decision is left open
+  - it changes no user-visible behavior beyond what was agreed
+  - it touches no public contract, schema or persisted data, security or authorization, dependency or infrastructure, or anything else hard to undo
+- `jg-plan` otherwise.
 
 This skill's output replaces any general completion summary.
