@@ -23,6 +23,7 @@ export type ISkillLucideIcon =
   | 'file-terminal'
   | 'flask-conical'
   | 'folder-tree'
+  | 'globe'
   | 'hammer'
   | 'lightbulb'
   | 'list-ordered'
@@ -33,6 +34,7 @@ export type ISkillLucideIcon =
   | 'scale'
   | 'search-check'
   | 'shield-question-mark'
+  | 'ship'
   | 'terminal'
   | 'upload'
   | 'workflow';
