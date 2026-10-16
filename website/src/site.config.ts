@@ -142,11 +142,11 @@ export const SKILL_CATALOG = {
     kind: 'explicit',
     order: 5,
     searchDescription:
-      "An explicit-only agent skill for Claude Code and Codex that builds a plan's milestones, supervised by default or autonomously with review and push.",
-    searchTitle: 'jg-execute: Build plans supervised or autonomously',
+      "An explicit-only agent skill for Claude Code and Codex that builds an agreed task or a plan's milestones, supervised or autonomously with review and push.",
+    searchTitle: 'jg-execute: Build tasks and plans supervised or autonomously',
     stage: 'build',
     whenToUse:
-      'Use it once a plan is approved: on its own to build the next milestone and stop, or with auto to build, review, and push every remaining milestone.',
+      'Use it once a plan is approved, or right after the discussion for a small, settled change. On its own it builds the next milestone or the change and stops; with auto it also reviews and pushes each one.',
   },
   'jg-debug': {
     access: 'changes-code',
