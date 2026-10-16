@@ -36,7 +36,7 @@ The agent loads this skill on its own when a task touches its area. This skill's
     env:
       TITLE: ${{ github.event.pull_request.title }}
     run: |
-      if [ "${#TITLE}" -gt 72 ]; then
+      if [[ ${#TITLE} -gt 72 ]]; then
         echo "::error::The title is longer than 72 characters."
         exit 1
       fi

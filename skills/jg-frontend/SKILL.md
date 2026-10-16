@@ -25,11 +25,12 @@ The agent loads this skill on its own when a task touches its area. This skill's
 These files belong to this skill and hold rules that apply only to some work. Read each one before the work it covers:
 
 - Before writing or reviewing a dialog, drawer, popover, menu, or tooltip, or using a native feature such as `<dialog>`, `popover`, `inert`, or `:has()` where no UI-package component fits, read `references/dialogs-and-overlays.md`. Use only native features that are Baseline for the supported browsers, or ship a fallback.
-- Before writing or reviewing toasts, inline errors, empty or loading states, pending actions, or status messages, read `references/feedback-and-errors.md`.
-- Before creating or changing a form or a form field, read `references/forms.md`.
+- Before writing or reviewing toasts, inline errors, empty or loading states, pending actions, or status messages, read `references/feedback-and-errors.md`. Never show raw exception text.
+- Before creating or changing a form or a form field, read `references/forms.md`. Client validation never replaces server validation.
+- Before adding or changing images, embeds, or other content that loads late, read `references/loading-performance.md`. Reserve space for late-loading content, so the page never shifts as it loads.
 - Before adding or changing animation or transitions, read `references/motion.md`. Every new or modified animation must have an equivalent reduced-motion path.
 - Before changing a single-page app's hosting headers, fallback rewrites, or chunk loading, read `references/single-page-app-delivery.md`.
-- Before writing or reviewing Tailwind classes, CSS, or Tailwind configuration, read `references/tailwind-and-css.md`.
+- Before writing or reviewing Tailwind classes, CSS, or Tailwind configuration, read `references/tailwind-and-css.md`. Never invent class names, tokens, or variants the project doesn't define.
 
 ## Web and accessibility guidance
 
@@ -40,6 +41,49 @@ When a task touches frontend code, UI behavior, layout, styling, components, pag
 - light and dark theme behavior
 
 Apply this requirement to new UI, modified UI, frontend bug fixes, refactors, and styling changes. Do not deliver desktop-only, mouse-only, light-mode-only, or inaccessible UI.
+
+### Responsive UI requirements
+
+Frontend implementations must be responsive from `320px` wide through large desktop screens.
+
+They must:
+
+- work at `320px` viewport width without horizontal page overflow
+- scale across mobile, tablet, laptop, and large desktop layouts
+- use mobile-first layouts by default
+- on mobile, prefer simple native-feeling hierarchy, not shrunken desktop cards/panels/containers
+- on mobile, flatten/remove outer cards, nested panels, redundant borders, shadows, backgrounds, gutters, and vertical spacing without meaningful grouping, containment, elevation, scrolling, selection, or interaction-state purpose
+- on mobile, use available width with compact touch-friendly insets; retain panels/generous spacing only for material clarity, usability, or established mobile design
+- on mobile, recompose rather than merely stack desktop panels when needed; prefer established edge-to-edge sections, lists, tabs, accordions, drawers, or sheets when more natural
+- progressively enhance at configured breakpoints; with unchanged Tailwind defaults, use `sm`, `md`, `lg`, `xl`, and `2xl`
+- avoid fixed widths that break narrow screens
+- prefer fluid sizing, wrapping, stacking, and flexible grids
+- keep text, controls, dialogs, forms, tables, and navigation usable on small screens
+- preserve accessibility, keyboard usability, and readable touch targets across supported viewport sizes
+
+Do not assume a component is desktop-first unless explicitly requested.
+
+### Light and dark theme requirements
+
+Frontend implementations must support light and dark modes through the repository's existing theme strategy.
+
+They must:
+
+- use existing tokens, CSS variables, Tailwind theme utilities, or component variants, not hard-coded one-off colors
+- preserve sufficient contrast in both themes for text, icons, controls, borders, focus indicators, validation, and disabled states
+- keep hover, active, focus-visible, selected, loading, empty, error, success, and disabled states clear in both themes
+- avoid color choices that only work in light mode or only work in dark mode
+- keep theme behavior consistent across responsive breakpoints and interactive states
+- avoid introducing a new theme mechanism unless the requested change explicitly requires it
+- set the CSS `color-scheme` property for each theme, so native controls, scrollbars, and form fields follow it
+
+For surfaces and states:
+
+- A surface that keeps one scheme regardless of theme, such as an always-dark panel or an inverted `bg-primary` block, sets its own `color-scheme` and restyles what the app themes with tokens, such as `::selection`, placeholders, focus rings, and hover states, checking contrast on that surface.
+- Prefer `color-mix(in oklab, …)` when mixing a hue with a near-neutral color, such as the foreground or background; `oklch` interpolates the neutral's tiny hue and can shift the result.
+- Style interaction states, such as copied, open, or selected, with `data-*` or `aria-*` variants on the element, not custom CSS in `@layer base` or `components`, which utilities in a later layer override.
+
+Without an existing theme mechanism, a limitation/follow-up note does not satisfy mandatory dual-theme support. Check whether existing design-system primitives can support both locally. Otherwise explain that a theme mechanism is required and materially expands scope, then ask one focused question before implementation. Do not silently add a broad system or finish single-theme UI.
 
 ### UI package and component reuse
 
@@ -94,12 +138,6 @@ When building UI:
 <img src="/logo.png" width="180" height="25" alt="Company logo" />
 ```
 
-### Loading performance
-
-- Give the main above-the-fold image `fetchpriority="high"`, and do not lazy-load it. Give images below the fold `loading="lazy"`.
-- Prefer the framework's image component, where one exists, over a raw `<img>`, so responsive sizes and modern formats are generated for you.
-- Reserve space for images, embeds, and late-loading content with explicit dimensions or `aspect-ratio`, so the page does not shift as it loads.
-
 ## Layout and long content
 
 Layouts hold up with long, real content at every width:
@@ -134,46 +172,3 @@ Application UIs, meaning signed-in or task-focused apps rather than content or m
 
 - When an action removes, hides, or replaces the focused element, move focus to a logical target, such as the next item, the control that opened it, or the new view's heading. Never leave focus on `body`.
 - A scroll container with no focusable content gets `tabindex="0"` and a visible focus style and, when its content is meaningful, `role="region"` and an accessible name, so keyboard users can scroll it.
-
-## Responsive UI requirements
-
-Frontend implementations must be responsive from `320px` wide through large desktop screens.
-
-They must:
-
-- work at `320px` viewport width without horizontal page overflow
-- scale across mobile, tablet, laptop, and large desktop layouts
-- use mobile-first layouts by default
-- on mobile, prefer simple native-feeling hierarchy, not shrunken desktop cards/panels/containers
-- on mobile, flatten/remove outer cards, nested panels, redundant borders, shadows, backgrounds, gutters, and vertical spacing without meaningful grouping, containment, elevation, scrolling, selection, or interaction-state purpose
-- on mobile, use available width with compact touch-friendly insets; retain panels/generous spacing only for material clarity, usability, or established mobile design
-- on mobile, recompose rather than merely stack desktop panels when needed; prefer established edge-to-edge sections, lists, tabs, accordions, drawers, or sheets when more natural
-- progressively enhance at configured breakpoints; with unchanged Tailwind defaults, use `sm`, `md`, `lg`, `xl`, and `2xl`
-- avoid fixed widths that break narrow screens
-- prefer fluid sizing, wrapping, stacking, and flexible grids
-- keep text, controls, dialogs, forms, tables, and navigation usable on small screens
-- preserve accessibility, keyboard usability, and readable touch targets across supported viewport sizes
-
-Do not assume a component is desktop-first unless explicitly requested.
-
-## Light and dark theme requirements
-
-Frontend implementations must support light and dark modes through the repository's existing theme strategy.
-
-They must:
-
-- use existing tokens, CSS variables, Tailwind theme utilities, or component variants, not hard-coded one-off colors
-- preserve sufficient contrast in both themes for text, icons, controls, borders, focus indicators, validation, and disabled states
-- keep hover, active, focus-visible, selected, loading, empty, error, success, and disabled states clear in both themes
-- avoid color choices that only work in light mode or only work in dark mode
-- keep theme behavior consistent across responsive breakpoints and interactive states
-- avoid introducing a new theme mechanism unless the requested change explicitly requires it
-- set the CSS `color-scheme` property for each theme, so native controls, scrollbars, and form fields follow it
-
-For surfaces and states:
-
-- A surface that keeps one scheme regardless of theme, such as an always-dark panel or an inverted `bg-primary` block, sets its own `color-scheme` and restyles what the app themes with tokens, such as `::selection`, placeholders, focus rings, and hover states, checking contrast on that surface.
-- Prefer `color-mix(in oklab, …)` when mixing a hue with a near-neutral color, such as the foreground or background; `oklch` interpolates the neutral's tiny hue and can shift the result.
-- Style interaction states, such as copied, open, or selected, with `data-*` or `aria-*` variants on the element, not custom CSS in `@layer base` or `components`, which utilities in a later layer override.
-
-Without an existing theme mechanism, a limitation/follow-up note does not satisfy mandatory dual-theme support. Check whether existing design-system primitives can support both locally. Otherwise explain that a theme mechanism is required and materially expands scope, then ask one focused question before implementation. Do not silently add a broad system or finish single-theme UI.

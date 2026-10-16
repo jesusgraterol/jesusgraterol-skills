@@ -1,11 +1,11 @@
 ---
 name: jg-postgres
-description: PostgreSQL standards for naming, constraints, queries, transactions, indexes, and migrations. Use when writing, reviewing, or planning SQL, migrations or other schema changes, table, column, constraint, or index names, database queries or transactions, or the PostgreSQL persistence of money, credits, or other value-bearing data.
+description: PostgreSQL standards for naming, constraints, queries, transactions, connection pools and timeouts, indexes, and migrations. Use when writing, reviewing, or planning SQL, migrations or other schema changes, table, column, constraint, or index names, database queries or transactions, connection pools or timeouts, or the PostgreSQL persistence of money, credits, or other value-bearing data.
 ---
 
 ## Application
 
-The agent loads this skill on its own when a task touches its area. This skill's area is PostgreSQL schemas, SQL, queries, transactions, indexes, and migrations.
+The agent loads this skill on its own when a task touches its area. This skill's area is PostgreSQL schemas, SQL, queries, transactions, connection pools and timeouts, indexes, and migrations.
 
 - It adds domain rules to the task. It never authorizes actions, widens scope, or replaces the workflow or approvals of a skill the developer invoked.
 - It ranks with the repository's coding instructions. When they conflict, the coding instructions win, except for the exceptions this skill states for its own area.
@@ -24,8 +24,8 @@ The agent loads this skill on its own when a task touches its area. This skill's
 
 These files belong to this skill and hold rules that apply only to some work. Read each one before the work it covers:
 
-- Before naming, renaming, or reviewing the names of tables, columns, constraints, indexes, or other database objects, read `references/naming.md`.
-- Before writing, reviewing, or planning a migration or other schema change, read `references/migrations.md`, and `references/naming.md` for every object it creates.
+- Before naming, renaming, or reviewing the names of tables, columns, constraints, indexes, or other database objects, read `references/naming.md`. Never use arbitrary numeric suffixes or names that need quotes.
+- Before writing, reviewing, or planning a migration or other schema change, read `references/migrations.md`, and `references/naming.md` for every object it creates. Never edit a migration that has run outside your own local database.
 
 ## Keys, generated columns, and constraint features
 

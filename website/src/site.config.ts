@@ -395,9 +395,9 @@ export const SKILL_CATALOG = {
     searchTitle: 'jg-postgres: PostgreSQL standards for coding agents',
     stage: 'implicit',
     summary:
-      'Naming, constraints, queries, transactions, indexes, and safe migrations for PostgreSQL.',
+      'Naming, constraints, queries, transactions, pools, timeouts, and migrations for PostgreSQL.',
     whenToUse:
-      'It loads on its own when a task touches PostgreSQL schemas, queries, or migrations. Call it by name to load it before such a task.',
+      'It loads on its own when a task touches PostgreSQL schemas, queries, connection pools, or migrations. Call it by name to load it before such a task.',
   },
   'jg-redis': {
     examples: [

@@ -145,7 +145,6 @@ Requirements:
 For NestJS `HttpService` dependencies, compile with real-setup-compatible HTTP imports/providers: include `HttpModule` in `imports` unless intentionally overridden or mocked.
 
 ```ts
-// @vitest-environment node
 import { Test, type TestingModule } from '@nestjs/testing';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 

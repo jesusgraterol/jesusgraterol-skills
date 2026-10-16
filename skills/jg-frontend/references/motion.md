@@ -6,7 +6,7 @@ Animate only for clear UX value, with minimal motion and short durations. Avoid 
 
 Prefer simple low-cost opacity changes and tiny transforms, such as fades or slight fade-and-slide transitions. Avoid large travel, width/height animation, many simultaneous elements, heavy blur/shadows, and complex custom keyframes unless explicitly requested, performant, and accessible.
 
-For predictably small-height content, use subtle fade plus minimal slide when direction clarifies origin/destination. Avoid height animation without a proven accessible project pattern. Example:
+For predictably small-height content, use subtle fade plus minimal slide when direction clarifies origin/destination. Avoid height animation without a proven accessible project pattern. Example, with `tw-animate-css` utilities, which apply only when it is installed:
 
 ```tsx
 <div
@@ -16,7 +16,7 @@ For predictably small-height content, use subtle fade plus minimal slide when di
 </div>
 ```
 
-Use fade-only entry/exit for unpredictable, user-generated, async-loaded, virtualized, paginated, or potentially large content. Do not slide, expand/collapse, animate height, or use large transforms on substantially growing content; avoid jank, disorientation, and unnecessary rendering. Example:
+Use fade-only entry/exit for unpredictable, user-generated, async-loaded, virtualized, paginated, or potentially large content. Do not slide, expand/collapse, animate height, or use large transforms on substantially growing content; avoid jank, disorientation, and unnecessary rendering. Example, again with `tw-animate-css` utilities:
 
 ```tsx
 <div
