@@ -315,9 +315,9 @@ export const SKILL_CATALOG = {
     searchTitle: 'jg-react: React standards for coding agents',
     stage: 'implicit',
     summary:
-      'Component organization, render performance, React 19 APIs, and user-focused tests for React.',
+      'Components, render performance, React 19 APIs, routing, hydration, client data, and tests for React.',
     whenToUse:
-      'It loads on its own when a task touches React components, hooks, state, or tests. Call it by name to load it before such a task.',
+      'It loads on its own when a task touches React components, hooks, state, routing, server rendering, client data caching, or tests. Call it by name to load it before such a task.',
   },
   'jg-nestjs': {
     examples: [
