@@ -297,7 +297,7 @@ export const SKILL_CATALOG = {
     summary:
       'Accessibility, responsive layout, themes, forms, motion, and design-system reuse for Tailwind CSS.',
     whenToUse:
-      'It loads on its own when a task touches UI, styling, forms, or frontend tests. Call it by name to load it before such a task.',
+      'It loads on its own when a task touches UI, styling, forms, mobile behavior, dialogs or feedback, single-page-app delivery, or frontend tests. Call it by name to load it before such a task.',
   },
   'jg-react': {
     examples: [

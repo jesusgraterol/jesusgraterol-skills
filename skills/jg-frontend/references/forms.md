@@ -6,7 +6,7 @@ Before creating or materially changing a form, inspect existing forms, shared co
 - Without an established application-owned form-validation system, native HTML constraint validation is an acceptable client fallback. Add no form library merely to avoid it unless requested behavior or non-trivial application-owned validation justifies one.
 - Preserve accurate native attributes for semantics, accessibility, autofill, mobile input, and progressive enhancement. When the application-owned system controls validation feedback/submission, prevent competing browser validation UI, normally with `noValidate` on `<form>`.
 - Align client validation with authoritative application/server contracts; it improves UX but never replaces trusted-server validation.
-- Set `autocomplete` tokens, `inputmode`, and `enterkeyhint` on inputs, so browsers can autofill them and mobile keyboards match the field.
+- Set `autocomplete` tokens, `inputmode`, and `enterkeyhint` on inputs, so browsers can autofill them and mobile keyboards match the field. Set `autocapitalize="none"`, `autocorrect="off"`, and `spellcheck="false"` on usernames, codes, and other fields that aren't prose.
 - (4.1+) Prefer the `user-invalid:` variant over `invalid:` for error styling, so a field shows its error only after the user has interacted with it.
 
 ## Form placeholder guidance
