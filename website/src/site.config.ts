@@ -26,7 +26,7 @@ export const SKILL_CATALOG = {
     searchTitle: 'jg-brainstorm: Brainstorm ideas with Claude Code and Codex',
     stage: 'plan',
     whenToUse:
-      'Use it when you have an idea or a question and want to settle the approach before writing a plan.',
+      'Use it when you have an idea or a question and want to settle the approach before planning or building it.',
   },
   'jg-plan': {
     access: 'planning-files',
@@ -112,6 +112,12 @@ export const SKILL_CATALOG = {
         label: 'Autonomous',
         outcome:
           'Builds each remaining milestone, reviews it until clean, and pushes it before starting the next.',
+      },
+      {
+        invocation: 'jg-execute',
+        label: 'Agreed task',
+        outcome:
+          'Builds a small change agreed in this conversation without a plan file, restating its scope first, then runs its checks and stops so you can review and push it.',
       },
       {
         invocation: `jg-execute ${EXAMPLE_PLAN_PATH}`,

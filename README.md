@@ -87,11 +87,13 @@ Each implicit skill states the versions it was written for and, for anything wit
 
 ## A typical run
 
-1. `jg-brainstorm` thinks the idea through with you and ends with a summary you can plan from.
+1. `jg-brainstorm` thinks the idea through with you and ends with a summary that recommends the next step: `jg-plan`, or `jg-execute` for a small, settled change.
 2. `jg-plan` asks about any decision that is yours to make, then turns the discussion into a plan under `coding-agent-planning/` and asks for approval. When the idea isn't clear enough to plan, it points you back to `jg-brainstorm`.
 3. Optionally, `jg-challenge-plan` returns a verdict, any required corrections, and numbered decisions, and `jg-plan` with your answers revises the same plan.
 4. Optionally, `jg-breakdown` writes `milestones.md` when the plan has real milestone boundaries, with an overview table of every milestone's status at the top and a status line under each milestone: pending, in progress, or done.
 5. `jg-execute` builds the next milestone, runs its checks, and stops so you can run `jg-review` and `jg-push` yourself. `jg-review` checks the change against the plan and the milestone it belongs to, as well as the code. `jg-execute auto` builds every remaining milestone instead, reviewing and pushing each one before starting the next.
+
+A small, settled change, such as a few edits with nothing left to decide, skips steps 2 to 4: invoke `jg-execute` right after the discussion, and it builds the agreed task as one unit.
 
 Use `jg-pause` at any point to stop the agent at a safe point and pick up later. Use `jg-debug` when something breaks and the cause isn't obvious.
 
