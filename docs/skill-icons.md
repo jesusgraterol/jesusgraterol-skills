@@ -34,6 +34,7 @@
 | `jg-session`        | `MessagesSquare`     | Reads past sessions.                                                                   |
 | `jg-frontend`       | Tailwind CSS mark    | Written for Tailwind CSS.                                                              |
 | `jg-react`          | React mark           | Written for React.                                                                     |
+| `jg-pwa`            | `MonitorSmartphone`  | Web apps installed on desktops and phones, across several browsers.                    |
 | `jg-nestjs`         | NestJS mark          | Written for NestJS.                                                                    |
 | `jg-postgres`       | `Database`           | PostgreSQL's elephant blurs at 20 pixels.                                              |
 | `jg-redis`          | Redis mark           | Written for Redis.                                                                     |

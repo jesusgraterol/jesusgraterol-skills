@@ -27,6 +27,7 @@ export type ISkillLucideIcon =
   | 'list-ordered'
   | 'map'
   | 'messages-square'
+  | 'monitor-smartphone'
   | 'scale'
   | 'search-check'
   | 'shield-question-mark'
