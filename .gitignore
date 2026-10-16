@@ -155,4 +155,5 @@ test-results/
 # local coding instructions and planning files, never published
 AGENTS.md
 CANDIDATE.md
+CLAUDE.md
 coding-agent-planning/
