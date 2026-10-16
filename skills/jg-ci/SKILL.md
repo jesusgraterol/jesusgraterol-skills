@@ -53,6 +53,17 @@ The agent loads this skill on its own when a task touches its area. This skill's
 
 - Never restore caches in workflows triggered by releases or tags, or that publish packages: no `actions/cache`, no setup-action caching, and `package-manager-cache: false` on `actions/setup-node`, which otherwise caches on its own when `package.json` names npm as its `packageManager`. A poisoned cache would end up in what gets published. CI and site deploys keep caching.
 
+## Keeping the gate fast
+
+Every job and test added to a pipeline makes each pull request wait longer, so keep the required gate small on purpose. The repository's own CI policy wins over these defaults.
+
+- Prefer a required pull-request gate that checks correctness, such as typecheck, lint, unit and integration tests, package and contract checks, and builds, and finishes in about ten minutes.
+- Prefer running browser, end-to-end, visual, and accessibility suites for presentation sites, such as documentation, marketing, and package websites, outside the required gate: on demand with `workflow_dispatch`, on a schedule, or before a release. A product interface keeps a small smoke suite for its critical journeys in the gate.
+- Code that publishes irreversibly, such as a UI package released to npm, keeps the browser checks it needs, run in the publishing workflow when its version changes instead of on every pull request.
+- Prefer not repeating, in deployment and publishing workflows, the suite the gate already ran on the same tree. Build once, and run only what publishing needs, such as packing and a smoke check of the artifact. Repeat the suite when the merged tree can differ from the one the gate tested, for example when branches don't have to be up to date before merging.
+- Before adding a job or a suite to the gate, estimate how long it takes. When a change would push the gate past its budget, propose one of the options under "When the numbers justify it" instead of absorbing the cost.
+- Prefer setting `timeout-minutes` near a job's normal duration, about twice its typical run time, so a slowdown fails visibly instead of running unnoticed for most of an hour.
+
 ## Defaults
 
 - Prefer cancelling superseded runs with a concurrency group per workflow and ref, such as `${{ github.workflow }}-${{ github.ref }}`.

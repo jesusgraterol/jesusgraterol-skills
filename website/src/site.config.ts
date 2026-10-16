@@ -434,7 +434,8 @@ export const SKILL_CATALOG = {
       'An implicit agent skill for Claude Code and Codex that keeps GitHub Actions workflows fast, secure, and reusable whenever a task touches CI.',
     searchTitle: 'jg-ci: GitHub Actions standards for coding agents',
     stage: 'implicit',
-    summary: 'Permissions, timeouts, caching, concurrency, and action pinning for GitHub Actions.',
+    summary:
+      'Lean required gates, permissions, timeouts, caching, concurrency, and action pinning for GitHub Actions.',
     whenToUse:
       'It loads on its own when a task touches GitHub Actions workflows, including CI and deployment pipelines. Call it by name to load it before such a task.',
   },
