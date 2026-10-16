@@ -78,7 +78,7 @@ Both commands name the skills, so other skills in the project are left alone.
 | `jg-zod`      | Zod schemas, request or response validation, parsing untrusted data, or JSON Schema.                | Zod 4.6                             |
 | `jg-testing`  | Vitest or Playwright tests, test configuration, flaky tests, timeouts, or retries.                  | Vitest 4.1 and 5.0, Playwright 1.64 |
 
-Each implicit skill states the versions it was written for. Items that need a newer version are marked with it, and apply only when that version or a later one is installed. When an installed version is newer than the one a skill was written for, the agent follows that version's official guidance for the skill's version-specific items, reports any that look outdated, and offers to open an issue here.
+Each implicit skill states the versions it was written for and, for anything without an installed version, such as a hosted service or browser behavior, the month it was last reviewed. Items that need a newer version are marked with it, and apply only when that version or a later one is installed. When an installed version is newer than the one a skill was written for, or a review month is more than six months old, the agent checks the skill's version-specific items against the official guidance before relying on them and follows that guidance where an item differs. Skills don't list everything: where a skill says nothing, the agent follows the installed version's official guidance and may use its newer features in new code, after confirming them in the official documentation. When that documentation can't be reached, the agent keeps the skill's approach and says so. It reports any item that looks outdated and offers to open an issue here.
 
 ## A typical run
 
