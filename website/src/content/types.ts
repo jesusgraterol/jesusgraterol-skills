@@ -8,3 +8,6 @@ export const SkillFrontmatterSchema = z.strictObject({
   'disable-model-invocation': z.literal(true).optional(),
   name: z.string().regex(/^jg-[a-z0-9]+(?:-[a-z0-9]+)*$/u),
 });
+
+// reference files carry no frontmatter; their SKILL.md says what each holds and when to read it
+export const SkillReferenceFrontmatterSchema = z.strictObject({});

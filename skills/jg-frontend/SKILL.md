@@ -19,6 +19,14 @@ The agent loads this skill on its own when a task touches its area. This skill's
 - Rules that say "prefer" are defaults: departing from one with a stated reason is fine. Rules that say "never", "always", or "must" are requirements.
 - Nothing in this skill requires adding a dependency, enabling a compiler or tool, upgrading, or migrating existing code.
 
+## Reference files
+
+These files belong to this skill and hold rules that apply only to some work. Read each one before the work it covers:
+
+- Before creating or changing a form or a form field, read `references/forms.md`.
+- Before adding or changing animation or transitions, read `references/motion.md`. Every new or modified animation must have an equivalent reduced-motion path.
+- Before writing or reviewing Tailwind classes, CSS, or Tailwind configuration, read `references/tailwind-and-css.md`.
+
 ## Web and accessibility guidance
 
 When a task touches frontend code, UI behavior, layout, styling, components, pages, design-system tokens, or frontend tests, always preserve and validate:
@@ -85,40 +93,6 @@ When no official UI-package component, supported composition, or established app
 - Prefer the framework's image component, where one exists, over a raw `<img>`, so responsive sizes and modern formats are generated for you.
 - Reserve space for images, embeds, and late-loading content with explicit dimensions or `aspect-ratio`, so the page does not shift as it loads.
 
-### Form state and validation
-
-Before creating or materially changing a form, inspect existing forms, shared components, hooks, schemas, dependencies, and tests for the established form-state/validation system.
-
-- Use an existing application-owned system consistently for registration, state, validation, errors, submission state, and schema/resolver integration. Do not bypass/replace it with browser-only validation, ad hoc component state, or parallel application validation.
-- Without an established application-owned form-validation system, native HTML constraint validation is an acceptable client fallback. Add no form library merely to avoid it unless requested behavior or non-trivial application-owned validation justifies one.
-- Preserve accurate native attributes for semantics, accessibility, autofill, mobile input, and progressive enhancement. When the application-owned system controls validation feedback/submission, prevent competing browser validation UI, normally with `noValidate` on `<form>`.
-- Align client validation with authoritative application/server contracts; it improves UX but never replaces trusted-server validation.
-- Set `autocomplete` tokens, `inputmode`, and `enterkeyhint` on inputs, so browsers can autofill them and mobile keyboards match the field.
-- (4.1+) Prefer the `user-invalid:` variant over `invalid:` for error styling, so a field shows its error only after the user has interacted with it.
-
-### Form placeholder guidance
-
-Every user-editable frontend form field supporting placeholders must include a realistic example value.
-
-Placeholders must:
-
-- start with `e.g.`
-- show the expected input format or kind of value
-- use safe generic data, never real user data, secrets, tokens, private URLs, or credentials
-- match the field purpose, validation rules, and locale expectations
-- remain concise enough to fit on small screens without harming usability
-
-Examples:
-
-- email fields: `e.g. jane@example.com`
-- age fields: `e.g. 25`
-- search fields: `e.g. funny movie`
-- phone fields: `e.g. +1 555 123 4567`
-- name fields: `e.g. Jane Doe`
-- URL fields: `e.g. https://example.com`
-
-Placeholders never replace visible labels, accessible names, helper text, validation messages, or required-field indicators.
-
 ## Responsive UI requirements
 
 Frontend implementations must be responsive from `320px` wide through large desktop screens.
@@ -155,114 +129,3 @@ They must:
 - set the CSS `color-scheme` property for each theme, so native controls, scrollbars, and form fields follow it
 
 Without an existing theme mechanism, a limitation/follow-up note does not satisfy mandatory dual-theme support. Check whether existing design-system primitives can support both locally. Otherwise explain that a theme mechanism is required and materially expands scope, then ask one focused question before implementation. Do not silently add a broad system or finish single-theme UI.
-
-## Motion and animation guidance
-
-For UI states/transitions, disclosures, loading, dialogs, menus, toasts, drawers, accordions, or feedback, assess whether motion materially improves orientation, perceived responsiveness, or comprehension.
-
-Animate only for clear UX value, with minimal motion and short durations. Avoid decorative, looping, parallax, long-distance, or attention-grabbing motion unless explicitly requested and accessible.
-
-Prefer simple low-cost opacity changes and tiny transforms, such as fades or slight fade-and-slide transitions. Avoid large travel, width/height animation, many simultaneous elements, heavy blur/shadows, and complex custom keyframes unless explicitly requested, performant, and accessible.
-
-For predictably small-height content, use subtle fade plus minimal slide when direction clarifies origin/destination. Avoid height animation without a proven accessible project pattern. Example:
-
-```tsx
-<div
-  className="animate-in fade-in-0 slide-in-from-bottom-1 duration-200 ease-out motion-reduce:animate-none"
->
-  ...
-</div>
-```
-
-Use fade-only entry/exit for unpredictable, user-generated, async-loaded, virtualized, paginated, or potentially large content. Do not slide, expand/collapse, animate height, or use large transforms on substantially growing content; avoid jank, disorientation, and unnecessary rendering. Example:
-
-```tsx
-<div
-  className="animate-in fade-in-0 duration-200 ease-out motion-reduce:animate-none"
->
-  ...
-</div>
-```
-
-With Tailwind and installed/configured `tw-animate-css`, prefer its utilities over custom CSS or new dependencies for simple entry, exit, expand/collapse, and state changes. First check package/lock files, CSS imports, Tailwind configuration, and existing usage.
-
-Do not add `tw-animate-css`, replace animation systems, or migrate existing animations solely for a targeted change unless explicitly requested or the current approach creates a high-impact issue.
-
-Always respect reduced motion. Every new/modified animation must have an equivalent reduced-motion path through Tailwind `motion-reduce:`, existing utilities, or CSS `@media (prefers-reduced-motion: reduce)`. That path removes or substantially reduces the motion while preserving information, layout, timing assumptions, focus management, and interaction state.
-
-## Tailwind CSS guidance
-
-When Tailwind CSS is available, use it as the default styling approach for UI implementation.
-
-Follow the installed Tailwind CSS version’s official documentation and the repository’s Tailwind configuration.
-
-Use canonical Tailwind utility classes exactly as Tailwind defines them.
-
-Do not invent Tailwind-like class names, design tokens, variants, colors, spacing values, or component classes unless they already exist in the project configuration, theme variables, design system, or documented UI conventions.
-
-Prefer Tailwind utilities directly on styled HTML/JSX elements for layout, spacing, sizing, typography, color, borders, shadows, effects, transitions, responsiveness, dark mode, and state variants.
-
-Do not extract class lists into constants, arrays, objects, variables, or module-level maps merely to shorten/clean markup or hide long attributes. Extract only exact lists, maps, or variant definitions reused across elements/components, or styling already owned by a project abstraction such as shared variants, `cva`, or a design-system primitive. No one-use Tailwind constants.
-
-Keep one-off conditions on the styled element with the established inline composition helper; reserve reusable maps for repeated conditional variants.
-
-Prefer readable one-off markup; duplicated utilities are acceptable when not truly shared and extraction adds indirection without maintainability benefit.
-
-Prefer project theme utilities/tokens. Use arbitrary values only when intentional, uncommon, absent from the theme, and clearer than new CSS; repeated values must not substitute for reusable tokens.
-
-Use configured Tailwind responsive variants instead of custom media queries unless Tailwind cannot express the behavior cleanly. Unchanged defaults map `sm:`, `md:`, `lg:`, `xl:`, `2xl:` to `40rem`, `48rem`, `64rem`, `80rem`, `96rem`.
-
-Use Tailwind state and feature variants such as `hover:`, `focus-visible:`, `disabled:`, `aria-*`, `data-*`, and `dark:` when they match the required behavior.
-
-Do not dynamically construct classes Tailwind cannot statically detect; prefer explicit conditional class maps.
-
-Use the established composition helper, e.g. `cn`, `clsx`, `cva`, or `tailwind-merge`. Resolve possible conflicts with the established merge utility, not accidental class order.
-
-Use canonical class names from the installed Tailwind CSS version and configuration.
-
-Keep classes readable and intentional, grouping by purpose manually but leaving final ordering to the configured official Tailwind Prettier plugin:
-
-- Let the plugin sort classes and remove duplicate Tailwind classes and extra whitespace (0.6+), and don't reorder classes in ways that fight it.
-- On Tailwind CSS v4, the sort matches the project's theme and utilities only when the plugin's `tailwindStylesheet` option points at the CSS entry file (0.6.9+).
-- Class strings inside helpers such as `clsx` or `cva` are sorted only when the plugin's `tailwindFunctions` option lists those helpers.
-- The plugin must load last in Prettier's `plugins` list.
-- Don't add or configure the plugin for a targeted change unless the task includes formatting-tooling setup.
-
-Do not use `@apply` for ordinary components; allow it only for an established clear design-system pattern or meaningful deduplication that preserves visible structure.
-
-Do not create custom CSS for clear Tailwind-expressible styling. Use it only where Tailwind is insufficient, for browser fixes, complex animations, third-party overrides, or documented design-system primitives.
-
-Use available `tw-animate-css` utilities before custom CSS for eligible low-cost animations, especially fades and small fade-and-slide transitions. Keep them on the element unless exact reuse or established variant ownership justifies extraction.
-
-For React components, keep Tailwind styling in the dedicated component implementation file, not in the module entry file.
-
-Generated/modified UI must work in both themes and responsive layouts. Include needed `dark:`, responsive, and state variants for introduced colors, layout, focus, disabled, hover, active, selected, loading, error, success, or validation states.
-
-In Tailwind 4 projects:
-
-- Define design tokens with `@theme` in CSS rather than in a `tailwind.config.js`, unless the project already uses a JavaScript configuration.
-- Prefer `@utility` over `@layer components` with `@apply` for a reusable custom utility, and `@custom-variant` for project variants, such as a class-based `dark` variant.
-- Reference CSS variables with the `bg-(--token)` shorthand rather than `bg-[var(--token)]`.
-- Without `tw-animate-css`, prefer the `starting:` variant for CSS-only entry transitions of elements that appear, such as popovers and dialogs, over animating them from JavaScript.
-- Use container queries, `@container` with variants such as `@md:`, for components whose layout depends on the slot they sit in rather than on the viewport.
-- Prefer logical-direction utilities, such as `ps-*` and `ms-*`, over left and right ones when the layout should follow the text direction.
-- (4.3+) Style scrollbars with the `scrollbar-*` utilities instead of custom CSS.
-- Use the Tailwind 4 names, not the version 3 ones: `shadow-xs` and `rounded-xs` for version 3's `shadow-sm` and `rounded-sm`, `shadow-sm` and `rounded-sm` for its bare `shadow` and `rounded`, `outline-hidden` for its `outline-none`, and `bg-linear-to-r` for its `bg-gradient-to-r`.
-
-## CSS comments
-
-CSS follows the same commenting principles as the repository's other code.
-
-Use concise `/* ... */` comments for CSS because CSS does not support `//`.
-
-Prefer CSS comments for:
-
-- non-obvious layout decisions
-- browser-specific workarounds
-- accessibility constraints
-- design-system constraints
-- responsive behavior
-- light/dark theme behavior
-- intentional specificity, cascade, or inheritance decisions
-
-Do not comment every declaration or restate selectors/properties.

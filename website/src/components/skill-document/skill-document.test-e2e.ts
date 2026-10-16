@@ -1,6 +1,25 @@
+import { readdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
+
 import { expect, test } from '@playwright/test';
 
 import { SKILL_CATALOG } from '../../site.config.ts';
+
+const SKILLS_DIRECTORY = resolve(import.meta.dirname, '..', '..', '..', '..', 'skills');
+
+/** Lists one skill's reference files as SKILL.md names them, or none without a references folder. */
+const listReferencePaths = async (name: string): Promise<string[]> => {
+  try {
+    return (await readdir(resolve(SKILLS_DIRECTORY, name, 'references')))
+      .filter((fileName) => fileName.endsWith('.md'))
+      .map((fileName) => `references/${fileName}`)
+      .toSorted();
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return [];
+
+    throw error;
+  }
+};
 
 // skill names in the catalog order the previous and next links follow
 const ORDERED_NAMES = Object.entries(SKILL_CATALOG)
@@ -106,6 +125,30 @@ test.describe('skill pages', () => {
       );
     });
   }
+
+  test('renders each reference file below the instructions, under the path SKILL.md names', async ({
+    page,
+  }) => {
+    for (const name of ORDERED_NAMES) {
+      const referencePaths = await listReferencePaths(name);
+
+      await page.goto(`/skills/${name}/`);
+
+      if (referencePaths.length === 0) {
+        await expect(page.locator('[data-skill-references]')).toHaveCount(0);
+        continue;
+      }
+
+      await expect(page.locator('[data-skill-reference]')).toHaveCount(referencePaths.length);
+
+      for (const referencePath of referencePaths) {
+        const reference = page.locator(`[data-skill-reference="${referencePath}"]`);
+
+        await expect(reference.getByText(referencePath, { exact: true })).toBeVisible();
+        await expect(reference.getByRole('heading', { level: 2 }).first()).toBeVisible();
+      }
+    }
+  });
 
   test('labels one example per supported case, each with its own copy button', async ({ page }) => {
     await page.goto('/skills/jg-execute/');

@@ -9,14 +9,25 @@ export const IMPLICIT_OPENAI_POLICY = 'policy:\n  allow_implicit_invocation: tru
 // stable messages for skill contract violations that must fail the build
 export const SKILL_CATALOG_ERROR_MESSAGES = {
   CatalogMismatch: 'Skill catalog does not match the skill folders',
+  ExplicitSkillReferences: 'Explicit skill has reference files',
+  FileOverBudget: 'Skill file is larger than its size budget',
   InvalidSearchMetadata: 'Skill search metadata is outside its limits',
   InvocationMismatch: 'Skill invocation settings do not match its catalog kind',
   MissingVersionLine: 'Implicit skill has no version line',
   NameMismatch: 'Skill name does not match its directory',
+  NestedReference: 'Skill reference file mentions another reference file',
   PrefixedSkillReference: 'Skill refers to another skill with a / or $ prefix',
+  ReferenceMissing: 'Skill mentions a reference file that does not exist',
+  ReferenceUnmentioned: 'Skill reference file is not mentioned in its SKILL.md',
   SectionLink: 'Skill links to a section of another document',
   SharedSectionMismatch: 'Skill shared section differs from the other skills of its kind',
 } as const;
+
+/*
+ * the largest SKILL.md or reference file, in bytes; after compaction Claude Code re-attaches only
+ * the first 5,000 tokens of each invoked skill, and a file this size stays close to that window
+ */
+export const SKILL_FILE_BYTE_BUDGET = 20_480;
 
 // the section each kind of skill copies word for word from the other skills of its kind
 export const SHARED_SECTION_HEADINGS = {

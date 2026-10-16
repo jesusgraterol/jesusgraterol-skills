@@ -92,7 +92,7 @@ Use `jg-pause` at any point to stop the agent at a safe point and pick up later.
 
 ## Website
 
-The site in `website/` is a static Astro and Tailwind CSS project. It reads every `skills/*/SKILL.md` at build time, so the published names, descriptions, and instructions always match what gets installed.
+The site in `website/` is a static Astro and Tailwind CSS project. It reads every `skills/*/SKILL.md` and `skills/*/references/*.md` at build time, so the published names, descriptions, instructions, and reference files always match what gets installed.
 
 Requirements: Node.js `24.15` or newer within Node 24, and npm `11.12` or newer within npm 11. Run these from `website/`:
 
@@ -112,7 +112,7 @@ npm run dev
 | `npm run format`          | Format the website files.                                                                           |
 | `npm run assets:generate` | Regenerate the committed open-graph image from its HTML template.                                   |
 
-The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill's frontmatter flag or Codex policy doesn't match its kind in the catalog, when a skill's search title or description would be cut off in search results, when a skill's shared `## Invocation` or `## Application` section drifts from the other skills of its kind, when an implicit skill has no version line, or when a skill links to a section of a document or names another skill with a `/` or `$` prefix. The type check fails when a skill's icon is missing or doesn't match its kind. When you add, change, rename, or remove a skill, follow [`docs/skill-guidelines.md`](docs/skill-guidelines.md).
+The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill's frontmatter flag or Codex policy doesn't match its kind in the catalog, when a skill's search title or description would be cut off in search results, when a skill's shared `## Invocation` or `## Application` section drifts from the other skills of its kind, when an implicit skill has no version line, when a skill or reference file links to a section of a document or names another skill with a `/` or `$` prefix, when a skill names a reference file that doesn't exist or has one it never names, when an explicit skill has reference files, when a reference names another reference, or when a `SKILL.md` or reference file is larger than 20,480 bytes. The type check fails when a skill's icon is missing or doesn't match its kind. When you add, change, rename, or remove a skill, follow [`docs/skill-guidelines.md`](docs/skill-guidelines.md).
 
 ### Deployment
 
@@ -133,14 +133,15 @@ Until then, the deploy job fails, or the site is served under a path where its r
 ├── skills/
 │   └── jg-<name>/
 │       ├── SKILL.md         # frontmatter and the skill's instructions
-│       └── agents/
-│           └── openai.yaml  # Codex invocation policy
+│       ├── agents/
+│       │   └── openai.yaml  # Codex invocation policy
+│       └── references/      # implicit skills only: topic detail that SKILL.md says when to read
 ├── website/
 │   ├── public/              # favicon, Claude Code mark, robots.txt, and the generated open-graph image
 │   ├── scripts/             # open-graph generation and build-artifact verification
 │   ├── src/
 │   │   ├── components/      # focused Astro presentation modules
-│   │   ├── content/         # SKILL.md frontmatter schema
+│   │   ├── content/         # SKILL.md and reference file frontmatter schemas
 │   │   ├── layouts/         # shared metadata, navigation, theme, and footer shell
 │   │   ├── pages/           # home, one page per skill, 404, and llms.txt
 │   │   ├── styles/          # Tailwind entry point and branded semantic tokens
@@ -152,6 +153,7 @@ Until then, the deploy job fails, or the site is served under a path where its r
 ```
 
 - Every skill directory name matches the `name` in its `SKILL.md` frontmatter.
+- An implicit skill may keep topics that only some tasks need in `references/<topic>.md`, one level deep. Its `SKILL.md` names each file as a code-formatted path, with when to read it, and the website renders the files below the skill's instructions. Explicit skills keep their whole workflow in `SKILL.md`. Every `SKILL.md` and reference file stays within 20,480 bytes, so an agent keeps all of it after compaction.
 - Explicit skills are explicit-only in both agents: their frontmatter sets `disable-model-invocation: true`, and their `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`. Implicit skills omit the flag and set `policy.allow_implicit_invocation: true`. The site catalog's `kind` must match, or the build fails.
 - Every skill is self-contained and never links to sections of a specific `AGENTS.md`. Explicit skills share the rules in their `## Invocation` section. Implicit skills share their `## Application` section, which sets how their rules rank against the repository's coding instructions and conventions. Skills refer to each other by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix. Every skill works on its own: a mention of another skill is only a pointer, and the one runtime dependency is `jg-execute auto`, which reads the `jg-review` and `jg-push` `SKILL.md` files from the neighboring folders.
 - Creating, writing, checking, maintaining, renaming, and removing a skill follow [`docs/skill-guidelines.md`](docs/skill-guidelines.md), which lists every place to update.

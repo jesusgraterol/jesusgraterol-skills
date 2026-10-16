@@ -8,6 +8,7 @@ import {
   IMPLICIT_OPENAI_POLICY,
   SHARED_SECTION_HEADINGS,
   SKILL_CATALOG_ERROR_MESSAGES,
+  SKILL_FILE_BYTE_BUDGET,
 } from './constants.ts';
 import type { ISkillDocument, ISkillKind } from './types.ts';
 
@@ -18,6 +19,9 @@ const SECTION_LINK_PATTERN =
 
 // a skill name written with a slash-command or mention prefix, but not a path such as skills/jg-x
 const PREFIXED_SKILL_REFERENCE_PATTERN = /(?:^|[\s`('"])([/$]jg-[a-z0-9-]+)/mu;
+
+// a reference file named by its path inside the skill folder, but not a path into another folder
+const REFERENCE_PATH_PATTERN = /(?<![\w./-])references\/[a-z0-9]+(?:-[a-z0-9]+)*\.md(?![\w-])/gu;
 
 // the frontmatter flag and Codex policy each kind of skill must ship
 const INVOCATION_SETTINGS = {
@@ -259,6 +263,82 @@ export const assertBareSkillReferences = ({
   if (match) {
     throw new Error(
       `${SKILL_CATALOG_ERROR_MESSAGES.PrefixedSkillReference}: ${name} (${match[1]})`,
+    );
+  }
+};
+
+/**
+ * Lists the reference files a skill document names, such as references/migrations.md.
+ * @param body The text of a SKILL.md or reference file.
+ * @returns The distinct reference paths in sorted order.
+ */
+export const extractReferencePaths = (body: string): string[] =>
+  [...new Set(body.match(REFERENCE_PATH_PATTERN) ?? [])].toSorted();
+
+/**
+ * Asserts that a skill's reference files and its SKILL.md agree: only implicit skills have them,
+ * every reference SKILL.md names exists, and every reference file is named, so the agent can
+ * find each one and none sits unused.
+ * @param skill The skill's name, kind, and SKILL.md body.
+ * @param referencePaths The paths of the skill's reference files, such as references/naming.md.
+ * @throws
+ * - Explicit skill has reference files
+ * - Skill mentions a reference file that does not exist
+ * - Skill reference file is not mentioned in its SKILL.md
+ */
+export const assertReferences = (
+  { body, kind, name }: ISkillDocument,
+  referencePaths: readonly string[],
+): void => {
+  if (kind === 'explicit' && referencePaths.length > 0) {
+    throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.ExplicitSkillReferences}: ${name}`);
+  }
+
+  const mentioned = extractReferencePaths(body);
+  const missing = mentioned.filter((path) => !referencePaths.includes(path));
+  const unmentioned = referencePaths.filter((path) => !mentioned.includes(path)).toSorted();
+
+  if (missing.length > 0) {
+    throw new Error(
+      `${SKILL_CATALOG_ERROR_MESSAGES.ReferenceMissing}: ${name} (${missing.join(', ')})`,
+    );
+  }
+
+  if (unmentioned.length > 0) {
+    throw new Error(
+      `${SKILL_CATALOG_ERROR_MESSAGES.ReferenceUnmentioned}: ${name} (${unmentioned.join(', ')})`,
+    );
+  }
+};
+
+/**
+ * Asserts that a reference file names no other reference file, so references stay one level deep
+ * and the agent never has to follow a chain to find a rule.
+ * @param skillName The skill that owns the reference.
+ * @param path The reference's path inside the skill folder.
+ * @param body The reference file's text.
+ * @throws
+ * - Skill reference file mentions another reference file
+ */
+export const assertReferenceIsLeaf = (skillName: string, path: string, body: string): void => {
+  if (extractReferencePaths(body).length > 0) {
+    throw new Error(`${SKILL_CATALOG_ERROR_MESSAGES.NestedReference}: ${skillName} (${path})`);
+  }
+};
+
+/**
+ * Asserts that a skill file fits the size budget, so the whole file stays within what an agent
+ * keeps of an invoked skill after compaction.
+ * @param skillName The skill that owns the file.
+ * @param path The file's path inside the skill folder, such as SKILL.md.
+ * @param bytes The file's size in bytes.
+ * @throws
+ * - Skill file is larger than its size budget
+ */
+export const assertFileBudget = (skillName: string, path: string, bytes: number): void => {
+  if (bytes > SKILL_FILE_BYTE_BUDGET) {
+    throw new Error(
+      `${SKILL_CATALOG_ERROR_MESSAGES.FileOverBudget}: ${skillName} (${path}, ${bytes} of ${SKILL_FILE_BYTE_BUDGET} bytes)`,
     );
   }
 };

@@ -270,6 +270,17 @@ describe('static build artifact', () => {
         ),
     ],
     [
+      'a skill page missing one of its reference files',
+      'Skill page is missing a reference file: skills/jg-postgres/index.html (references/migrations.md)',
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          'skills/jg-postgres/index.html',
+          'data-skill-reference="references/migrations.md"',
+          'data-skill-reference="references/removed.md"',
+        ),
+    ],
+    [
       'missing skill source code entity',
       `Skill page is missing its source code entity in ${SKILL_PAGE}`,
       async (buildDirectory) =>

@@ -4,13 +4,17 @@ import { describe, expect, test } from 'vitest';
 import {
   assertBareSkillReferences,
   assertCatalogCoverage,
+  assertFileBudget,
   assertInvocationSettings,
   assertNoSectionLinks,
+  assertReferenceIsLeaf,
+  assertReferences,
   assertSearchMetadata,
   assertSharedSections,
   assertSkillName,
   assertVersionLine,
   buildSourceUrl,
+  extractReferencePaths,
   extractSection,
 } from './utilities.ts';
 
@@ -366,6 +370,130 @@ describe('assertBareSkillReferences', () => {
   ])('assertBareSkillReferences(%s) -> throws', (_caseName, body, reference) => {
     expect(() => assertBareSkillReferences({ body, name: 'jg-execute' })).toThrow(
       `Skill refers to another skill with a / or $ prefix: jg-execute (${reference})`,
+    );
+  });
+});
+
+describe('extractReferencePaths', () => {
+  test('lists each reference a skill names once, in sorted order', () => {
+    expect(
+      extractReferencePaths(
+        [
+          '- Before a migration, read `references/migrations.md`.',
+          '- Before naming objects, read `references/naming.md`, and `references/migrations.md` again.',
+        ].join('\n'),
+      ),
+    ).toStrictEqual(['references/migrations.md', 'references/naming.md']);
+  });
+
+  test.each([
+    ['no reference', 'Read the repository README first.'],
+    ['a path into another folder', 'Read `skills/jg-review/references/checks.md`.'],
+    ['a file that is not Markdown', 'Run `references/check.ts`.'],
+    ['a name that is not kebab case', 'Read `references/Migrations.md`.'],
+  ])('ignores %s', (_caseName, body) => {
+    expect(extractReferencePaths(body)).toStrictEqual([]);
+  });
+});
+
+describe('assertReferences', () => {
+  const body = buildImplicitBody().concat(
+    '- Before a migration, read `references/migrations.md`.\n',
+    '- Before naming objects, read `references/naming.md`.\n',
+  );
+
+  test('accepts an implicit skill that names exactly the reference files it has', () => {
+    expect(() =>
+      assertReferences({ body, kind: 'implicit', name: 'jg-postgres' }, [
+        'references/naming.md',
+        'references/migrations.md',
+      ]),
+    ).not.toThrow();
+  });
+
+  test('accepts a skill without reference files that names none', () => {
+    expect(() =>
+      assertReferences(
+        { body: buildExplicitBody('Rules.', 'Steps.'), kind: 'explicit', name: 'jg-plan' },
+        [],
+      ),
+    ).not.toThrow();
+  });
+
+  test.each([
+    [
+      'an explicit skill with a reference file',
+      { body: buildExplicitBody('Rules.', 'Steps.'), kind: 'explicit', name: 'jg-plan' },
+      ['references/steps.md'],
+      'Explicit skill has reference files: jg-plan',
+    ],
+    [
+      'a named reference that does not exist',
+      { body, kind: 'implicit', name: 'jg-postgres' },
+      ['references/naming.md'],
+      'Skill mentions a reference file that does not exist: jg-postgres (references/migrations.md)',
+    ],
+    [
+      'a reference file the skill never names',
+      { body, kind: 'implicit', name: 'jg-postgres' },
+      ['references/migrations.md', 'references/naming.md', 'references/roles.md'],
+      'Skill reference file is not mentioned in its SKILL.md: jg-postgres (references/roles.md)',
+    ],
+  ] as const)('assertReferences(%s) -> throws', (_caseName, skill, referencePaths, message) => {
+    expect(() => assertReferences(skill, referencePaths)).toThrow(message);
+  });
+});
+
+describe('assertReferenceIsLeaf', () => {
+  test('accepts a reference that names no other reference', () => {
+    expect(() =>
+      assertReferenceIsLeaf('jg-postgres', 'references/migrations.md', '## Migrations\n\n- Rule.'),
+    ).not.toThrow();
+  });
+
+  test('rejects a reference that names another reference', () => {
+    expect(() =>
+      assertReferenceIsLeaf(
+        'jg-postgres',
+        'references/migrations.md',
+        'Name objects as `references/naming.md` describes.',
+      ),
+    ).toThrow(
+      'Skill reference file mentions another reference file: jg-postgres (references/migrations.md)',
+    );
+  });
+});
+
+describe('assertFileBudget', () => {
+  test('accepts a file at exactly the budget', () => {
+    expect(() => assertFileBudget('jg-postgres', 'SKILL.md', 20_480)).not.toThrow();
+  });
+
+  test('rejects a file one byte over the budget, naming the file and its size', () => {
+    expect(() => assertFileBudget('jg-postgres', 'references/naming.md', 20_481)).toThrow(
+      'Skill file is larger than its size budget: jg-postgres (references/naming.md, 20481 of 20480 bytes)',
+    );
+  });
+});
+
+describe('content checks on reference files', () => {
+  test('name the reference file when it links to a section of a document', () => {
+    expect(() =>
+      assertNoSectionLinks({
+        body: 'Follow [Security](../../AGENTS.md#security).',
+        name: 'jg-postgres/references/migrations.md',
+      }),
+    ).toThrow('Skill links to a section of another document: jg-postgres/references/migrations.md');
+  });
+
+  test('name the reference file when it names a skill with a prefix', () => {
+    expect(() =>
+      assertBareSkillReferences({
+        body: 'Then run /jg-review.',
+        name: 'jg-postgres/references/migrations.md',
+      }),
+    ).toThrow(
+      'Skill refers to another skill with a / or $ prefix: jg-postgres/references/migrations.md',
     );
   });
 });

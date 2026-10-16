@@ -103,12 +103,21 @@ export interface IImplicitSkillCatalogEntry extends ISkillCatalogEntryBase {
 // site-owned presentation data for one skill; the skill folder owns everything else
 export type ISkillCatalogEntry = IExplicitSkillCatalogEntry | IImplicitSkillCatalogEntry;
 
+// one topic file an implicit skill tells the agent to read only when its task needs it
+export interface ISkillReference {
+  entry: CollectionEntry<'skillReferences'>;
+  // the file's path inside the skill folder, as SKILL.md names it, e.g. references/migrations.md
+  path: string;
+}
+
 // what the skill folder contributes to a skill
 interface ISkillSource {
   argumentHint: string | undefined;
   description: string;
   entry: CollectionEntry<'skills'>;
   name: string;
+  // reference files in path order; explicit skills have none
+  references: readonly ISkillReference[];
   sourceUrl: string;
 }
 

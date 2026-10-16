@@ -33,6 +33,25 @@ jobs:
           cache: npm
           cache-dependency-path: website/package-lock.json
 
+      # installs every skill the way the skills CLI does and fails when a file, such as a
+      # reference, is missing from or differs in the installed copy
+      - name: Verify skill installation
+        working-directory: .
+        env:
+          SKILLS_TEST_HOME: ${{ runner.temp }}/skills-home
+          # runs the pinned CLI without dependency lifecycle scripts, like the npm ci step below
+          npm_config_ignore_scripts: 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p "$SKILLS_TEST_HOME"
+          HOME="$SKILLS_TEST_HOME" XDG_CONFIG_HOME="$SKILLS_TEST_HOME/.config" \
+            npx --yes skills@1.7.2 add ./skills --skill '*' -g -a codex -y --copy
+          for skill_dir in skills/*/; do
+            name="$(basename "$skill_dir")"
+            test -d "$SKILLS_TEST_HOME/.agents/skills/$name"
+            diff --recursive --brief "$skill_dir" "$SKILLS_TEST_HOME/.agents/skills/$name"
+          done
+
       - name: Install dependencies
         run: npm ci --ignore-scripts
 

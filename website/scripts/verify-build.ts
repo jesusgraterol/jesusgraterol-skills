@@ -22,6 +22,7 @@ const VERIFY_BUILD_ERROR_MESSAGES = {
   MissingOrDuplicatePageTitle: 'Missing or duplicate page title',
   MissingRequiredMetadata: 'Missing required metadata',
   MissingSkillPage: 'Missing skill page',
+  MissingSkillReference: 'Skill page is missing a reference file',
   MissingSoftwareSourceCode: 'Skill page is missing its source code entity',
   MissingStructuredData: 'Missing structured data',
   NonObjectStructuredData: 'Structured data is not an object',
@@ -102,6 +103,25 @@ const listSkillNames = async (skillsDirectory: string): Promise<string[]> =>
     .map((entry) => entry.name)
     .toSorted();
 
+/** Lists one skill's reference files as SKILL.md names them, or none when it has no references folder. */
+const listSkillReferencePaths = async (
+  skillsDirectory: string,
+  skillName: string,
+): Promise<string[]> => {
+  try {
+    return (
+      await readdir(resolve(skillsDirectory, skillName, 'references'), { withFileTypes: true })
+    )
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
+      .map((entry) => `references/${entry.name}`)
+      .toSorted();
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return [];
+
+    throw error;
+  }
+};
+
 /** Resolves one root-relative site URL to its expected static artifact path. */
 const resolveInternalArtifact = (href: string): string => {
   const path = href.split(/[?#]/u, 1)[0] ?? '/';
@@ -177,8 +197,8 @@ const extractStructuredDataEntities = (
 };
 
 /**
- * Verifies required routes, one page per skill, metadata, internal links, and production-build
- * exclusions.
+ * Verifies required routes, one page per skill with every reference file it ships, metadata,
+ * internal links, and production-build exclusions.
  * @param buildDirectory The static artifact directory to inspect.
  * @param skillsDirectory The repository directory whose skill folders each need a page.
  * @returns A promise that resolves when the artifact satisfies the project contract.
@@ -189,6 +209,7 @@ const extractStructuredDataEntities = (
  * - Structured data graph is invalid
  * - Production build contains a test file
  * - Missing skill page
+ * - Skill page is missing a reference file
  * - Missing required metadata
  * - Missing or duplicate page description
  * - Missing or duplicate page title
@@ -231,6 +252,24 @@ export const verifyBuild = async (
 
   if (missingSkillPage) {
     throw new Error(`${VERIFY_BUILD_ERROR_MESSAGES.MissingSkillPage}: ${missingSkillPage}`);
+  }
+
+  for (const name of skillNames) {
+    const referencePaths = await listSkillReferencePaths(skillsDirectory, name);
+
+    if (referencePaths.length === 0) continue;
+
+    const pagePath = `skills/${name}/index.html`;
+    const pageHtml = await readFile(resolve(buildDirectory, pagePath), 'utf8');
+    const missingReference = referencePaths.find(
+      (referencePath) => !pageHtml.includes(`data-skill-reference="${referencePath}"`),
+    );
+
+    if (missingReference) {
+      throw new Error(
+        `${VERIFY_BUILD_ERROR_MESSAGES.MissingSkillReference}: ${pagePath} (${missingReference})`,
+      );
+    }
   }
 
   const htmlFiles = buildFiles.filter((filePath) => filePath.endsWith('.html'));

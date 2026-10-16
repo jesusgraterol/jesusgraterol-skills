@@ -19,13 +19,16 @@
 - **Requirements and defaults.** Use "never", "always", or "must" only for requirements, and "prefer" for defaults that a stated reason can override. Keep techniques with a trade-off in a "when the numbers justify it" section. Don't add rules that get in a developer's way without a reason.
 - **Changes that affect others.** Have the skill propose changes such as a bot, a CI job, or a dependency, instead of making them.
 - **Versions.** An implicit skill states the versions it was written for in its version bullet, and marks items that need a minimum version, like (4.3+). Verify version-specific facts against primary sources, such as official documentation and release notes, and record the sources in the plan.
-- **Self-contained.** Never link to sections of the coding instructions or another document, and never name project-specific symbols. Refer to other skills by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix. A mention is only a pointer: the one runtime dependency is `jg-execute auto`, which reads the `jg-review` and `jg-push` `SKILL.md` files from the neighboring folders.
+- **Size and order.** Every `SKILL.md` and reference file stays within 20,480 bytes; the build fails above it. After compaction, Claude Code re-attaches only the first 5,000 tokens of each invoked skill, so put requirements before defaults and long examples.
+- **Reference files.** An implicit skill may move a whole topic that only some tasks need into `references/<topic>.md`, such as migrations or forms. Name each file in `SKILL.md` as a code-formatted path, such as `references/migrations.md`, never as a Markdown link, together with the work it covers, so the agent reads it before that work. Keep references one level deep: a reference never names another reference. Prefer a short contents list at the top of a reference longer than 100 lines. Keep in `SKILL.md` every section whose outcome is required on every task in the skill's area, such as accessibility or responsive behavior. A reference may hold requirements that apply only to its topic, and its pointer line restates the one that matters most, as `jg-frontend` does for reduced motion.
+- **Explicit skills at the budget.** Explicit skills keep their whole workflow in `SKILL.md`, because `jg-execute auto` reads `jg-review` and `jg-push` by path. An explicit skill that reaches the budget is trimmed before anything is added; `jg-review` has about 100 bytes to spare.
+- **Self-contained.** Never link to sections of the coding instructions or another document, and never name project-specific symbols. A skill may name its own reference files. Refer to other skills by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix. A mention is only a pointer: the one runtime dependency is `jg-execute auto`, which reads the `jg-review` and `jg-push` `SKILL.md` files from the neighboring folders.
 - **Shared sections.** Copy `## Invocation` or `## Application` word for word. An implicit skill may change only two lines of its Application section: its area sentence, and its version bullet, which may describe a target instead of an installed version, as `jg-bash` does. A change to a shared section changes every skill of that kind in the same commit.
 - **Wording.** Keep it plain and specific. Examples are illustrative and never override the installed version's API.
 
 ## Adding a skill
 
-- **Folder.** Create `skills/jg-<name>/` with `SKILL.md`, whose `name` matches the directory, and `agents/openai.yaml`.
+- **Folder.** Create `skills/jg-<name>/` with `SKILL.md`, whose `name` matches the directory, and `agents/openai.yaml`. An implicit skill may add `references/<topic>.md` files.
 - **Description.** An explicit skill's description is its card text, below. An implicit skill's description is one summary sentence, then "Use when writing, reviewing, or planning …" with distinct triggers. Avoid triggers that match nearly every task, such as running tests.
 - **Catalog entry.** Add one in `website/src/site.config.ts`.
   - An explicit skill needs `access`, `examples`, `stage`, and `whenToUse`. An implicit skill needs an example request with its outcome, a `summary`, and `whenToUse`.
@@ -44,16 +47,22 @@
   - a search title or description falls outside its limits
   - a shared section differs from the other skills of its kind, outside the two lines an implicit skill may change
   - an implicit skill has no version line
-  - a skill links to a section of a document, or names another skill with a `/` or `$` prefix
+  - a skill or reference file links to a section of a document, or names another skill with a `/` or `$` prefix
+  - a skill names a reference file that doesn't exist, or has a reference file it never names
+  - an explicit skill has reference files, or a reference names another reference
+  - a `SKILL.md` or reference file is larger than 20,480 bytes
+  - a skill page is missing one of its reference files
 
   The type check fails on a missing or mismatched icon.
 - **New or changed triggers.** Check that an implicit skill loads in Claude Code and Codex.
-  - Use a throwaway Git repository with every implicit skill in `.claude/skills/` and `.agents/skills/`, and stub `CLAUDE.md` and `AGENTS.md` files holding one neutral line, with no index and no instruction to run tests.
+  - Use a throwaway Git repository with every implicit skill folder, references included, copied whole into `.claude/skills/` and `.agents/skills/`, and stub `CLAUDE.md` and `AGENTS.md` files holding one neutral line, with no index and no instruction to run tests.
   - Run requests that should load the skill, plus two unrelated ones, in both agents and read-only: `claude -p "<request>" --output-format stream-json --verbose --max-turns 10 --no-session-persistence --permission-mode plan`, and `codex exec --json --ephemeral --sandbox read-only -C <repository> "<request>"`.
   - The requests that should load the skill must load it, and others may load too when a request touches them. The unrelated requests must load none.
+  - When a skill has reference files, a request that needs one must read it, and a request that loads the skill without needing any must read none.
   - When the check fails, revise the description and its index line, up to three times, then report.
 - **Changed explicit workflows.** Run the skill non-interactively in both agents on a request that exercises the change. Test a pick or a confirmation by resuming the session with a reply: `claude -p "<reply>" --resume <session-id>`, or `codex exec resume <session-id> --json -c sandbox_mode=read-only "<reply>"` from the repository.
-- **Rules moving between files.** Back up any git-ignored file first, such as `CANDIDATE.md`, then confirm that every removed rule landed in its destination or was dropped on purpose.
+- **Rules moving between files.** Back up any git-ignored file first, such as `CANDIDATE.md`, then confirm that every removed rule landed in its destination or was dropped on purpose. This includes moving a topic from `SKILL.md` into a reference file.
+- **Installation.** CI installs every skill with a pinned skills CLI into a temporary home and fails when an installed folder, references included, differs from its source.
 - **Cleanup.** After agent runs, delete the throwaway repository and its logs, plus the session records under `~/.claude/projects/` and `~/.codex/sessions/` and the plan files under `~/.claude/plans/` that the runs left. Leave other sessions' files alone.
 
 ## Maintaining a skill
