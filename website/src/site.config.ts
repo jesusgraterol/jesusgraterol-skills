@@ -337,13 +337,13 @@ export const SKILL_CATALOG = {
     kind: 'implicit',
     order: 15,
     searchDescription:
-      'An implicit agent skill for Claude Code and Codex that keeps web apps installable and their service workers, caching, updates, and push notifications safe.',
+      'An implicit agent skill for Claude Code and Codex for web apps you choose to make installable, keeping their service workers, caching, and push safe.',
     searchTitle: 'jg-pwa: Progressive web app standards for coding agents',
     stage: 'implicit',
     summary:
       'Manifests, install prompts, service worker updates, caching, and push for progressive web apps.',
     whenToUse:
-      'It loads on its own when a task touches a web app manifest, install prompts, a service worker, offline caching, or web push, or creates a new web application. Call it by name to load it before such a task.',
+      'It loads on its own when a task touches a web app manifest, install prompts, a service worker, offline caching, or web push. Call it by name to load it before such a task.',
   },
   'jg-seo': {
     examples: [
@@ -530,7 +530,7 @@ export const SKILL_CATALOG = {
     examples: [
       {
         outcome:
-          'Grants read-only permissions, cancels superseded runs, caches dependencies by the lockfile, sets a timeout on every job, and pins any third-party action to a commit SHA.',
+          "Runs the project's check command with read-only permissions, a timeout, cancelled superseded runs, and lockfile-keyed caching, adding no bots or extra jobs.",
         request: 'Add a GitHub Actions workflow that runs the tests on every pull request.',
       },
     ],
@@ -538,11 +538,11 @@ export const SKILL_CATALOG = {
     kind: 'implicit',
     order: 25,
     searchDescription:
-      'An implicit agent skill for Claude Code and Codex that keeps GitHub Actions workflows fast, secure, and reusable whenever a task touches CI.',
+      'An implicit agent skill for Claude Code and Codex that keeps GitHub Actions CI minimal and secure, adding more only when you ask for it.',
     searchTitle: 'jg-ci: GitHub Actions standards for coding agents',
     stage: 'implicit',
     summary:
-      'Required gates, permissions, timeouts, caching, concurrency, and action pinning for GitHub Actions.',
+      'A single check workflow, permissions, timeouts, caching, and action pinning for GitHub Actions.',
     whenToUse:
       'It loads on its own when a task touches GitHub Actions workflows, including CI and deployment pipelines. Call it by name to load it before such a task.',
   },

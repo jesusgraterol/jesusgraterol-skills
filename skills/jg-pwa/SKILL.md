@@ -1,11 +1,11 @@
 ---
 name: jg-pwa
-description: Progressive web app standards that make every new web app installable, with update-safe service workers, caching, and push notifications. Use when creating or scaffolding a new web application, or when writing, reviewing, or planning web app manifests and install metadata, install prompts, service worker registration, updates, or caching, offline behavior, web push notifications or app badges, or Home Screen web app behavior on iOS and Safari.
+description: Progressive web app standards for installable web apps, with update-safe service workers, caching, and push notifications. Use when writing, reviewing, or planning web app manifests and install metadata, install prompts, service worker registration, updates, or caching, offline behavior, web push notifications or app badges, or Home Screen web app behavior on iOS and Safari.
 ---
 
 ## Application
 
-The agent loads this skill on its own when a task touches its area. This skill's area is progressive web apps: web app manifests and install metadata, including those of every new web application, install prompts, service worker registration, updates, and caching, offline behavior, web push notifications and app badges, and Home Screen web app behavior on iOS and Safari.
+The agent loads this skill on its own when a task touches its area. This skill's area is progressive web apps: web app manifests and install metadata, install prompts, service worker registration, updates, and caching, offline behavior, web push notifications and app badges, and Home Screen web app behavior on iOS and Safari.
 
 - It adds domain rules to the task. It never authorizes actions, widens scope, or replaces the workflow or approvals of a skill the developer invoked.
 - It ranks with the repository's coding instructions. When they conflict, the coding instructions win, except for the exceptions this skill states for its own area.
@@ -29,14 +29,14 @@ These files belong to this skill and hold rules that apply only to some work. Re
 
 ## Scope
 
-- New web applications are installable by default: give them the manifest and install metadata below, without a service worker.
+- Make a web application installable only when the developer asks for it or an approved plan includes it. An installable app gets the manifest and install metadata below, without a service worker.
 - Add a service worker only when the task or an approved plan calls for one, such as for offline use or push, and reuse the repository's established service-worker tooling.
 - Propose hosting, CDN, and dependency changes, such as new response headers or a service-worker library, instead of making them.
 - Never migrate an existing app's manifest or service worker only to follow this skill.
 
 ## Manifest and install metadata
 
-- Every new web application has a web app manifest, linked with `<link rel="manifest">` from every HTML entry point, with `id`, `name`, `short_name`, `description`, `start_url`, `scope`, `display: "standalone"`, `theme_color`, and `background_color`.
+- An installable app has a web app manifest, linked with `<link rel="manifest">` from every HTML entry point, with `id`, `name`, `short_name`, `description`, `start_url`, `scope`, `display: "standalone"`, `theme_color`, and `background_color`.
 - Set `id` explicitly and never change it, because browsers treat an app with a different `id` as a different app.
 - Provide 192×192 and 512×512 PNG icons with `purpose: "any"`, plus separate `maskable` icons whose content fits the central safe circle, with a radius of 40% of the icon's width. Never combine them as `"any maskable"` in one entry, because the padding a maskable icon needs shrinks it everywhere else.
 - Prefer `screenshots` with both `form_factor: "wide"` and `form_factor: "narrow"`, each with a `label`, for Chromium's richer install dialog.

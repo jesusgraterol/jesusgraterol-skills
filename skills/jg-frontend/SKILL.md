@@ -166,7 +166,7 @@ Application UIs, meaning signed-in or task-focused apps rather than content or m
 - On phones, 3 to 5 top-level destinations sit in a bottom tab bar within thumb reach and the rest in a drawer; dialogs and contextual actions open as bottom sheets or full-screen pages.
 - Never depend on browser chrome: Home Screen sites open standalone by default (Safari 26+), and `display-mode` reporting isn't Baseline. Screens below the top level have an in-app back control, errors offer a retry, the system back gesture closes the topmost sheet first (native `<dialog>` and popover close requests, `CloseWatcher` where supported, or a history entry), and Back restores the previous screen's scroll and state.
 - Prefer same-document View Transitions (`document.startViewTransition`, Baseline 2025) for screen changes, feature-detected and skipped under reduced motion.
-- New web applications are installable by default; jg-pwa holds the manifest, install, and service-worker rules.
+- Installability, manifests, and service workers belong to jg-pwa.
 
 ## Focus management
 
