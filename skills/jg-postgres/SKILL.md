@@ -74,7 +74,7 @@ A function used by one trigger ends in `_trigger`; a shared trigger function des
 
 For indexes, constraints, triggers, policies, managed sequences, and extended statistics, abbreviate tables with each underscore-delimited token’s first character, preserving identifying digits. `_tx` contributes only `t`.
 
-Examples: `user` → `u`, `user_balance` → `ub`, `app_user` → `au`, `app_user_2fa` → `au2`, `partner_commission_payout_tx` → `pcpt`, and `global_analytics_total` → `gat`.
+Examples: `member` → `m`, `user_balance` → `ub`, `app_user` → `au`, `app_user_2fa` → `au2`, `partner_commission_payout_tx` → `pcpt`, and `global_analytics_total` → `gat`.
 
 Use:
 
@@ -208,7 +208,7 @@ If classification ambiguity materially affects compatibility, security, integrit
 - Prefer one query with `WHERE id = ANY($1)` and an array parameter over one query per item.
 - Prefer `INSERT … ON CONFLICT (…) DO UPDATE … RETURNING …` over a read followed by an insert or update, which races under concurrency. (18+) `RETURNING` can name `OLD` and `NEW` when the caller needs the values before and after the change.
 - For value-bearing changes, prefer a conditional update that checks the invariant in the same statement, such as `UPDATE … SET balance = balance - $1 WHERE id = $2 AND balance >= $1`, and treat zero affected rows as the failure. Use `SELECT … FOR UPDATE` when the decision needs more than one statement.
-- Workers claim rows from a queue table with one statement that also marks them claimed, such as `UPDATE job SET status = 'running', claimed_at = now() WHERE id IN (SELECT id FROM job WHERE status = 'pending' ORDER BY id LIMIT $1 FOR UPDATE SKIP LOCKED) RETURNING id`, or by selecting `FOR UPDATE SKIP LOCKED` and marking the rows in the same transaction on one client. A row lock ends with its transaction, so a plain `SKIP LOCKED` select lets another worker claim the same row as soon as it returns. Give each claim an expiry, such as a `claimed_at` older than the job's timeout, so rows a crashed worker held become claimable again, and keep processing idempotent, because a job can run more than once.
+- Workers claim rows from a queue table with one statement that also marks them claimed, such as `UPDATE job SET status = 'running', claimed_at = now() WHERE id IN (SELECT id FROM job WHERE status = 'pending' OR (status = 'running' AND claimed_at < now() - $2::interval) ORDER BY id LIMIT $1 FOR UPDATE SKIP LOCKED) RETURNING id`, or by selecting `FOR UPDATE SKIP LOCKED` and marking the rows in the same transaction on one client. A row lock ends with its transaction, so a plain `SKIP LOCKED` select lets another worker claim the same row as soon as it returns. Give each claim an expiry longer than the job's timeout, as the `claimed_at` check does, so rows a crashed worker held become claimable again, and keep processing idempotent, because a job can run more than once.
 - With node-postgres, run single statements through the pool. Check out a client with `pool.connect()` only for a transaction or session state, and always release it in `finally`, so a failure never leaks a connection.
 
 For an `_tx` record, commit the balance mutation and the state that prevents reapplication in the same database transaction when both are stored in PostgreSQL. A retry or duplicate delivery must resolve to the already-applied result without changing the balance again.

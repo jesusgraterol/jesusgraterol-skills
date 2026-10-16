@@ -110,7 +110,7 @@ Placeholders must:
 
 Examples:
 
-- email fields: `e.g. johndoe@gmail.com`
+- email fields: `e.g. jane@example.com`
 - age fields: `e.g. 25`
 - search fields: `e.g. funny movie`
 - phone fields: `e.g. +1 555 123 4567`

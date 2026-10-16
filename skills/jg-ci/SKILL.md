@@ -41,7 +41,7 @@ The agent loads this skill on its own when a task touches its area. This skill's
       fi
   ```
 
-- Never check out or run a pull request's code in a `pull_request_target` or `workflow_run` workflow that has secrets or write permissions. Use `pull_request` for anything that runs the pull request's code.
+- Never check out or run a pull request's code in a `pull_request_target` or `workflow_run` workflow, even with read-only permissions, because both run in the base repository's context with its secrets and caches. Use `pull_request` for anything that runs the pull request's code.
 - Never print secrets. Mask values derived from them with `::add-mask::` before anything can log them, and keep production secrets in environments with protection rules.
 - Never cancel a deployment in progress. In a workflow that both verifies pull requests and deploys, cancel only pull request runs:
 

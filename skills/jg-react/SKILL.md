@@ -36,15 +36,16 @@ The agent loads this skill on its own when a task touches its area. This skill's
 A component module, with only the files it needs:
 
 ```txt
-some-component/
+otp-dialog/
   index.ts
-  some-component.component.tsx
+  otp-dialog.component.tsx
+  otp-dialog.hook.ts
   types.ts
   constants.ts
   utilities.ts
   validations.ts
-  some-component.component.test-unit.tsx
-  some-component.css
+  otp-dialog.component.test-unit.tsx
+  otp-dialog.css
 ```
 
 Its entry file:

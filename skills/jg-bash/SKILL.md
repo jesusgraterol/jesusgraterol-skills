@@ -117,7 +117,7 @@ These rules apply to all shell code.
 - Guard destructive commands on paths built from variables with `${var:?}`, so an empty or unset variable stops the script instead of widening the target.
 - In scripts that delete or overwrite data, prefer a `--dry-run` flag that prints what would change.
 - Never pass a secret as a command-line argument, because other users can read the process list. Pass it through an environment variable, a file, or stdin. Never print it, and keep it out of `set -x` output.
-- Download with `curl -fsSL --retry`, and verify a published checksum or signature before using the file. Never pipe a download into a shell.
+- Download with `curl -fsSL --retry 3`, and verify a published checksum or signature before using the file. Never pipe a download into a shell.
 - Setup and provisioning scripts must be safe to run again: use `mkdir -p` and `ln -sfn`, and check before appending to a file.
 - Prefer `flock` for scheduled jobs that must not overlap.
 - Container entrypoints must `exec` the final process, so it runs as PID 1 and receives the container's stop signals.

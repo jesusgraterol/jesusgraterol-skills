@@ -46,11 +46,11 @@ Exception to this skill's precedence: the repository's testing guidelines and es
 
 ## Repeat runs
 
-The coding instructions require repeat runs for new or changed end-to-end and integration tests. Run each repetition with retries off, so a retry can't hide a failure:
+When the coding instructions require repeat runs for new or changed end-to-end and integration tests, run each repetition with retries off, so a retry can't hide a failure:
 
 - Playwright: `--repeat-each=3 --retries=0` on the test files.
 - Vitest 5.0.3+: `--repeats=2 --retry=0`. `--repeats` counts runs after the first, so this gives three. Earlier 5.0 releases could hide a failed repeat when retries were on.
-- Vitest 4: run the test file three times. Its per-test `repeats` option would have to stay in the test code, which the instructions forbid.
+- Vitest 4: run the test file three times rather than using its per-test `repeats` option, which would leave a repeat setting in the test code.
 
 ## Timeouts
 

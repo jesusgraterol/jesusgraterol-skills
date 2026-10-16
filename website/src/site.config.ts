@@ -229,18 +229,18 @@ export const SKILL_CATALOG = {
       {
         invocation: 'jg-push',
         outcome:
-          "Commits only this task's files with a signed-off, signed commit and pushes the current branch.",
+          "Commits this task's files, or every change when there is no task, with a signed-off, signed commit and pushes the current branch.",
       },
     ],
     icon: 'upload',
     kind: 'explicit',
     order: 10,
     searchDescription:
-      "An explicit-only agent skill for Claude Code and Codex that commits only the current task's files with a signed-off, signed commit and pushes.",
+      "An explicit-only agent skill for Claude Code and Codex that commits the current task's files, or every change without a task, in a signed commit and pushes.",
     searchTitle: 'jg-push: Signed commits and pushes for coding agents',
     stage: 'ship',
     whenToUse:
-      'Use it when a reviewed change is ready to publish, even while other agents work in the same checkout.',
+      "Use it when a reviewed change is ready to publish. In a checkout shared with other agents, run it in the session that made the change, so it commits only that task's files.",
   },
   'jg-feedback': {
     access: 'read-only',

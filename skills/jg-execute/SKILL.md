@@ -52,7 +52,7 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
 7. **Autonomous mode.** For each unit, in order:
    1. Run it.
    2. Follow `jg-review`'s `SKILL.md` on the unit's scope, including files changed by review fixes, treating the unit as finished. Fix the blocking findings and review again until it reports `Ready to commit`; list non-blocking findings in the report instead of fixing them.
-   3. When review fixes changed the unit, recheck its acceptance criteria, then follow `jg-push`'s `SKILL.md` on the same scope.
+   3. When review fixes changed the unit, recheck its acceptance criteria. Then follow `jg-push`'s `SKILL.md` on the same scope.
    4. When the unit is a milestone, mark it done. Report the commit and continue with the next unit.
 
    Reuse a passing check whose inputs haven't changed instead of rerunning slow suites on every review pass.
@@ -63,7 +63,7 @@ Carry out an agreed task, a plan, or the milestones of a plan. Supervised mode b
    - a check that cannot run
    - the same failure or blocking finding survives three fix attempts
    - a review that ends in `Review incomplete`, or three review rounds that still report blocking findings
-   - a merge conflict, or a rejected or failed push
+   - a merge conflict, a rejected or failed push, or `jg-push` stopping before it pushes
    - changes in scope that nobody can account for
 
    Never weaken a test, check, or finding to get past it. A stopped milestone stays in progress, so the next run picks it up through preflight.

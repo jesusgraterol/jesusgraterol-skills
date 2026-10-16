@@ -62,7 +62,7 @@ Target: Ubuntu 24.04, bash 5.2 · in /home/dev/project · found: find, sort, num
    Lists the same files with the disk space each one uses, which is smaller for sparse files.
 
 3. POSIX sh                                            read-only
-   find . -path ./.git -prune -o -type f -size +204800 -exec ls -l {} +
+   find . -path ./.git -prune -o -type f -size +204800 -exec ls -l -- {} +
    Works with any POSIX find, showing sizes in bytes, unsorted.
 
 Differs on: macOS (BSD find has no -printf), Alpine (BusyBox find).
