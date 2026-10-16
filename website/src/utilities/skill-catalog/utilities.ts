@@ -11,8 +11,10 @@ import {
 } from './constants.ts';
 import type { ISkillDocument, ISkillKind } from './types.ts';
 
-// a link to a heading anchor, which a self-contained skill never needs
-const SECTION_LINK_PATTERN = /\]\(#[^)]*\)/u;
+// a link to a section of any document, as an inline link, a reference definition, or an autolink
+// whose target carries a #fragment; a self-contained skill never needs one
+const SECTION_LINK_PATTERN =
+  /\]\([^)]*#[^)]*\)|^ {0,3}\[[^\]]+\]:[ \t]*\S*#|<[a-z][a-z\d+.-]*:[^\s>]*#[^\s>]*>/imu;
 
 // a skill name written with a slash-command or mention prefix, but not a path such as skills/jg-x
 const PREFIXED_SKILL_REFERENCE_PATTERN = /(?:^|[\s`('"])([/$]jg-[a-z0-9-]+)/mu;
@@ -224,8 +226,8 @@ export const assertVersionLine = ({ body, kind, name }: ISkillDocument): void =>
 };
 
 /**
- * Asserts that a skill never links to a heading anchor, because skills are self-contained and must
- * not depend on the sections of a particular instructions file.
+ * Asserts that a skill never links to a section of a document, in the same file or another one,
+ * because skills are self-contained and must not depend on the sections of a particular file.
  * @param skill The skill's name and SKILL.md body.
  * @throws
  * - Skill links to a section of another document

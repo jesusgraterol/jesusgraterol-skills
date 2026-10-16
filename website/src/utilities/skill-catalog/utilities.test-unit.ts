@@ -315,16 +315,30 @@ describe('assertVersionLine', () => {
 });
 
 describe('assertNoSectionLinks', () => {
-  test('accepts links to other pages and plain text', () => {
-    expect(() =>
-      assertNoSectionLinks({
-        body: 'See [the docs](https://react.dev/reference) and the Decision precedence rules.',
-        name: 'jg-react',
-      }),
-    ).not.toThrow();
+  test.each([
+    [
+      'links to other pages and plain text',
+      'See [the docs](https://react.dev/reference) and the Decision precedence rules.',
+    ],
+    ['a hash sign outside a link', 'Track it in issue #42, and keep `color: #fff` as is.'],
+    ['a reference link without a fragment', 'See [the docs].\n\n[the docs]: https://react.dev/'],
+  ])('accepts %s', (_caseName, body) => {
+    expect(() => assertNoSectionLinks({ body, name: 'jg-react' })).not.toThrow();
   });
 
-  test('rejects a link to a heading anchor', () => {
+  test.each([
+    ['a heading anchor', 'Follow [Decision precedence](#decision-precedence).'],
+    ['a relative document anchor', 'Follow [Security](../../AGENTS.md#security).'],
+    ['an absolute document anchor', 'Follow [Security](https://example.com/AGENTS.md#security).'],
+    ['a reference definition anchor', 'Follow [Security].\n\n[Security]: ../../AGENTS.md#security'],
+    ['an autolink anchor', 'Follow <https://example.com/AGENTS.md#security>.'],
+  ])('rejects %s', (_caseName, body) => {
+    expect(() => assertNoSectionLinks({ body, name: 'jg-react' })).toThrow(
+      'Skill links to a section of another document: jg-react',
+    );
+  });
+
+  test('names the offending link in the error', () => {
     expect(() =>
       assertNoSectionLinks({
         body: 'Follow [Decision precedence](#decision-precedence).',
