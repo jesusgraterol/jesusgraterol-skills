@@ -31,7 +31,9 @@ const VERIFY_BUILD_ERROR_MESSAGES = {
   PageDescriptionOutOfRange: 'Page description is not 70 to 160 characters long',
   PageTitleTooLong: 'Page title is longer than 60 characters',
   ProductionBuildContainsTestFile: 'Production build contains a test file',
+  RobotsTextMissingSitemap: 'robots.txt does not name the sitemap index',
   SearchIndexableNotFoundPage: 'The custom 404 page must remain excluded from search indexes',
+  CanonicalOnNotFoundPage: 'The custom 404 page must not name a canonical URL',
   StructuredDataDoesNotMatchPage: 'Structured data does not match the canonical page',
 } as const;
 const REQUIRED_BUILD_PATHS = [
@@ -230,6 +232,8 @@ const extractStructuredDataEntities = (
  * - Broken internal link
  * - Fragment link has no matching element ID
  * - The custom 404 page must remain excluded from search indexes
+ * - The custom 404 page must not name a canonical URL
+ * - robots.txt does not name the sitemap index
  * - llms.txt does not follow the required project index structure
  * - Broken internal llms.txt link
  */
@@ -512,6 +516,18 @@ export const verifyBuild = async (
 
   if (!notFoundHtml.includes('<meta name="robots" content="noindex, follow">')) {
     throw new Error(VERIFY_BUILD_ERROR_MESSAGES.SearchIndexableNotFoundPage);
+  }
+
+  // a canonical URL on a noindex page sends search engines contradicting signals
+  if (/<link rel="canonical"/u.test(notFoundHtml) || /property="og:url"/u.test(notFoundHtml)) {
+    throw new Error(VERIFY_BUILD_ERROR_MESSAGES.CanonicalOnNotFoundPage);
+  }
+
+  const robotsText = await readFile(resolve(buildDirectory, 'robots.txt'), 'utf8');
+  const sitemapIndexUrl = new URL('/sitemap-index.xml', SITE_CONFIG.url).toString();
+
+  if (!robotsText.split('\n').includes(`Sitemap: ${sitemapIndexUrl}`)) {
+    throw new Error(VERIFY_BUILD_ERROR_MESSAGES.RobotsTextMissingSitemap);
   }
 
   const notFoundDescription = notFoundHtml.match(

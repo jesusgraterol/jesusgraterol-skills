@@ -47,7 +47,10 @@ import ThemeControl from '../theme-control/theme-control.astro';
       <ThemeControl />
     </nav>
 
-    <details class="group relative md:hidden">
+    <details
+      class="group relative md:hidden"
+      data-site-menu
+    >
       <summary
         class="flex size-10 list-none items-center justify-center rounded-full border border-border-strong marker:content-none"
         aria-label="Navigation menu"
@@ -101,3 +104,24 @@ import ThemeControl from '../theme-control/theme-control.astro';
     </details>
   </div>
 </header>
+
+<script>
+  // closes the mobile menu once a link inside it is chosen, and on Escape, returning focus to the
+  // menu button, because a same-page link otherwise leaves the open panel covering its target
+  document.querySelectorAll<HTMLDetailsElement>('[data-site-menu]').forEach((menu) => {
+    const summary = menu.querySelector<HTMLElement>('summary');
+
+    menu.addEventListener('click', (event) => {
+      if (event.target instanceof Element && event.target.closest('a')) {
+        menu.open = false;
+      }
+    });
+
+    menu.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && menu.open) {
+        menu.open = false;
+        summary?.focus();
+      }
+    });
+  });
+</script>

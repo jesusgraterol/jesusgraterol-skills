@@ -117,7 +117,7 @@ npm run dev
 | `npm run format`          | Format the website files.                                                                           |
 | `npm run assets:generate` | Regenerate the committed open-graph image from its HTML template.                                   |
 
-The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill's frontmatter flag or Codex policy doesn't match its kind in the catalog, when a skill's search title or description would be cut off in search results, when a skill's shared `## Invocation` or `## Application` section drifts from the other skills of its kind, when the `## Task scope` copies in `jg-review` and `jg-push` differ, when an implicit skill has no version line, when a skill or reference file links to a section of a document or names another skill with a `/` or `$` prefix, when a skill names a reference file that doesn't exist or has one it never names, when a reference path isn't a kebab-case Markdown file directly in `references/` or that folder holds a nested or non-Markdown file, when a skill or reference file contains raw HTML or a `javascript:` link outside code, when an explicit skill has reference files, when a reference names another reference, when a `SKILL.md` or reference file is larger than 20,480 bytes, or when a built page links to a missing fragment or repeats an element ID. The type check fails when a skill's icon is missing or doesn't match its kind. When you add, change, rename, or remove a skill, follow [`docs/skill-guidelines.md`](docs/skill-guidelines.md).
+The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill's frontmatter flag or Codex policy doesn't match its kind in the catalog, when a skill's search title or description would be cut off in search results, when a skill's shared `## Invocation` or `## Application` section drifts from the other skills of its kind, when the `## Task scope` copies in `jg-review` and `jg-push` differ, when an implicit skill has no version line, when a skill or reference file links to a section of a document or names another skill with a `/` or `$` prefix, when a skill names a reference file that doesn't exist or has one it never names, when a reference path isn't a kebab-case Markdown file directly in `references/` or that folder holds a nested or non-Markdown file, when a skill or reference file contains raw HTML or a `javascript:` link outside code, when an explicit skill has reference files, when a reference names another reference, when a `SKILL.md` or reference file is larger than 20,480 bytes, when a built page links to a missing fragment or repeats an element ID, when `robots.txt` doesn't name the sitemap index, or when the 404 page names a canonical URL. The type check fails when a skill's icon is missing or doesn't match its kind. When you add, change, rename, or remove a skill, follow [`docs/skill-guidelines.md`](docs/skill-guidelines.md).
 
 ### Deployment
 
@@ -142,13 +142,13 @@ Until then, the deploy job fails, or the site is served under a path where its r
 │       │   └── openai.yaml  # Codex invocation policy
 │       └── references/      # implicit skills only: topic detail that SKILL.md says when to read
 ├── website/
-│   ├── public/              # favicon, Claude Code mark, robots.txt, and the generated open-graph image
+│   ├── public/              # favicon, Claude Code mark, and the generated open-graph image
 │   ├── scripts/             # open-graph generation and build-artifact verification
 │   ├── src/
 │   │   ├── components/      # focused Astro presentation modules
 │   │   ├── content/         # SKILL.md and reference file frontmatter schemas
 │   │   ├── layouts/         # shared metadata, navigation, theme, and footer shell
-│   │   ├── pages/           # home, one page per skill, 404, and llms.txt
+│   │   ├── pages/           # home, one page per skill, 404, llms.txt, and robots.txt
 │   │   ├── styles/          # Tailwind entry point and branded semantic tokens
 │   │   ├── utilities/       # skill catalog loading, SEO, theme, and llms.txt behavior
 │   │   └── site.config.ts   # site metadata, commands, and the skill catalog

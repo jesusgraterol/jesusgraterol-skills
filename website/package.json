@@ -27,7 +27,7 @@
     "format": "prettier --write --config .prettierrc .",
     "format:check": "prettier --check --config .prettierrc .",
     "lint": "eslint astro.config.ts eslint.config.js playwright.config.ts scripts src vitest",
-    "preview": "vite preview",
+    "preview": "astro preview",
     "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "test:e2e": "npm run build && npm run test:e2e:artifact",
     "test:e2e:artifact": "playwright test",

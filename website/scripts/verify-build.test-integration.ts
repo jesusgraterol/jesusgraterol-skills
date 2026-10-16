@@ -128,6 +128,23 @@ describe('static build artifact', () => {
         ),
     ],
     [
+      'canonical URL on the 404 page',
+      'The custom 404 page must not name a canonical URL',
+      async (buildDirectory) =>
+        replaceBuildFileText(
+          buildDirectory,
+          '404.html',
+          '</head>',
+          '<link rel="canonical" href="https://jg-skills.jesusgraterol.dev/404.html"></head>',
+        ),
+    ],
+    [
+      'robots.txt without the sitemap',
+      'robots.txt does not name the sitemap index',
+      async (buildDirectory) =>
+        replaceBuildFileText(buildDirectory, 'robots.txt', /^Sitemap: .*$/mu, ''),
+    ],
+    [
       'missing fragment target',
       `Fragment link has no matching element ID in ${SKILL_PAGE}: #main-content -> ${SKILL_PAGE}`,
       async (buildDirectory) =>

@@ -626,6 +626,8 @@ export const SITE_CONFIG = {
     locale: 'en_US',
     width: 1200,
   },
+  // the author's own domain; links to it and its subdomains keep their referrer
+  ownedDomain: 'jesusgraterol.dev',
   repositoryUrl: 'https://github.com/jesusgraterol/jg-skills',
   themeColors: {
     dark: '#1e2939',

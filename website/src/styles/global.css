@@ -192,11 +192,6 @@
     text-wrap: balance;
   }
 
-  .section-title-long {
-    max-width: 28ch;
-    font-size: clamp(2.125rem, 4.4vw, 3rem);
-  }
-
   .lede {
     max-width: 42rem;
     color: var(--muted);
