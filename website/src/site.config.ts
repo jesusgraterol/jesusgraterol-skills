@@ -375,7 +375,7 @@ export const SKILL_CATALOG = {
     stage: 'implicit',
     summary: 'Key names, expiry, scanning, round trips, data structures, and locks for Redis.',
     whenToUse:
-      'It loads on its own when a task touches Redis keys, caching, locks, or queues. Call it by name to load it before such a task.',
+      'It loads on its own when a task touches code that uses Redis, such as its keys, caching, locks, or queues. Call it by name to load it before such a task.',
   },
   'jg-node': {
     examples: [
@@ -396,7 +396,7 @@ export const SKILL_CATALOG = {
     summary:
       'Cross-platform paths, safe filesystem access, processes, and CLIs for Node.js scripts.',
     whenToUse:
-      'It loads on its own when a task touches scripts, CLIs, build tooling, or filesystem code. Call it by name to load it before such a task.',
+      'It loads on its own when a task touches Node.js scripts, CLIs, build tooling, or filesystem code. Call it by name to load it before such a task.',
   },
   'jg-bash': {
     examples: [
@@ -436,7 +436,7 @@ export const SKILL_CATALOG = {
     stage: 'implicit',
     summary: 'Permissions, timeouts, caching, concurrency, and action pinning for GitHub Actions.',
     whenToUse:
-      'It loads on its own when a task touches GitHub Actions workflows or CI and deployment pipelines. Call it by name to load it before such a task.',
+      'It loads on its own when a task touches GitHub Actions workflows, including CI and deployment pipelines. Call it by name to load it before such a task.',
   },
   'jg-zod': {
     examples: [

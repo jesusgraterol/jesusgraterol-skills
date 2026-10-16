@@ -1,11 +1,11 @@
 ---
 name: jg-ci
-description: GitHub Actions standards for fast, secure, and reusable CI and deployment workflows. Use when writing, reviewing, or planning GitHub Actions workflows under .github/workflows, reusable workflows, composite actions, Dependabot configuration, or CI, deployment, or pipeline changes.
+description: GitHub Actions standards for fast, secure, and reusable CI and deployment workflows. Use when writing, reviewing, or planning GitHub Actions workflows under .github/workflows, reusable workflows, composite actions, Dependabot configuration, or CI and deployment changes made in GitHub Actions. Not for other CI systems, such as GitLab CI or Jenkins.
 ---
 
 ## Application
 
-The agent loads this skill on its own when a task touches its area. This skill's area is GitHub Actions workflows, reusable workflows, composite actions, Dependabot configuration, and CI and deployment pipelines.
+The agent loads this skill on its own when a task touches its area. This skill's area is GitHub Actions workflows, reusable workflows, composite actions, Dependabot configuration, and CI and deployment pipelines built on GitHub Actions.
 
 - It adds domain rules to the task. It never authorizes actions, widens scope, or replaces the workflow or approvals of a skill the developer invoked.
 - It ranks with the repository's coding instructions. When they conflict, the coding instructions win, except for the exceptions this skill states for its own area.

@@ -1,11 +1,11 @@
 ---
 name: jg-redis
-description: Redis standards for key names, expiry, scanning, round trips, data structures, and locks. Use when writing, reviewing, or planning Redis keys, caching in Redis, distributed locks, rate limits, streams or queues, or pub/sub.
+description: Redis standards for key names, expiry, scanning, round trips, data structures, and locks. Use when writing, reviewing, or planning code that uses Redis, such as its keys, caching, distributed locks, rate limits, streams or queues, or pub/sub.
 ---
 
 ## Application
 
-The agent loads this skill on its own when a task touches its area. This skill's area is Redis keys, caching in Redis, locks, rate limits, streams, queues, and pub/sub.
+The agent loads this skill on its own when a task touches its area. This skill's area is code that uses Redis, such as its keys, caching, locks, rate limits, streams, queues, and pub/sub.
 
 - It adds domain rules to the task. It never authorizes actions, widens scope, or replaces the workflow or approvals of a skill the developer invoked.
 - It ranks with the repository's coding instructions. When they conflict, the coding instructions win, except for the exceptions this skill states for its own area.

@@ -1,11 +1,11 @@
 ---
 name: jg-node
-description: Portable, safe developer scripts and filesystem code. Use when writing, reviewing, or planning developer scripts, CLIs, build tooling, process spawning, filesystem code, path handling, or archive extraction.
+description: Portable, safe Node.js scripts and filesystem code. Use when writing, reviewing, or planning Node.js developer scripts, CLIs, build tooling, process spawning, filesystem code, path handling, or archive extraction.
 ---
 
 ## Application
 
-The agent loads this skill on its own when a task touches its area. This skill's area is developer scripts, CLIs, build tooling, spawned processes, filesystem code, path handling, and archive extraction.
+The agent loads this skill on its own when a task touches its area. This skill's area is Node.js developer scripts, CLIs, build tooling, spawned processes, filesystem code, path handling, and archive extraction.
 
 - It adds domain rules to the task. It never authorizes actions, widens scope, or replaces the workflow or approvals of a skill the developer invoked.
 - It ranks with the repository's coding instructions. When they conflict, the coding instructions win, except for the exceptions this skill states for its own area.

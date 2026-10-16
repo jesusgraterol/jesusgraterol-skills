@@ -71,8 +71,8 @@ Both commands name the skills, so other skills in the project are left alone.
 | `jg-react`    | React components, hooks, state, data loading, or React tests.                                       | React 19.2, React Router 7          |
 | `jg-nestjs`   | NestJS modules, controllers, providers, configuration, logging, or NestJS tests.                    | NestJS 12                           |
 | `jg-postgres` | SQL, migrations, schema names, queries, or transactions.                                            | PostgreSQL 18, node-postgres 8      |
-| `jg-redis`    | Redis keys, caching, locks, rate limits, streams, or pub/sub.                                       | Redis 8, node-redis 5               |
-| `jg-node`     | Developer scripts, CLIs, build tooling, or filesystem code.                                         | Node.js 24                          |
+| `jg-redis`    | Code that uses Redis, such as keys, caching, locks, rate limits, streams, or pub/sub.               | Redis 8, node-redis 5               |
+| `jg-node`     | Node.js developer scripts, CLIs, build tooling, or filesystem code.                                 | Node.js 24                          |
 | `jg-bash`     | Shell scripts, container entrypoints, Dockerfile `RUN` steps, CI `run:` steps, or Makefile recipes. | Bash 5.3, POSIX `sh`                |
 | `jg-ci`       | GitHub Actions workflows, reusable workflows, composite actions, or deployment pipelines.           | GitHub Actions (October 2026)       |
 | `jg-zod`      | Zod schemas, request or response validation, parsing untrusted data, or JSON Schema.                | Zod 4.6                             |
