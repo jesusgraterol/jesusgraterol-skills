@@ -12,19 +12,24 @@ import {
 import { THEME_STORAGE_KEY } from '../utilities/theme-preference/index.ts';
 import '../styles/global.css';
 
-interface Props {
+interface IBaseLayoutProps {
   breadcrumbs?: readonly IBreadcrumbItem[] | undefined;
-  canonicalPath: string;
   description: string;
   // pages a website page lists, published as its structured item list
   listedPages?: readonly IListedPage[] | undefined;
-  noIndex?: boolean | undefined;
   // the skill a skill page documents, published as structured source code
   skill?: IStructuredDataSkill | undefined;
   structuredDataTitle?: string | undefined;
   structuredDataType?: IStructuredDataType | undefined;
   title: string;
 }
+
+// an indexable page names its canonical URL; a noindex page has none, which would contradict noindex
+type Props = IBaseLayoutProps &
+  (
+    | { canonicalPath: string; noIndex?: false | undefined }
+    | { canonicalPath?: undefined; noIndex: true }
+  );
 
 const {
   breadcrumbs,
@@ -37,20 +42,22 @@ const {
   title,
   structuredDataTitle = title,
 } = Astro.props;
-const canonicalUrl = new URL(canonicalPath, SITE_CONFIG.url).toString();
+const canonicalUrl =
+  canonicalPath === undefined ? undefined : new URL(canonicalPath, SITE_CONFIG.url).toString();
 const llmsTextUrl = new URL('/llms.txt', SITE_CONFIG.url).toString();
 const openGraphImageUrl = new URL(SITE_CONFIG.openGraph.image, SITE_CONFIG.url).toString();
-const structuredData = structuredDataType
-  ? buildStructuredData({
-      breadcrumbs,
-      canonicalUrl,
-      description,
-      listedPages,
-      skill,
-      title: structuredDataTitle,
-      type: structuredDataType,
-    })
-  : undefined;
+const structuredData =
+  structuredDataType && canonicalUrl
+    ? buildStructuredData({
+        breadcrumbs,
+        canonicalUrl,
+        description,
+        listedPages,
+        skill,
+        title: structuredDataTitle,
+        type: structuredDataType,
+      })
+    : undefined;
 const serializedStructuredData = structuredData
   ? JSON.stringify(structuredData).replaceAll('<', '\\u003c')
   : undefined;
@@ -90,10 +97,14 @@ const serializedStructuredData = structuredData
       name="robots"
       content={noIndex ? 'noindex, follow' : 'index, follow, max-image-preview:large'}
     />
-    <link
-      rel="canonical"
-      href={canonicalUrl}
-    />
+    {
+      canonicalUrl && (
+        <link
+          rel="canonical"
+          href={canonicalUrl}
+        />
+      )
+    }
     <link
       rel="describedby"
       href={llmsTextUrl}
@@ -124,10 +135,14 @@ const serializedStructuredData = structuredData
       property="og:description"
       content={description}
     />
-    <meta
-      property="og:url"
-      content={canonicalUrl}
-    />
+    {
+      canonicalUrl && (
+        <meta
+          property="og:url"
+          content={canonicalUrl}
+        />
+      )
+    }
     <meta
       property="og:image"
       content={openGraphImageUrl}

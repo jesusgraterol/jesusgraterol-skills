@@ -229,15 +229,15 @@ export const SKILL_CATALOG = {
       {
         invocation: 'jg-push',
         outcome:
-          "Commits this task's files, or every change when there is no task, with a signed-off, signed commit and pushes the current branch.",
+          "Commits this task's files, or every change when there is no task, signing the commit when signing is set up, and pushes the current branch.",
       },
     ],
     icon: 'upload',
     kind: 'explicit',
     order: 10,
     searchDescription:
-      "An explicit-only agent skill for Claude Code and Codex that commits the current task's files, or every change without a task, in a signed commit and pushes.",
-    searchTitle: 'jg-push: Signed commits and pushes for coding agents',
+      "An explicit-only agent skill for Claude Code and Codex that commits the current task's files, or every change without a task, and pushes the branch.",
+    searchTitle: 'jg-push: Safe commits and pushes for coding agents',
     stage: 'ship',
     whenToUse:
       "Use it when a reviewed change is ready to publish. In a checkout shared with other agents, run it in the session that made the change, so it commits only that task's files.",
@@ -297,7 +297,7 @@ export const SKILL_CATALOG = {
     summary:
       'Accessibility, responsive layout, themes, forms, motion, and design-system reuse for Tailwind CSS.',
     whenToUse:
-      'It loads on its own when a task touches UI, styling, forms, or frontend tests. Call it by name to load it before such a task.',
+      'It loads on its own when a task touches UI, styling, forms, mobile behavior, dialogs or feedback, single-page-app delivery, or frontend tests. Call it by name to load it before such a task.',
   },
   'jg-react': {
     examples: [
@@ -315,9 +315,50 @@ export const SKILL_CATALOG = {
     searchTitle: 'jg-react: React standards for coding agents',
     stage: 'implicit',
     summary:
-      'Component organization, render performance, React 19 APIs, and user-focused tests for React.',
+      'Components, render performance, React 19 APIs, routing, hydration, client data, and tests for React.',
     whenToUse:
-      'It loads on its own when a task touches React components, hooks, state, or tests. Call it by name to load it before such a task.',
+      'It loads on its own when a task touches React components, hooks, state, routing, server rendering, client data caching, or tests. Call it by name to load it before such a task.',
+  },
+  'jg-pwa': {
+    examples: [
+      {
+        outcome:
+          'Adds a complete manifest with standard and maskable icons, theme color, and an iOS touch icon, and proposes a service worker only if offline use is in scope.',
+        request: 'Make the new dashboard installable on phones and desktops.',
+      },
+    ],
+    icon: 'monitor-smartphone',
+    kind: 'implicit',
+    order: 15,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps web apps installable and their service workers, caching, updates, and push notifications safe.',
+    searchTitle: 'jg-pwa: Progressive web app standards for coding agents',
+    stage: 'implicit',
+    summary:
+      'Manifests, install prompts, service worker updates, caching, and push for progressive web apps.',
+    whenToUse:
+      'It loads on its own when a task touches a web app manifest, install prompts, a service worker, offline caching, or web push, or creates a new web application. Call it by name to load it before such a task.',
+  },
+  'jg-seo': {
+    examples: [
+      {
+        outcome:
+          'Gives every post one canonical URL, real lastmod dates, structured data, and a social preview, and checks the sitemap in the build.',
+        request:
+          'Add a blog section to the marketing site with sitemap entries and article previews.',
+      },
+    ],
+    icon: 'globe',
+    kind: 'implicit',
+    order: 16,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps metadata, canonical URLs, sitemaps, robots rules, and structured data right on public sites.',
+    searchTitle: 'jg-seo: SEO standards for public websites',
+    stage: 'implicit',
+    summary:
+      'Metadata, canonicals, sitemaps, robots, structured data, and social previews for public sites.',
+    whenToUse:
+      "It loads on its own when a task touches a public site's metadata, sitemap, robots rules, or structured data. Call it by name to load it before such a task.",
   },
   'jg-nestjs': {
     examples: [
@@ -329,7 +370,7 @@ export const SKILL_CATALOG = {
     ],
     icon: 'nestjs',
     kind: 'implicit',
-    order: 15,
+    order: 17,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that applies NestJS module, validation, logging, lifecycle, and test standards whenever a task touches Nest.',
     searchTitle: 'jg-nestjs: NestJS standards for coding agents',
@@ -348,15 +389,15 @@ export const SKILL_CATALOG = {
     ],
     icon: 'database',
     kind: 'implicit',
-    order: 16,
+    order: 18,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that applies PostgreSQL naming, constraint, query, and migration standards whenever a task touches SQL.',
     searchTitle: 'jg-postgres: PostgreSQL standards for coding agents',
     stage: 'implicit',
     summary:
-      'Naming, constraints, queries, transactions, indexes, and safe migrations for PostgreSQL.',
+      'Naming, constraints, queries, transactions, pools, timeouts, and migrations for PostgreSQL.',
     whenToUse:
-      'It loads on its own when a task touches PostgreSQL schemas, queries, or migrations. Call it by name to load it before such a task.',
+      'It loads on its own when a task touches PostgreSQL schemas, queries, connection pools, or migrations. Call it by name to load it before such a task.',
   },
   'jg-redis': {
     examples: [
@@ -368,7 +409,7 @@ export const SKILL_CATALOG = {
     ],
     icon: 'redis',
     kind: 'implicit',
-    order: 17,
+    order: 19,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that applies Redis key, expiry, scanning, and locking standards whenever a task touches Redis.',
     searchTitle: 'jg-redis: Redis standards for coding agents',
@@ -388,7 +429,7 @@ export const SKILL_CATALOG = {
     ],
     icon: 'nodedotjs',
     kind: 'implicit',
-    order: 18,
+    order: 20,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that keeps Node.js scripts, CLIs, and filesystem code portable and safe on Windows, macOS, and Linux.',
     searchTitle: 'jg-node: Portable Node.js scripts for coding agents',
@@ -397,6 +438,46 @@ export const SKILL_CATALOG = {
       'Cross-platform paths, safe filesystem access, processes, and CLIs for Node.js scripts.',
     whenToUse:
       'It loads on its own when a task touches Node.js scripts, CLIs, build tooling, or filesystem code. Call it by name to load it before such a task.',
+  },
+  'jg-npm-package': {
+    examples: [
+      {
+        outcome:
+          'Adds an exports subpath with types first, tests the packed tarball in a temporary project, and releases a minor with trusted publishing.',
+        request: 'Add a browser entry point to the date utilities package and release it.',
+      },
+    ],
+    icon: 'package',
+    kind: 'implicit',
+    order: 21,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps package exports, dependency ranges, tarball tests, and npm releases correct and safe.',
+    searchTitle: 'jg-npm-package: npm package standards for coding agents',
+    stage: 'implicit',
+    summary:
+      'Exports, dependency ranges, tarball tests, versioning, and trusted publishing for npm packages.',
+    whenToUse:
+      "It loads on its own when a task touches a published package's manifest, build output, tests, or release. Call it by name to load it before such a task.",
+  },
+  'jg-monorepo': {
+    examples: [
+      {
+        outcome:
+          'Declares it as a workspace dependency and a task input, so changing it re-runs the right tests without stale cache hits.',
+        request: 'Add a shared Vitest config package and use it in every app.',
+      },
+    ],
+    icon: 'folder-tree',
+    kind: 'implicit',
+    order: 22,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps Turborepo task graphs, cache keys, and pnpm workspace dependencies correct.',
+    searchTitle: 'jg-monorepo: Turborepo and pnpm workspace standards',
+    stage: 'implicit',
+    summary:
+      'Task graphs, cache inputs, filters, and workspace dependencies for Turborepo and pnpm.',
+    whenToUse:
+      'It loads on its own when a task touches turbo.json, pnpm-workspace.yaml, or workspace packages. Call it by name to load it before such a task.',
   },
   'jg-bash': {
     examples: [
@@ -409,7 +490,7 @@ export const SKILL_CATALOG = {
     ],
     icon: 'file-terminal',
     kind: 'implicit',
-    order: 19,
+    order: 23,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that keeps bash and sh scripts on Linux safe, consistent, and checked whenever a task touches shell.',
     searchTitle: 'jg-bash: Bash script standards for coding agents',
@@ -418,6 +499,26 @@ export const SKILL_CATALOG = {
       'Shell choice, script structure, quoting, safety, and verification for bash and sh on Linux.',
     whenToUse:
       'It loads on its own when a task touches shell scripts, Dockerfile RUN steps, or CI run steps. Call it by name to load it before such a task.',
+  },
+  'jg-docker': {
+    examples: [
+      {
+        outcome:
+          'Pins the image, binds the port to localhost, adds a healthcheck the API waits on, and rotates its logs.',
+        request: 'Add a Redis service for the API to the Compose file.',
+      },
+    ],
+    icon: 'ship',
+    kind: 'implicit',
+    order: 24,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps Compose services private, healthy, and reproducible, and Dockerfiles small and safe.',
+    searchTitle: 'jg-docker: Docker Compose and Dockerfile standards',
+    stage: 'implicit',
+    summary:
+      'Compose services, healthchecks, secrets, ports, image tags, and Dockerfile structure for Docker.',
+    whenToUse:
+      'It loads on its own when a task touches Compose files, Dockerfiles, or commands that recreate or remove containers. Call it by name to load it before such a task.',
   },
   'jg-ci': {
     examples: [
@@ -429,13 +530,13 @@ export const SKILL_CATALOG = {
     ],
     icon: 'workflow',
     kind: 'implicit',
-    order: 20,
+    order: 25,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that keeps GitHub Actions workflows fast, secure, and reusable whenever a task touches CI.',
     searchTitle: 'jg-ci: GitHub Actions standards for coding agents',
     stage: 'implicit',
     summary:
-      'Lean required gates, permissions, timeouts, caching, concurrency, and action pinning for GitHub Actions.',
+      'Required gates, permissions, timeouts, caching, concurrency, and action pinning for GitHub Actions.',
     whenToUse:
       'It loads on its own when a task touches GitHub Actions workflows, including CI and deployment pipelines. Call it by name to load it before such a task.',
   },
@@ -449,7 +550,7 @@ export const SKILL_CATALOG = {
     ],
     icon: 'zod',
     kind: 'implicit',
-    order: 21,
+    order: 26,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that applies Zod 4 schema, strictness, and error standards whenever a task validates data.',
     searchTitle: 'jg-zod: Zod 4 validation standards for coding agents',
@@ -462,13 +563,13 @@ export const SKILL_CATALOG = {
     examples: [
       {
         outcome:
-          'Finds elements by role, waits on assertions instead of sleeps, fixes the clock, and runs the new test three times before calling it done.',
+          'Finds elements by role, waits on assertions instead of sleeps, fixes the clock, and repeats new tests when your instructions require it.',
         request: 'Add an end-to-end test for the checkout flow.',
       },
     ],
     icon: 'flask-conical',
     kind: 'implicit',
-    order: 22,
+    order: 27,
     searchDescription:
       'An implicit agent skill for Claude Code and Codex that keeps Vitest and Playwright tests deterministic and fast whenever a task touches tests.',
     searchTitle: 'jg-testing: Vitest and Playwright standards for agents',
@@ -525,6 +626,8 @@ export const SITE_CONFIG = {
     locale: 'en_US',
     width: 1200,
   },
+  // the author's own domain; links to it and its subdomains keep their referrer
+  ownedDomain: 'jesusgraterol.dev',
   repositoryUrl: 'https://github.com/jesusgraterol/jg-skills',
   themeColors: {
     dark: '#1e2939',

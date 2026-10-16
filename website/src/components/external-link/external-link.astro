@@ -1,6 +1,8 @@
 ---
 import { ArrowUpRight, ExternalLink as ExternalLinkIcon } from '@lucide/astro';
 
+import { SITE_CONFIG } from '../../site.config.ts';
+
 interface Props {
   class?: string | undefined;
   // pins an up-right arrow to the top-right corner of the nearest positioned card instead of
@@ -13,13 +15,17 @@ interface Props {
 const NEW_TAB_NOTICE = ' (opens in a new tab)';
 
 const { class: className, cornerArrow = false, href } = Astro.props;
+// links to the author's own sites keep their referrer; third-party sites get none
+const { hostname } = new URL(href);
+const isOwnedSite =
+  hostname === SITE_CONFIG.ownedDomain || hostname.endsWith(`.${SITE_CONFIG.ownedDomain}`);
 ---
 
 <a
   class={className}
   href={href}
   target="_blank"
-  rel="noreferrer"
+  rel={isOwnedSite ? undefined : 'noreferrer'}
   ><slot />{
     cornerArrow ? (
       <ArrowUpRight

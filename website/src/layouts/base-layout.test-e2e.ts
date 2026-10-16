@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-import { SKILL_CATALOG } from '../site.config.ts';
+import { SITE_CONFIG, SKILL_CATALOG } from '../site.config.ts';
 
 const SKILL_ROUTES = Object.keys(SKILL_CATALOG).map((name) => `/skills/${name}/`);
 const PUBLIC_ROUTES = ['/', ...SKILL_ROUTES] as const;
@@ -70,7 +70,17 @@ test.describe('production website', () => {
         }
 
         await expect(link).toHaveAttribute('target', '_blank');
-        await expect(link).toHaveAttribute('rel', /\bnoreferrer\b/u);
+
+        // links to the author's own sites keep their referrer; third-party links drop it
+        const { hostname } = new URL(href, page.url());
+        const isOwnedSite =
+          hostname === SITE_CONFIG.ownedDomain || hostname.endsWith(`.${SITE_CONFIG.ownedDomain}`);
+
+        if (isOwnedSite) {
+          await expect(link).not.toHaveAttribute('rel', /\bnoreferrer\b/u);
+        } else {
+          await expect(link).toHaveAttribute('rel', /\bnoreferrer\b/u);
+        }
 
         const spokenName = await link.evaluate(
           (element) => element.getAttribute('aria-label') ?? element.textContent ?? '',
@@ -211,6 +221,44 @@ test.describe('production website', () => {
 
     await expect(mobileNavigation).toBeHidden();
     await expect(menu.locator('[data-menu-icon="open"]')).toBeVisible();
+  });
+
+  test('mobile navigation closes after a same-page link and on Escape', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 720 });
+    await page.goto('/');
+
+    const menu = page.getByLabel('Navigation menu', { exact: true });
+    const mobileNavigation = page.getByRole('navigation', { name: 'Mobile navigation' });
+
+    await menu.click();
+    await mobileNavigation.getByRole('link', { name: 'Install', exact: true }).click();
+
+    await expect(page).toHaveURL(/#install$/u);
+    await expect(mobileNavigation).toBeHidden();
+
+    await menu.click();
+    await expect(mobileNavigation).toBeVisible();
+    await mobileNavigation.getByRole('link', { name: 'Skills', exact: true }).focus();
+    await page.keyboard.press('Escape');
+
+    await expect(mobileNavigation).toBeHidden();
+    await expect(menu).toBeFocused();
+  });
+
+  test('the 404 page names no canonical URL', async ({ page }) => {
+    await page.goto('/404.html');
+
+    await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+    await expect(page.locator('meta[property="og:url"]')).toHaveCount(0);
+  });
+
+  test('a missing URL answers with the 404 page and a 404 status', async ({ page }) => {
+    const response = await page.goto('/no-such-page/');
+
+    expect(response?.status()).toBe(404);
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'No skill lives at this path.' }),
+    ).toBeVisible();
   });
 
   test('reduced-motion users do not receive animated scrolling or transitions', async ({

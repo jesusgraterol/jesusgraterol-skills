@@ -12,7 +12,9 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'npm run preview -- --host 127.0.0.1 --port 4173',
+    // --ignore-lock keeps the server in the foreground, which Playwright needs, even where Astro
+    // would move it to the background because it detects a coding agent
+    command: 'npm run preview -- --host 127.0.0.1 --port 4173 --ignore-lock',
     reuseExistingServer: false,
     url: 'http://127.0.0.1:4173',
   },

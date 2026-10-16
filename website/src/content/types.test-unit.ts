@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, test } from 'vitest';
 
-import { SkillFrontmatterSchema } from './types.ts';
+import { SkillFrontmatterSchema, SkillReferenceFrontmatterSchema } from './types.ts';
 
 // frontmatter of a valid explicit-only skill
 const VALID_FRONTMATTER = {
@@ -43,5 +43,15 @@ describe('SkillFrontmatterSchema', () => {
     ['an empty argument hint', { ...VALID_FRONTMATTER, 'argument-hint': '' }],
   ])('rejects frontmatter with %s', (_caseName, frontmatter) => {
     expect(SkillFrontmatterSchema.safeParse(frontmatter).success).toBe(false);
+  });
+});
+
+describe('SkillReferenceFrontmatterSchema', () => {
+  test('accepts a reference file without frontmatter', () => {
+    expect(SkillReferenceFrontmatterSchema.parse({})).toStrictEqual({});
+  });
+
+  test('rejects a reference file with any frontmatter key', () => {
+    expect(SkillReferenceFrontmatterSchema.safeParse({ name: 'migrations' }).success).toBe(false);
   });
 });

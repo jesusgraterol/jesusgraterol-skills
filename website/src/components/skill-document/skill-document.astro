@@ -7,6 +7,7 @@ import {
   SKILL_STAGES,
   type ISkill,
 } from '../../utilities/skill-catalog/index.ts';
+import { SITE_CONFIG } from '../../site.config.ts';
 import ExternalLink from '../external-link/external-link.astro';
 import SkillIcon from '../skill-icon/skill-icon.astro';
 import TerminalWindow from '../terminal-window/terminal-window.astro';
@@ -20,6 +21,13 @@ interface Props {
 
 const { next, previous, skill } = Astro.props;
 const { Content } = await render(skill.entry);
+// each reference file, rendered below SKILL.md under the path SKILL.md names it by
+const references = await Promise.all(
+  skill.references.map(async ({ entry, path }) => ({
+    Content: (await render(entry)).Content,
+    path,
+  })),
+);
 const isImplicit = skill.kind === 'implicit';
 const hasCases = !isImplicit && skill.examples.length > 1;
 // implicit skills open with their summary, because their description is a trigger list for agents
@@ -61,7 +69,7 @@ const examples =
         <a
           class="underline-offset-4 hover:text-foreground hover:underline"
           href="/"
-          >JG Skills</a
+          >{SITE_CONFIG.name}</a
         >
         <span aria-hidden="true">/</span>
       </li>
@@ -230,9 +238,37 @@ const examples =
     <div
       class="article-content mt-6 rounded-xl border border-border bg-surface px-5 py-6 text-base shadow-surface sm:px-8 sm:py-8 [&_h2]:mt-10 [&_h2]:pt-6 [&_h2]:text-xl [&_h2:first-child]:mt-0 [&_h2:first-child]:border-t-0 [&_h2:first-child]:pt-0"
       data-skill-instructions
+      data-skill-markdown
     >
       <Content />
     </div>
+    {
+      references.length > 0 && (
+        <div
+          class="mt-10"
+          data-skill-references
+        >
+          <p class="text-xl font-semibold tracking-tight">Reference files</p>
+          <p class="mt-2 text-sm leading-6 text-muted">
+            The agent reads each file only when its task needs it, as SKILL.md says.
+          </p>
+          {references.map(({ Content: ReferenceContent, path }) => (
+            <div
+              class="mt-6"
+              data-skill-reference={path}
+            >
+              <p class="font-mono text-sm font-semibold wrap-anywhere text-foreground">{path}</p>
+              <div
+                class="article-content mt-3 rounded-xl border border-border bg-surface px-5 py-6 text-base shadow-surface sm:px-8 sm:py-8 [&_h2]:mt-10 [&_h2]:pt-6 [&_h2]:text-xl [&_h2:first-child]:mt-0 [&_h2:first-child]:border-t-0 [&_h2:first-child]:pt-0"
+                data-skill-markdown
+              >
+                <ReferenceContent />
+              </div>
+            </div>
+          ))}
+        </div>
+      )
+    }
   </section>
 
   <footer class="mt-14 border-t border-border pt-8">

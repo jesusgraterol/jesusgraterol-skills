@@ -192,11 +192,6 @@
     text-wrap: balance;
   }
 
-  .section-title-long {
-    max-width: 28ch;
-    font-size: clamp(2.125rem, 4.4vw, 3rem);
-  }
-
   .lede {
     max-width: 42rem;
     color: var(--muted);
@@ -298,6 +293,13 @@
     font-size: 0.9em;
     font-weight: 650;
     overflow-wrap: anywhere;
+  }
+
+  /* Shiki writes the light theme inline, so dark mode switches each code block to its --shiki-dark colors */
+  .dark .astro-code,
+  .dark .astro-code span {
+    background-color: var(--shiki-dark-bg) !important;
+    color: var(--shiki-dark) !important;
   }
 
   /* fixed layout lets cells wrap within the column, so wide reference tables never scroll the page */

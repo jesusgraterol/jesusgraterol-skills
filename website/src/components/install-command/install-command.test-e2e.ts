@@ -68,20 +68,31 @@ test.describe('install command', () => {
     );
   });
 
-  test('copy reports a useful failure when the clipboard is unavailable', async ({ page }) => {
+  test('copy shows lasting manual-copy guidance when the clipboard is unavailable', async ({
+    page,
+  }) => {
+    await page.clock.install();
     await page.addInitScript(() => {
       Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined });
     });
     await page.goto('/');
 
     const copyControl = page.locator('button[data-copy-source="remove-command"]');
+    const guidance = 'Copy failed. Select the remove command and copy it manually.';
+    const hint = page.locator('[data-copy-hint="remove-command"]');
 
     await copyControl.click();
 
     await expect(copyControl).toHaveAttribute('data-copy-state', 'error');
     await expect(copyControl).toContainText('Copy failed');
-    await expect(page.locator('#remove-command-copy-status')).toHaveText(
-      'Copy failed. Select the command and copy it manually.',
-    );
+    await expect(page.locator('#remove-command-copy-status')).toHaveText(guidance);
+    await expect(hint).toBeVisible();
+    await expect(hint).toHaveText(guidance);
+
+    // the guidance outlasts the success message's two-second reset
+    await page.clock.runFor(2_500);
+
+    await expect(hint).toBeVisible();
+    await expect(copyControl).toHaveAttribute('data-copy-state', 'error');
   });
 });

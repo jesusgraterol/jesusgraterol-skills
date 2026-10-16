@@ -1,2 +1,2 @@
 // schemas
-export { SkillFrontmatterSchema } from './types.ts';
+export { SkillFrontmatterSchema, SkillReferenceFrontmatterSchema } from './types.ts';

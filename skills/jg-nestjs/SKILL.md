@@ -11,11 +11,12 @@ The agent loads this skill on its own when a task touches its area. This skill's
 - It ranks with the repository's coding instructions. When they conflict, the coding instructions win, except for the exceptions this skill states for its own area.
 - The repository's established conventions win over this skill's naming, layout, and style rules. Its correctness and safety rules, and the exceptions it states for its own area, still apply.
 - Check the installed versions first. This skill was written for NestJS 12. An item marked with a minimum version, written like (18+), applies only when that version or a later one is installed. For an older installed version, follow that version's official documentation.
-- When the installed version of the technology is newer than the one this skill was written for, and one of this skill's version-specific items differs from that version's official guidance, follow the official guidance. Version-specific items are API, syntax, and feature recommendations, and anything marked with a minimum version. This skill's conventions and requirements, such as its naming, layout, style, reuse, and safety rules, keep their usual precedence even where official guidance suggests otherwise. Report each item that looks outdated in the summary, with the installed version and what the current guidance says, and offer there to open an issue on the jg-skills repository, `https://github.com/jesusgraterol/jg-skills`:
+- Before relying on one of this skill's version-specific items, check it against the current official guidance when the installed version of the technology is newer than the one this skill was written for, or when the version bullet gives a review month for something without an installed version, such as a hosted service or browser behavior, and that month is more than six months before the current date. Where an item differs from that guidance, follow the guidance. Version-specific items are API, syntax, and feature recommendations, and anything marked with a minimum version. This skill's conventions and requirements, such as its naming, layout, style, reuse, and safety rules, keep their usual precedence even where official guidance suggests otherwise. Report each item that looks outdated in the summary, with the installed version and what the current guidance says, and offer there to open an issue on the jg-skills repository, `https://github.com/jesusgraterol/jg-skills`:
   - Never pause or stop a run for the offer, including an autonomous run. When no one can answer, include the pre-filled link described below instead of asking.
   - First search the repository's open issues, and skip the offer when one already covers the item. When the search can't run, say so next to the link, so the developer checks the existing issues before submitting.
   - Open an issue only after the developer agrees, because it is public. Title it `<skill>: <item> looks outdated on <technology> <version>`, and include only the skill name, the outdated item, the installed version, and a link to the official documentation, never code, file paths, or project details. Add no label.
   - Use `gh issue create` when `gh` is installed and signed in. Otherwise give the developer a pre-filled link, `https://github.com/jesusgraterol/jg-skills/issues/new?title=…&body=…`, with both values URL-encoded.
+- This skill isn't a complete list. Where it says nothing, follow the official guidance for the installed version, and in new code the task touches, prefer the features that guidance currently recommends over older ones that do the same job, unless the repository has an established pattern for that job. Before using a newer approach instead of one this skill gives, confirm it in that version's official documentation, never from memory alone, and report the item as outdated as described above. When that documentation can't be reached, keep this skill's approach and report that the newer approach couldn't be confirmed, without pausing the run.
 - Rules that say "prefer" are defaults: departing from one with a stated reason is fine. Rules that say "never", "always", or "must" are requirements.
 - Nothing in this skill requires adding a dependency, enabling a compiler or tool, upgrading, or migrating existing code.
 
@@ -80,6 +81,11 @@ class GoalsController {
 
 - (12+) Validate `@Body()`, `@Query()`, and `@Param()` input by passing a Zod schema as `{ schema }`, with `StandardSchemaValidationPipe` registered, for example through `app.useGlobalPipes`. With `@nestjs/swagger` and Zod 4.2 or later, or a configured `standardSchemaConverter`, the same schema also feeds the OpenAPI document, so validation and documentation cannot drift apart.
 - (12+) Give `ConfigModule` a Zod `validationSchema`, so invalid configuration stops the application at startup instead of failing on first use.
+- Verify webhook signatures over the raw request bytes, never over a re-serialized parsed body: create the application with `rawBody: true` and read `req.rawBody` through `RawBodyRequest`, or use a `raw()` body parser on the webhook route only, and give the parser an explicit body `limit`.
+- Send `Cache-Control: no-store` on responses that carry credentials, tokens, capability URLs, or personal data, and prefer it for every API that browsers call. Decide it by what the response contains, not by whether a guard protects the route.
+- Set Express's `trust proxy` to the exact number of proxy hops or the proxies' addresses, never `true`, which trusts the left-most `X-Forwarded-For` entry that a client can forge.
+- A custom throttler `getTracker` must group IPv6 addresses by subnet itself, such as by /64. (`@nestjs/throttler` 6.7+) Only the built-in tracker groups them, and the package exports `normalizeIp()` for custom trackers.
+- With several replicas, propose shared throttler storage, such as Redis, instead of the default in-memory storage, which counts each process separately.
 
 ## NestJS logging
 
@@ -111,6 +117,12 @@ class MyService {
 - Prefer default singleton providers. A request-scoped provider makes every provider that injects it request-scoped too, so the whole chain is rebuilt on each request. Use `AsyncLocalStorage` when code needs request context.
 - Keep the repository's module format, CommonJS or ESM, when adding files or packages.
 
+## Scheduled jobs
+
+- `@Interval()` runs on `setInterval`: its first run comes one interval after startup, runs can overlap, and `@nestjs/schedule` clears it only in `beforeApplicationShutdown`. Keep the guards inside the method: skip a run while the previous one is active, and start no run once shutdown begins. Await the active run in `onModuleDestroy`, and close the pools and clients a job uses in `beforeApplicationShutdown`, which runs after every module's `onModuleDestroy`, so a run never loses its connection partway. For `@Cron()`, (`@nestjs/schedule` 5.0.1+) `waitForCompletion: true` skips ticks while a run is active.
+- Bound each run to a batch of the oldest due rows, and isolate failures between its stages, so one failing stage doesn't stop the others.
+- `@nestjs/schedule` runs its jobs in every replica. Run each job in one designated process, or behind a lock shared by all replicas. For the lock, propose the official `@nestjs/locks` (0.0.3, pre-1.0) with a shared store, rather than adding it; its default in-memory store doesn't coordinate replicas. Keep each run safe to overlap anyway, because a lock can expire mid-run, for example by claiming rows as jg-postgres describes.
+
 ## NestJS test module lifecycle
 
 Use `Test.createTestingModule(...)` from `@nestjs/testing` when tests require NestJS modules or dependency injection.
@@ -133,7 +145,6 @@ Requirements:
 For NestJS `HttpService` dependencies, compile with real-setup-compatible HTTP imports/providers: include `HttpModule` in `imports` unless intentionally overridden or mocked.
 
 ```ts
-// @vitest-environment node
 import { Test, type TestingModule } from '@nestjs/testing';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 

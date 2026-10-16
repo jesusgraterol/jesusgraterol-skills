@@ -1,23 +1,36 @@
 ---
 name: jg-frontend
-description: Frontend standards for accessible, responsive, light- and dark-themed UI, UI-package reuse, forms, motion, and Tailwind CSS. Use when writing, reviewing, or planning UI components, pages, layout, styling, CSS or Tailwind, forms, accessibility, responsive or theme behavior, motion, or frontend tests.
+description: Frontend standards for accessible, responsive, light- and dark-themed UI that feels native on mobile, UI-package reuse, forms, dialogs and feedback, motion, single-page-app delivery, and Tailwind CSS. Use when writing, reviewing, or planning UI components, pages, layout, styling, CSS or Tailwind, forms, dialogs, toasts or error states, accessibility, responsive, mobile, or theme behavior, motion, single-page-app hosting headers or chunk loading, or frontend tests.
 ---
 
 ## Application
 
-The agent loads this skill on its own when a task touches its area. This skill's area is frontend UI: components, pages, layout, styling, CSS and Tailwind, forms, accessibility, responsive and theme behavior, motion, and frontend tests.
+The agent loads this skill on its own when a task touches its area. This skill's area is frontend UI: components, pages, layout, styling, CSS and Tailwind, forms, dialogs and feedback, accessibility, responsive, mobile, and theme behavior, motion, single-page-app delivery, and frontend tests.
 
 - It adds domain rules to the task. It never authorizes actions, widens scope, or replaces the workflow or approvals of a skill the developer invoked.
 - It ranks with the repository's coding instructions. When they conflict, the coding instructions win, except for the exceptions this skill states for its own area.
 - The repository's established conventions win over this skill's naming, layout, and style rules. Its correctness and safety rules, and the exceptions it states for its own area, still apply.
-- Check the installed versions first. This skill was written for Tailwind CSS 4.3. An item marked with a minimum version, written like (18+), applies only when that version or a later one is installed. For an older installed version, follow that version's official documentation.
-- When the installed version of the technology is newer than the one this skill was written for, and one of this skill's version-specific items differs from that version's official guidance, follow the official guidance. Version-specific items are API, syntax, and feature recommendations, and anything marked with a minimum version. This skill's conventions and requirements, such as its naming, layout, style, reuse, and safety rules, keep their usual precedence even where official guidance suggests otherwise. Report each item that looks outdated in the summary, with the installed version and what the current guidance says, and offer there to open an issue on the jg-skills repository, `https://github.com/jesusgraterol/jg-skills`:
+- Check the installed versions first. This skill was written for Tailwind CSS 4.3, and for browser behavior as of October 2026. An item marked with a minimum version, written like (18+), applies only when that version or a later one is installed. For an older installed version, follow that version's official documentation.
+- Before relying on one of this skill's version-specific items, check it against the current official guidance when the installed version of the technology is newer than the one this skill was written for, or when the version bullet gives a review month for something without an installed version, such as a hosted service or browser behavior, and that month is more than six months before the current date. Where an item differs from that guidance, follow the guidance. Version-specific items are API, syntax, and feature recommendations, and anything marked with a minimum version. This skill's conventions and requirements, such as its naming, layout, style, reuse, and safety rules, keep their usual precedence even where official guidance suggests otherwise. Report each item that looks outdated in the summary, with the installed version and what the current guidance says, and offer there to open an issue on the jg-skills repository, `https://github.com/jesusgraterol/jg-skills`:
   - Never pause or stop a run for the offer, including an autonomous run. When no one can answer, include the pre-filled link described below instead of asking.
   - First search the repository's open issues, and skip the offer when one already covers the item. When the search can't run, say so next to the link, so the developer checks the existing issues before submitting.
   - Open an issue only after the developer agrees, because it is public. Title it `<skill>: <item> looks outdated on <technology> <version>`, and include only the skill name, the outdated item, the installed version, and a link to the official documentation, never code, file paths, or project details. Add no label.
   - Use `gh issue create` when `gh` is installed and signed in. Otherwise give the developer a pre-filled link, `https://github.com/jesusgraterol/jg-skills/issues/new?title=…&body=…`, with both values URL-encoded.
+- This skill isn't a complete list. Where it says nothing, follow the official guidance for the installed version, and in new code the task touches, prefer the features that guidance currently recommends over older ones that do the same job, unless the repository has an established pattern for that job. Before using a newer approach instead of one this skill gives, confirm it in that version's official documentation, never from memory alone, and report the item as outdated as described above. When that documentation can't be reached, keep this skill's approach and report that the newer approach couldn't be confirmed, without pausing the run.
 - Rules that say "prefer" are defaults: departing from one with a stated reason is fine. Rules that say "never", "always", or "must" are requirements.
 - Nothing in this skill requires adding a dependency, enabling a compiler or tool, upgrading, or migrating existing code.
+
+## Reference files
+
+These files belong to this skill and hold rules that apply only to some work. Read each one before the work it covers:
+
+- Before writing or reviewing a dialog, drawer, popover, menu, or tooltip, or using a native feature such as `<dialog>`, `popover`, `inert`, or `:has()` where no UI-package component fits, read `references/dialogs-and-overlays.md`. Use only native features that are Baseline for the supported browsers, or ship a fallback.
+- Before writing or reviewing toasts, inline errors, empty or loading states, pending actions, or status messages, read `references/feedback-and-errors.md`. Never show raw exception text.
+- Before creating or changing a form or a form field, read `references/forms.md`. Client validation never replaces server validation.
+- Before adding or changing images, embeds, or other content that loads late, read `references/loading-performance.md`. Reserve space for late-loading content, so the page never shifts as it loads.
+- Before adding or changing animation or transitions, read `references/motion.md`. Every new or modified animation must have an equivalent reduced-motion path.
+- Before changing a single-page app's hosting headers, fallback rewrites, or chunk loading, read `references/single-page-app-delivery.md`.
+- Before writing or reviewing Tailwind classes, CSS, or Tailwind configuration, read `references/tailwind-and-css.md`. Never invent class names, tokens, or variants the project doesn't define.
 
 ## Web and accessibility guidance
 
@@ -29,97 +42,7 @@ When a task touches frontend code, UI behavior, layout, styling, components, pag
 
 Apply this requirement to new UI, modified UI, frontend bug fixes, refactors, and styling changes. Do not deliver desktop-only, mouse-only, light-mode-only, or inaccessible UI.
 
-### UI package and component reuse
-
-For selecting component ownership in frontend code introduced or materially changed by the current task, this subsection is a specific exception to the codebase-pattern precedence rules in the repository's coding instructions. Existing local duplication, inconsistent usage, or a nearby one-off implementation is not by itself sufficient reason to bypass an official UI or design-system package. Preserve existing public contracts and do not migrate unrelated legacy UI solely for consistency.
-
-Before planning or implementing a new, replaced, or materially changed UI element/component, identify any official UI/design-system package intended for the affected application. Before coding, inspect its smallest relevant public surface: entry points/exports, APIs, variants, docs/examples, and existing usage, including established application-owned compositions. Determine whether an export, primitive, supported composition, or established abstraction already satisfies the need.
-
-- Use official components, primitives, supported compositions, or established application abstractions built on official exports whenever they satisfy the task contract. Import through package public boundaries; preserve variants, tokens, interactions, accessibility, responsiveness, and themes.
-- Do not recreate, copy, fork, or independently style equivalent general-purpose components for speed, simplicity, or familiarity.
-- Feature-specific components may compose official exports for domain structure, behavior, state, data orchestration, or stable application contracts. Do not add pass-through/styling-only wrappers merely to rename/repackage exports, bypass variants, or replace tokens.
-- Before rejecting the closest official option, inspect its props, variants, slots, compositions, and package-owned extension points. Do not deep-import private files or bypass public APIs.
-- Create local general-purpose components/primitives only after inspection finds no suitable official export, supported composition, or established application abstraction, or their use violates an explicit requirement or higher-precedence correctness, accessibility, compatibility, or performance constraint. Align justified local implementations with package tokens/conventions.
-- Extend the UI package only for genuinely reusable behavior within authorized scope. Otherwise use the smallest justified feature-specific composition or local exception.
-- In required plans, name the official component, primitive, composition, or application abstraction to reuse, or explain its absence. In completion summaries, name inspected UI exports/public paths and justify new local general-purpose exceptions.
-
-New or substantially redesigned UI must be polished, contemporary, product-specific, and consistent with established branding/design systems. Before new primitives or one-off styles, inspect/reuse brand guidance, tokens, typography, colors, spacing, icons, variants, the internal UI library, reusable components, and screen patterns. Use intentional hierarchy, typography, spacing, density, composition, and relevant interaction states. Avoid generic library layouts or decoration that harms clarity, accessibility, responsiveness, or performance.
-
-For product explanations/demonstrations, prefer realistic content and actual reusable components or faithful simulations over decorative empty mockups.
-
-When building UI:
-
-- Prefer semantic HTML over generic `div`s.
-- Use landmarks when appropriate: `main`, `nav`, `section`, `article`, `header`, `footer`, `aside`.
-- Preserve valid heading hierarchy.
-- Ensure keyboard accessibility.
-- Use correct native elements before falling back to `role`.
-- Use ARIA only when needed and ensure it is correct.
-- Specify image dimensions explicitly when appropriate.
-- Meet WCAG 2.2 AA, including targets of at least 24 by 24 CSS pixels, or spaced as its target-size exceptions allow, and a focused component that sticky headers, footers, or overlays never hide entirely.
-
-```html
-<button type="button">
-  <span class="some-icon" aria-hidden="true">add</span>
-  Add Book
-</button>
-```
-
-```html
-<button type="button" aria-label="Add book">
-  <span class="some-icon" aria-hidden="true">add</span>
-</button>
-```
-
-```html
-<img src="/logo.png" width="180" height="25" alt="Company logo" />
-```
-
-### Native platform features
-
-When no official UI-package component, supported composition, or established application abstraction covers the need, prefer native platform features over custom JavaScript: `<dialog>` with `showModal()` for modal dialogs, the `popover` attribute for menus and popovers, `inert` to take hidden or background content out of focus and the accessibility tree, and `:has()` for styling that depends on an element's contents. Use a feature only when it is Baseline for the application's supported browsers, or ship a fallback.
-
-### Loading performance
-
-- Give the main above-the-fold image `fetchpriority="high"`, and do not lazy-load it. Give images below the fold `loading="lazy"`.
-- Prefer the framework's image component, where one exists, over a raw `<img>`, so responsive sizes and modern formats are generated for you.
-- Reserve space for images, embeds, and late-loading content with explicit dimensions or `aspect-ratio`, so the page does not shift as it loads.
-
-### Form state and validation
-
-Before creating or materially changing a form, inspect existing forms, shared components, hooks, schemas, dependencies, and tests for the established form-state/validation system.
-
-- Use an existing application-owned system consistently for registration, state, validation, errors, submission state, and schema/resolver integration. Do not bypass/replace it with browser-only validation, ad hoc component state, or parallel application validation.
-- Without an established application-owned form-validation system, native HTML constraint validation is an acceptable client fallback. Add no form library merely to avoid it unless requested behavior or non-trivial application-owned validation justifies one.
-- Preserve accurate native attributes for semantics, accessibility, autofill, mobile input, and progressive enhancement. When the application-owned system controls validation feedback/submission, prevent competing browser validation UI, normally with `noValidate` on `<form>`.
-- Align client validation with authoritative application/server contracts; it improves UX but never replaces trusted-server validation.
-- Set `autocomplete` tokens, `inputmode`, and `enterkeyhint` on inputs, so browsers can autofill them and mobile keyboards match the field.
-- (4.1+) Prefer the `user-invalid:` variant over `invalid:` for error styling, so a field shows its error only after the user has interacted with it.
-
-### Form placeholder guidance
-
-Every user-editable frontend form field supporting placeholders must include a realistic example value.
-
-Placeholders must:
-
-- start with `e.g.`
-- show the expected input format or kind of value
-- use safe generic data, never real user data, secrets, tokens, private URLs, or credentials
-- match the field purpose, validation rules, and locale expectations
-- remain concise enough to fit on small screens without harming usability
-
-Examples:
-
-- email fields: `e.g. jane@example.com`
-- age fields: `e.g. 25`
-- search fields: `e.g. funny movie`
-- phone fields: `e.g. +1 555 123 4567`
-- name fields: `e.g. Jane Doe`
-- URL fields: `e.g. https://example.com`
-
-Placeholders never replace visible labels, accessible names, helper text, validation messages, or required-field indicators.
-
-## Responsive UI requirements
+### Responsive UI requirements
 
 Frontend implementations must be responsive from `320px` wide through large desktop screens.
 
@@ -140,7 +63,7 @@ They must:
 
 Do not assume a component is desktop-first unless explicitly requested.
 
-## Light and dark theme requirements
+### Light and dark theme requirements
 
 Frontend implementations must support light and dark modes through the repository's existing theme strategy.
 
@@ -154,115 +77,98 @@ They must:
 - avoid introducing a new theme mechanism unless the requested change explicitly requires it
 - set the CSS `color-scheme` property for each theme, so native controls, scrollbars, and form fields follow it
 
+For surfaces and states:
+
+- A surface that keeps one scheme regardless of theme, such as an always-dark panel or an inverted `bg-primary` block, sets its own `color-scheme` and restyles what the app themes with tokens, such as `::selection`, placeholders, focus rings, and hover states, checking contrast on that surface.
+- Prefer `color-mix(in oklab, …)` when mixing a hue with a near-neutral color, such as the foreground or background; `oklch` interpolates the neutral's tiny hue and can shift the result.
+- Style interaction states, such as copied, open, or selected, with `data-*` or `aria-*` variants on the element, not custom CSS in `@layer base` or `components`, which utilities in a later layer override.
+
 Without an existing theme mechanism, a limitation/follow-up note does not satisfy mandatory dual-theme support. Check whether existing design-system primitives can support both locally. Otherwise explain that a theme mechanism is required and materially expands scope, then ask one focused question before implementation. Do not silently add a broad system or finish single-theme UI.
 
-## Motion and animation guidance
+### UI package and component reuse
 
-For UI states/transitions, disclosures, loading, dialogs, menus, toasts, drawers, accordions, or feedback, assess whether motion materially improves orientation, perceived responsiveness, or comprehension.
+For choosing which component to use in frontend code the task adds or materially changes, this subsection is an exception to the codebase-pattern precedence in the repository's coding instructions: local duplication, inconsistent usage, or a nearby one-off is not by itself a reason to bypass an official UI or design-system package. Preserve existing public contracts, and don't migrate unrelated legacy UI only for consistency.
 
-Animate only for clear UX value, with minimal motion and short durations. Avoid decorative, looping, parallax, long-distance, or attention-grabbing motion unless explicitly requested and accessible.
+Before planning or building a new, replaced, or materially changed UI element, identify the official UI or design-system package for the affected application and inspect its smallest relevant public surface: entry points and exports, APIs, variants, docs and examples, and existing usage, including established application-owned compositions.
 
-Prefer simple low-cost opacity changes and tiny transforms, such as fades or slight fade-and-slide transitions. Avoid large travel, width/height animation, many simultaneous elements, heavy blur/shadows, and complex custom keyframes unless explicitly requested, performant, and accessible.
+- Use official components, primitives, supported compositions, or established application abstractions built on them whenever they satisfy the task. Import through the package's public boundary, and preserve its variants, tokens, interactions, accessibility, responsiveness, and themes.
+- Do not recreate, copy, fork, or independently style an equivalent general-purpose component for speed, simplicity, or familiarity, and never deep-import private files or bypass public APIs.
+- Feature components may compose official exports for domain structure, behavior, state, data orchestration, or stable application contracts. Don't add pass-through or styling-only wrappers that only rename or repackage exports, bypass variants, or replace tokens.
+- Before rejecting the closest official option, inspect its props, variants, slots, compositions, and package-owned extension points. Create a local general-purpose component only when no export, composition, or established abstraction fits, or when using one would break an explicit requirement or a higher-precedence correctness, accessibility, compatibility, or performance constraint, and align it with the package's tokens and conventions.
+- Extend the UI package only for genuinely reusable behavior within the authorized scope; otherwise use the smallest justified feature-specific composition or local exception.
+- In required plans, name the official component, primitive, composition, or abstraction to reuse, or explain its absence. In completion summaries, name the UI exports inspected and justify each new local general-purpose component.
+- When a repository has an official UI package, propose, don't add, lint rules such as `no-restricted-imports` that block direct imports of the libraries the package wraps.
 
-For predictably small-height content, use subtle fade plus minimal slide when direction clarifies origin/destination. Avoid height animation without a proven accessible project pattern. Example:
+New or substantially redesigned UI must be polished, contemporary, product-specific, and consistent with established branding/design systems. Before new primitives or one-off styles, inspect/reuse brand guidance, tokens, typography, colors, spacing, icons, variants, the internal UI library, reusable components, and screen patterns. Use intentional hierarchy, typography, spacing, density, composition, and relevant interaction states. Avoid generic library layouts or decoration that harms clarity, accessibility, responsiveness, or performance.
 
-```tsx
-<div
-  className="animate-in fade-in-0 slide-in-from-bottom-1 duration-200 ease-out motion-reduce:animate-none"
->
-  ...
-</div>
+For product explanations/demonstrations, prefer realistic content and actual reusable components or faithful simulations over decorative empty mockups.
+
+When building UI:
+
+- Prefer semantic HTML over generic `div`s.
+- Use landmarks when appropriate: `main`, `nav`, `section`, `article`, `header`, `footer`, `aside`.
+- Preserve valid heading hierarchy.
+- Ensure keyboard accessibility.
+- Use correct native elements before falling back to `role`.
+- Use ARIA only when needed and ensure it is correct.
+- Specify image dimensions explicitly when appropriate.
+- Meet WCAG 2.2 AA, including targets of at least 24 by 24 CSS pixels, or spaced as its target-size exceptions allow, and a focused component that sticky headers, footers, or overlays never hide entirely.
+- Prefer one `h1` per page that names its content.
+- Keep element IDs unique, and give every same-page `#fragment` link a target.
+- Prefer opening links in the same tab. A link that opens a new tab shows a visible indicator and says "opens in a new tab" in its accessible name or description. `target="_blank"` already implies `noopener`; leave out `noreferrer` on links to your own and partner sites, and use it on pages whose URLs carry secrets.
+- Remote images that can fail, such as avatars, render a same-size fallback, such as initials. An avatar next to the person's visible name gets `alt=""`.
+- Copy buttons call `navigator.clipboard.writeText` in the click handler, before any `await`, report success only after it resolves, and on failure show manual-copy guidance with the text left selectable.
+- Prefer a button component's size variants over height or size utilities on one instance; add a touch size to the UI package rather than to one button.
+- Prefer removing decoration before adding it: no divider between blocks that spacing already separates, a leading icon only when it identifies the subject or its state, and no breadcrumb trail on a top-level page.
+
+```html
+<button type="button">
+  <span class="some-icon" aria-hidden="true">add</span>
+  Add Book
+</button>
 ```
 
-Use fade-only entry/exit for unpredictable, user-generated, async-loaded, virtualized, paginated, or potentially large content. Do not slide, expand/collapse, animate height, or use large transforms on substantially growing content; avoid jank, disorientation, and unnecessary rendering. Example:
-
-```tsx
-<div
-  className="animate-in fade-in-0 duration-200 ease-out motion-reduce:animate-none"
->
-  ...
-</div>
+```html
+<button type="button" aria-label="Add book">
+  <span class="some-icon" aria-hidden="true">add</span>
+</button>
 ```
 
-With Tailwind and installed/configured `tw-animate-css`, prefer its utilities over custom CSS or new dependencies for simple entry, exit, expand/collapse, and state changes. First check package/lock files, CSS imports, Tailwind configuration, and existing usage.
+```html
+<img src="/logo.png" width="180" height="25" alt="Company logo" />
+```
 
-Do not add `tw-animate-css`, replace animation systems, or migrate existing animations solely for a targeted change unless explicitly requested or the current approach creates a high-impact issue.
+## Layout and long content
 
-Always respect reduced motion. Every new/modified animation must have an equivalent reduced-motion path through Tailwind `motion-reduce:`, existing utilities, or CSS `@media (prefers-reduced-motion: reduce)`. That path removes or substantially reduces the motion while preserving information, layout, timing assumptions, focus management, and interaction state.
+Layouts hold up with long, real content at every width:
 
-## Tailwind CSS guidance
+- Let flex and grid children shrink below their content: give a flex child that holds text `min-w-0`, and size grid columns with `grid-cols-<n>` or `minmax(0,1fr)`, never a bare `1fr` or a `grid` without columns, because both default to the content's minimum width.
+- Prefer breaking long paths and identifiers after separators (`/ _ . -`) with `<wbr>`, which copying ignores, and use (4.1+) `wrap-break-word` or `wrap-anywhere` as the last resort. Don't put `break-all` on text with ordinary words; tokens without separators, such as hashes and addresses, may break anywhere.
+- Prefer letting an overflowing tab list scroll horizontally with complete labels over truncating them, and scroll a tab that receives keyboard focus fully into view.
+- Prefer a line-height of at least 1 on headings that can wrap, and check tighter display leading at 320px so lines never collide. Never give a heading a fixed height.
+- Keep fields that share a row aligned when one shows an error or a longer label; prefer `grid-rows-subgrid`, with each field spanning its label, control, and message rows.
+- Truncated text, such as `truncate` or `line-clamp-*`, stays available in full to keyboard and assistive-technology users, through the accessible name, a tooltip that also opens on focus, or a detail view.
+- Test layouts with the longest realistic content, such as long names, paths, and translated labels, at 320px.
 
-When Tailwind CSS is available, use it as the default styling approach for UI implementation.
+## Native feel on mobile
 
-Follow the installed Tailwind CSS version’s official documentation and the repository’s Tailwind configuration.
+Application UIs, meaning signed-in or task-focused apps rather than content or marketing sites, must look and feel like native apps on phones and tablets:
 
-Use canonical Tailwind utility classes exactly as Tailwind defines them.
+- Never block zoom (WCAG 1.4.4). The viewport is `width=device-width, initial-scale=1, viewport-fit=cover`, without `maximum-scale`, `user-scalable=no`, or a pinch-blocking `touch-action` on `html` or `body`.
+- Focusing a field never zooms the page. iOS Safari zooms into focused fields whose text is smaller than 16px, an undocumented but long-standing threshold, so on touch devices keep inputs, selects, and editors at 16px or larger, for example with `text-base pointer-fine:text-sm` (4.1+), and check by focusing them in iOS Safari or its simulator.
+- Content never sits under notches, status bars, or the home indicator: pad fixed bars, sheets, and edge-to-edge sections with `max(<spacing>, env(safe-area-inset-*))` arbitrary values, since Tailwind has no safe-area utilities.
+- Full-height layouts fit the visible viewport: `h-dvh` for fixed app shells and `min-h-svh` for growing pages, never `h-screen` or `100vh`.
+- The on-screen keyboard never hides the focused field or its submit action, and bottom bars never ride above it. Prefer `interactive-widget=resizes-content` in the viewport for composer screens (Chromium Android 108+; Safari ignores it), and use `visualViewport` where Safari needs it.
+- On touch devices at any width, targets are at least 44 by 44 CSS pixels with space between neighbors. Set them with `pointer-coarse:` (4.1+), not a width breakpoint, so tablets get them too.
+- Nothing requires hover: controls revealed on hover stay visible without a hover-capable pointer and on `focus-within`. Tailwind's `hover:` already applies only under `(hover: hover)`; custom CSS must do the same.
+- Tappable elements show an `active:` pressed state, because preflight removes the tap highlight. App chrome, such as tab bars and buttons, uses `select-none` and `[-webkit-touch-callout:none]`; content people may copy never does.
+- Scrolling inside sheets, drawers, menus, and shell panels never chains to the page behind: put `overscroll-contain` on the overflowing container. Keep native pull-to-refresh unless the app provides its own.
+- On phones, 3 to 5 top-level destinations sit in a bottom tab bar within thumb reach and the rest in a drawer; dialogs and contextual actions open as bottom sheets or full-screen pages.
+- Never depend on browser chrome: Home Screen sites open standalone by default (Safari 26+), and `display-mode` reporting isn't Baseline. Screens below the top level have an in-app back control, errors offer a retry, the system back gesture closes the topmost sheet first (native `<dialog>` and popover close requests, `CloseWatcher` where supported, or a history entry), and Back restores the previous screen's scroll and state.
+- Prefer same-document View Transitions (`document.startViewTransition`, Baseline 2025) for screen changes, feature-detected and skipped under reduced motion.
+- New web applications are installable by default; jg-pwa holds the manifest, install, and service-worker rules.
 
-Do not invent Tailwind-like class names, design tokens, variants, colors, spacing values, or component classes unless they already exist in the project configuration, theme variables, design system, or documented UI conventions.
+## Focus management
 
-Prefer Tailwind utilities directly on styled HTML/JSX elements for layout, spacing, sizing, typography, color, borders, shadows, effects, transitions, responsiveness, dark mode, and state variants.
-
-Do not extract class lists into constants, arrays, objects, variables, or module-level maps merely to shorten/clean markup or hide long attributes. Extract only exact lists, maps, or variant definitions reused across elements/components, or styling already owned by a project abstraction such as shared variants, `cva`, or a design-system primitive. No one-use Tailwind constants.
-
-Keep one-off conditions on the styled element with the established inline composition helper; reserve reusable maps for repeated conditional variants.
-
-Prefer readable one-off markup; duplicated utilities are acceptable when not truly shared and extraction adds indirection without maintainability benefit.
-
-Prefer project theme utilities/tokens. Use arbitrary values only when intentional, uncommon, absent from the theme, and clearer than new CSS; repeated values must not substitute for reusable tokens.
-
-Use configured Tailwind responsive variants instead of custom media queries unless Tailwind cannot express the behavior cleanly. Unchanged defaults map `sm:`, `md:`, `lg:`, `xl:`, `2xl:` to `40rem`, `48rem`, `64rem`, `80rem`, `96rem`.
-
-Use Tailwind state and feature variants such as `hover:`, `focus-visible:`, `disabled:`, `aria-*`, `data-*`, and `dark:` when they match the required behavior.
-
-Do not dynamically construct classes Tailwind cannot statically detect; prefer explicit conditional class maps.
-
-Use the established composition helper, e.g. `cn`, `clsx`, `cva`, or `tailwind-merge`. Resolve possible conflicts with the established merge utility, not accidental class order.
-
-Use canonical class names from the installed Tailwind CSS version and configuration.
-
-Keep classes readable and intentional, grouping by purpose manually but leaving final ordering to the configured official Tailwind Prettier plugin:
-
-- Let the plugin sort classes and remove duplicate Tailwind classes and extra whitespace (0.6+), and don't reorder classes in ways that fight it.
-- On Tailwind CSS v4, the sort matches the project's theme and utilities only when the plugin's `tailwindStylesheet` option points at the CSS entry file (0.6.9+).
-- Class strings inside helpers such as `clsx` or `cva` are sorted only when the plugin's `tailwindFunctions` option lists those helpers.
-- The plugin must load last in Prettier's `plugins` list.
-- Don't add or configure the plugin for a targeted change unless the task includes formatting-tooling setup.
-
-Do not use `@apply` for ordinary components; allow it only for an established clear design-system pattern or meaningful deduplication that preserves visible structure.
-
-Do not create custom CSS for clear Tailwind-expressible styling. Use it only where Tailwind is insufficient, for browser fixes, complex animations, third-party overrides, or documented design-system primitives.
-
-Use available `tw-animate-css` utilities before custom CSS for eligible low-cost animations, especially fades and small fade-and-slide transitions. Keep them on the element unless exact reuse or established variant ownership justifies extraction.
-
-For React components, keep Tailwind styling in the dedicated component implementation file, not in the module entry file.
-
-Generated/modified UI must work in both themes and responsive layouts. Include needed `dark:`, responsive, and state variants for introduced colors, layout, focus, disabled, hover, active, selected, loading, error, success, or validation states.
-
-In Tailwind 4 projects:
-
-- Define design tokens with `@theme` in CSS rather than in a `tailwind.config.js`, unless the project already uses a JavaScript configuration.
-- Prefer `@utility` over `@layer components` with `@apply` for a reusable custom utility, and `@custom-variant` for project variants, such as a class-based `dark` variant.
-- Reference CSS variables with the `bg-(--token)` shorthand rather than `bg-[var(--token)]`.
-- Without `tw-animate-css`, prefer the `starting:` variant for CSS-only entry transitions of elements that appear, such as popovers and dialogs, over animating them from JavaScript.
-- Use container queries, `@container` with variants such as `@md:`, for components whose layout depends on the slot they sit in rather than on the viewport.
-- Prefer logical-direction utilities, such as `ps-*` and `ms-*`, over left and right ones when the layout should follow the text direction.
-- (4.3+) Style scrollbars with the `scrollbar-*` utilities instead of custom CSS.
-- Use the Tailwind 4 names, not the version 3 ones: `shadow-xs` and `rounded-xs` for version 3's `shadow-sm` and `rounded-sm`, `shadow-sm` and `rounded-sm` for its bare `shadow` and `rounded`, `outline-hidden` for its `outline-none`, and `bg-linear-to-r` for its `bg-gradient-to-r`.
-
-## CSS comments
-
-CSS follows the same commenting principles as the repository's other code.
-
-Use concise `/* ... */` comments for CSS because CSS does not support `//`.
-
-Prefer CSS comments for:
-
-- non-obvious layout decisions
-- browser-specific workarounds
-- accessibility constraints
-- design-system constraints
-- responsive behavior
-- light/dark theme behavior
-- intentional specificity, cascade, or inheritance decisions
-
-Do not comment every declaration or restate selectors/properties.
+- When an action removes, hides, or replaces the focused element, move focus to a logical target, such as the next item, the control that opened it, or the new view's heading. Never leave focus on `body`.
+- A scroll container with no focusable content gets `tabindex="0"` and a visible focus style and, when its content is meaningful, `role="region"` and an accessible name, so keyboard users can scroll it.

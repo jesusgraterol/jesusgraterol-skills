@@ -35,14 +35,14 @@ Implicit skills load on their own when a task touches their stack, such as a mig
 Run these from your repository's root:
 
 ```bash
-npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-command jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-node jg-bash jg-ci jg-zod jg-testing
+npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-command jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-pwa jg-seo jg-nestjs jg-postgres jg-redis jg-node jg-npm-package jg-monorepo jg-bash jg-docker jg-ci jg-zod jg-testing
 ```
 
 ```bash
-npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-command jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-nestjs jg-postgres jg-redis jg-node jg-bash jg-ci jg-zod jg-testing
+npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-command jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-pwa jg-seo jg-nestjs jg-postgres jg-redis jg-node jg-npm-package jg-monorepo jg-bash jg-docker jg-ci jg-zod jg-testing
 ```
 
-Both commands name the skills, so other skills in the project are left alone.
+Both commands name the skills, so other skills in the project are left alone. Update refreshes only the skills you already have, so rerun the install command to add skills released since you installed.
 
 ## Skills
 
@@ -59,26 +59,31 @@ Both commands name the skills, so other skills in the project are left alone.
 | `jg-pause`          | Stops at the nearest safe point, reports where things stand, and waits until you continue.    | Nothing.                                                                                                                    |
 | `jg-command`        | Turns a task into a few checked shell commands for your machine and explains each one.        | Nothing until you pick; then runs that command. Irreversible ones ask again; `sudo` ones are printed.                       |
 | `jg-review`         | Reviews the task's changes and how they follow its plan, or the branch against a target.      | No files. With a target branch, it may refresh that branch's remote-tracking ref.                                           |
-| `jg-push`           | Commits the current task's files with a signed-off, signed commit and pushes the branch.      | Stages and commits the task's files (or every change without a task) and pushes the current branch.                         |
+| `jg-push`           | Commits the current task's files, signed when signing is set up, and pushes the branch.       | Stages and commits the task's files (or every change without a task) and pushes the current branch.                         |
 | `jg-feedback`       | Assesses feedback independently and recommends what to adopt, reject, or adjust.              | Nothing.                                                                                                                    |
 | `jg-session`        | Finds a named Codex or Claude Code session and answers questions about it.                    | Nothing.                                                                                                                    |
 
 ### Implicit skills
 
-| Skill         | Loads when a task touches                                                                           | Written for                         |
-| ------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| `jg-frontend` | UI, styling, forms, accessibility, motion, or frontend tests.                                       | Tailwind CSS 4.3                    |
-| `jg-react`    | React components, hooks, state, data loading, or React tests.                                       | React 19.2, React Router 7          |
-| `jg-nestjs`   | NestJS modules, controllers, providers, configuration, logging, or NestJS tests.                    | NestJS 12                           |
-| `jg-postgres` | SQL, migrations, schema names, queries, or transactions.                                            | PostgreSQL 18, node-postgres 8      |
-| `jg-redis`    | Code that uses Redis, such as keys, caching, locks, rate limits, streams, or pub/sub.               | Redis 8, node-redis 5               |
-| `jg-node`     | Node.js developer scripts, CLIs, build tooling, or filesystem code.                                 | Node.js 24                          |
-| `jg-bash`     | Shell scripts, container entrypoints, Dockerfile `RUN` steps, CI `run:` steps, or Makefile recipes. | Bash 5.3, POSIX `sh`                |
-| `jg-ci`       | GitHub Actions workflows, reusable workflows, composite actions, or deployment pipelines.           | GitHub Actions (October 2026)       |
-| `jg-zod`      | Zod schemas, request or response validation, parsing untrusted data, or JSON Schema.                | Zod 4.6                             |
-| `jg-testing`  | Vitest or Playwright tests, test configuration, flaky tests, timeouts, or retries.                  | Vitest 4.1 and 5.0, Playwright 1.64 |
+| Skill            | Loads when a task touches                                                                                            | Written for                                                                                          |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `jg-frontend`    | UI, styling, forms, accessibility, mobile behavior, motion, single-page-app delivery, or frontend tests.             | Tailwind CSS 4.3, browser behavior as of October 2026                                                |
+| `jg-react`       | React components, hooks, state, data loading, routing, server rendering, client data caching, or React tests.        | React 19.2, React Router 7                                                                           |
+| `jg-pwa`         | Web app manifests, install prompts, service workers, offline caching, web push, or a new web application.            | The web platform as of October 2026, Playwright 1.64, `sw-builder` 1.2, `sw-service` 1.2             |
+| `jg-seo`         | A public site's metadata, canonical URLs, sitemap, robots rules, structured data, social previews, or llms.txt.      | Google Search Central guidance as of October 2026, Astro 7.4 with `@astrojs/sitemap` 3.7, Next.js 16 |
+| `jg-nestjs`      | NestJS modules, controllers, providers, configuration, logging, or NestJS tests.                                     | NestJS 12                                                                                            |
+| `jg-postgres`    | SQL, migrations, schema names, queries, transactions, or connection pools and timeouts.                              | PostgreSQL 18, node-postgres 8                                                                       |
+| `jg-redis`       | Code that uses Redis, such as keys, caching, locks, rate limits, streams, or pub/sub.                                | Redis 8, node-redis 5                                                                                |
+| `jg-node`        | Node.js developer scripts, CLIs, build tooling, or filesystem code.                                                  | Node.js 24                                                                                           |
+| `jg-npm-package` | A published package's manifest, build output, tests, release, or a UI component library shipped to npm.              | npm CLI 11 and 12, Node.js 22, 24, and 26, TypeScript 6.0, pnpm 11 workspaces, Tailwind CSS 4.3      |
+| `jg-monorepo`    | `turbo.json`, `pnpm-workspace.yaml`, workspace dependency ranges, or adding, moving, or removing workspace packages. | Turborepo 2.11, pnpm 12 (pnpm items also hold for pnpm 11)                                           |
+| `jg-bash`        | Shell scripts, container entrypoints, Dockerfile `RUN` steps, CI `run:` steps, or Makefile recipes.                  | Bash 5.3, POSIX `sh`                                                                                 |
+| `jg-docker`      | Compose files, Dockerfiles, image tags, or commands that recreate or remove containers, volumes, or their data.      | Docker Engine 29, Docker Compose 5.6, Dockerfile syntax 1.28                                         |
+| `jg-ci`          | GitHub Actions workflows, reusable workflows, composite actions, or deployment pipelines.                            | GitHub Actions (October 2026), npm 11 and 12, pnpm 10 and 11                                         |
+| `jg-zod`         | Zod schemas, request or response validation, parsing untrusted data, or JSON Schema.                                 | Zod 4.6                                                                                              |
+| `jg-testing`     | Vitest or Playwright tests, test configuration, flaky tests, timeouts, or retries.                                   | Vitest 4.1 and 5.0, Playwright 1.64                                                                  |
 
-Each implicit skill states the versions it was written for. Items that need a newer version are marked with it, and apply only when that version or a later one is installed. When an installed version is newer than the one a skill was written for, the agent follows that version's official guidance for the skill's version-specific items, reports any that look outdated, and offers to open an issue here.
+Each implicit skill states the versions it was written for and, for anything without an installed version, such as a hosted service or browser behavior, the month it was last reviewed. Items that need a newer version are marked with it, and apply only when that version or a later one is installed. When an installed version is newer than the one a skill was written for, or a review month is more than six months old, the agent checks the skill's version-specific items against the official guidance before relying on them and follows that guidance where an item differs. Skills don't list everything: where a skill says nothing, the agent follows the installed version's official guidance and may use its newer features in new code, after confirming them in the official documentation. When that documentation can't be reached, the agent keeps the skill's approach and says so. It reports any item that looks outdated and offers to open an issue here.
 
 ## A typical run
 
@@ -92,7 +97,7 @@ Use `jg-pause` at any point to stop the agent at a safe point and pick up later.
 
 ## Website
 
-The site in `website/` is a static Astro and Tailwind CSS project. It reads every `skills/*/SKILL.md` at build time, so the published names, descriptions, and instructions always match what gets installed.
+The site in `website/` is a static Astro and Tailwind CSS project. It reads every `skills/*/SKILL.md` and `skills/*/references/*.md` at build time, so the published names, descriptions, instructions, and reference files always match what gets installed.
 
 Requirements: Node.js `24.15` or newer within Node 24, and npm `11.12` or newer within npm 11. Run these from `website/`:
 
@@ -112,7 +117,7 @@ npm run dev
 | `npm run format`          | Format the website files.                                                                           |
 | `npm run assets:generate` | Regenerate the committed open-graph image from its HTML template.                                   |
 
-The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill's frontmatter flag or Codex policy doesn't match its kind in the catalog, when a skill's search title or description would be cut off in search results, when a skill's shared `## Invocation` or `## Application` section drifts from the other skills of its kind, when an implicit skill has no version line, or when a skill links to a section of a document or names another skill with a `/` or `$` prefix. The type check fails when a skill's icon is missing or doesn't match its kind. When you add, change, rename, or remove a skill, follow [`docs/skill-guidelines.md`](docs/skill-guidelines.md).
+The build fails when the site catalog in `website/src/site.config.ts` and the skill folders disagree, when a skill name differs from its directory, when a skill's frontmatter flag or Codex policy doesn't match its kind in the catalog, when a skill's search title or description would be cut off in search results, when a skill's shared `## Invocation` or `## Application` section drifts from the other skills of its kind, when the `## Task scope` copies in `jg-review` and `jg-push` differ, when an implicit skill has no version line, when a skill or reference file links to a section of a document or names another skill with a `/` or `$` prefix, when a skill names a reference file that doesn't exist or has one it never names, when a reference path isn't a kebab-case Markdown file directly in `references/` or that folder holds a nested or non-Markdown file, when a skill or reference file renders an element Markdown doesn't produce, a comment, an event handler, or a URL whose scheme isn't `http`, `https`, or `mailto`, when an explicit skill has reference files, when a reference names another reference, when a `SKILL.md` or reference file is larger than 20,480 bytes, when a built page links to a missing fragment, repeats an element ID, or holds an event handler or a URL with any other scheme, when `robots.txt` doesn't name the sitemap index, or when the 404 page names a canonical URL. The type check fails when a skill's icon is missing or doesn't match its kind. When you add, change, rename, or remove a skill, follow [`docs/skill-guidelines.md`](docs/skill-guidelines.md).
 
 ### Deployment
 
@@ -133,16 +138,17 @@ Until then, the deploy job fails, or the site is served under a path where its r
 ├── skills/
 │   └── jg-<name>/
 │       ├── SKILL.md         # frontmatter and the skill's instructions
-│       └── agents/
-│           └── openai.yaml  # Codex invocation policy
+│       ├── agents/
+│       │   └── openai.yaml  # Codex invocation policy
+│       └── references/      # implicit skills only: topic detail that SKILL.md says when to read
 ├── website/
-│   ├── public/              # favicon, Claude Code mark, robots.txt, and the generated open-graph image
+│   ├── public/              # favicon, Claude Code mark, and the generated open-graph image
 │   ├── scripts/             # open-graph generation and build-artifact verification
 │   ├── src/
 │   │   ├── components/      # focused Astro presentation modules
-│   │   ├── content/         # SKILL.md frontmatter schema
+│   │   ├── content/         # SKILL.md and reference file frontmatter schemas
 │   │   ├── layouts/         # shared metadata, navigation, theme, and footer shell
-│   │   ├── pages/           # home, one page per skill, 404, and llms.txt
+│   │   ├── pages/           # home, one page per skill, 404, llms.txt, and robots.txt
 │   │   ├── styles/          # Tailwind entry point and branded semantic tokens
 │   │   ├── utilities/       # skill catalog loading, SEO, theme, and llms.txt behavior
 │   │   └── site.config.ts   # site metadata, commands, and the skill catalog
@@ -152,12 +158,13 @@ Until then, the deploy job fails, or the site is served under a path where its r
 ```
 
 - Every skill directory name matches the `name` in its `SKILL.md` frontmatter.
+- An implicit skill may keep topics that only some tasks need in `references/<topic>.md`, one level deep. Its `SKILL.md` names each file as a code-formatted path, with when to read it, and the website renders the files below the skill's instructions. Explicit skills keep their whole workflow in `SKILL.md`. Every `SKILL.md` and reference file stays within 20,480 bytes, so it stays close to the 5,000 tokens Claude Code re-attaches after compaction.
 - Explicit skills are explicit-only in both agents: their frontmatter sets `disable-model-invocation: true`, and their `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`. Implicit skills omit the flag and set `policy.allow_implicit_invocation: true`. The site catalog's `kind` must match, or the build fails.
 - Every skill is self-contained and never links to sections of a specific `AGENTS.md`. Explicit skills share the rules in their `## Invocation` section. Implicit skills share their `## Application` section, which sets how their rules rank against the repository's coding instructions and conventions. Skills refer to each other by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix. Every skill works on its own: a mention of another skill is only a pointer, and the one runtime dependency is `jg-execute auto`, which reads the `jg-review` and `jg-push` `SKILL.md` files from the neighboring folders.
 - Creating, writing, checking, maintaining, renaming, and removing a skill follow [`docs/skill-guidelines.md`](docs/skill-guidelines.md), which lists every place to update.
 - Website links show where they lead: `ArrowDown` for a section on the same page, `ArrowRight` (or `ArrowLeft` going back) for another page on the site, and the `external-link` component, which adds a screen-reader note plus an inline new-tab icon, or an up-right arrow in the corner when the link covers a whole card, for other sites.
 - The website shares its design tokens, Ubuntu Sans typography, and tooling with Agentic Coding and jesusgraterol.dev. [`docs/asset-attribution.md`](docs/asset-attribution.md) records where its brand marks come from.
-- Local coding instructions (`AGENTS.md`, `CANDIDATE.md`) and `coding-agent-planning/` are git-ignored and never published.
+- Local coding instructions (`AGENTS.md`, `CLAUDE.md`, `CANDIDATE.md`) and `coding-agent-planning/` are git-ignored and never published.
 - `/docs` is reserved for concise, quickly scannable documentation of essential, durable project concepts and processes. API and HTTP endpoint documentation, if the project ever needs it, belongs outside `/docs`.
 
 ## Credits
