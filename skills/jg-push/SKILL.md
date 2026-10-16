@@ -18,7 +18,7 @@ This skill's own rules about supplied material take precedence over this section
 
 ## Task scope
 
-- The task's files are the files created, modified, renamed, or deleted for the current task in this conversation, counting both paths of a rename, plus any files the developer names or confirms.
+- The task's files are the files created, modified, renamed, or deleted for the current task in this conversation, counting both paths of a rename, plus any files the developer names or confirms. Planning files under `coding-agent-planning/`, such as `plan.md` and `milestones.md`, count only when the developer names or confirms them.
 - Only paths Git reports as changed count. Ignored files, such as build and test output, and files with no net change against `HEAD`, such as scratch files created and then removed, are left out.
 - Without a task in this conversation, the scope is the complete uncommitted change.
 - If the task's files can't be established confidently, for example after context compaction, list the likely paths and ask the developer to confirm them before going further.
