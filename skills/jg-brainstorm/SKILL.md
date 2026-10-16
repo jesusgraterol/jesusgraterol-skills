@@ -1,6 +1,6 @@
 ---
 name: jg-brainstorm
-description: Think an idea through before planning, with options, tradeoffs, and a recommended direction. Read-only.
+description: Think an idea through before planning, with options, tradeoffs, and a recommended direction.
 argument-hint: '[idea or question]'
 disable-model-invocation: true
 ---
@@ -23,7 +23,7 @@ Think through the idea supplied with this invocation, or the one under discussio
 
 This skill is read-only. Do not edit files, create planning files or prototypes, install dependencies, generate artifacts, or change Git or external state. Agreement such as "sounds good" or "yes" is not approval to implement.
 
-When the idea concerns a repository, read the root `README.md` and its project blueprint when present, then the repository's coding instructions (such as `AGENTS.md` or `CLAUDE.md`), then only the files needed to judge the idea. When the codebase is unavailable, say so and keep the advice general.
+When the idea concerns a repository, read the root `README.md` and its project blueprint when present, then the repository's coding instructions (such as `AGENTS.md` or `CLAUDE.md`) and the implicit jg skills that apply to the idea, then only the files needed to judge it. When the codebase is unavailable, say so and keep the advice general.
 
 Reply conversationally and in proportion to the question; a simple follow-up gets a simple answer.
 

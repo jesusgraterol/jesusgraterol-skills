@@ -28,6 +28,9 @@ describe('buildLlmsText', () => {
     );
     expect(text.indexOf('/skills/jg-plan/')).toBeLessThan(text.indexOf('/skills/jg-[review]/'));
     expect(text).toMatch(/\n## Optional\n/u);
+    expect(text).toContain(
+      '- [Start an AGENTS.md](https://agenticcoding.jesusgraterol.dev/start/): A neutral AGENTS.md foundation for repositories without coding instructions.\n- [Refine an AGENTS.md](https://agenticcoding.jesusgraterol.dev/refine/): A prompt that refines existing coding instructions without losing project knowledge.\n',
+    );
     expect(text.endsWith('\n')).toBe(true);
   });
 

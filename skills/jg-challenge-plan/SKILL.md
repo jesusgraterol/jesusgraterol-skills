@@ -1,6 +1,6 @@
 ---
 name: jg-challenge-plan
-description: Challenge a plan before approval and surface material risks, gaps, and decisions. Read-only.
+description: Challenge a plan before approval and surface material risks, gaps, and decisions.
 argument-hint: '[plan-path]'
 disable-model-invocation: true
 ---

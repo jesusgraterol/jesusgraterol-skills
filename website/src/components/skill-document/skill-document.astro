@@ -8,6 +8,7 @@ import {
   type ISkill,
 } from '../../utilities/skill-catalog/index.ts';
 import ExternalLink from '../external-link/external-link.astro';
+import SkillIcon from '../skill-icon/skill-icon.astro';
 import TerminalWindow from '../terminal-window/terminal-window.astro';
 
 interface Props {
@@ -19,21 +20,35 @@ interface Props {
 
 const { next, previous, skill } = Astro.props;
 const { Content } = await render(skill.entry);
-const hasCases = skill.examples.length > 1;
-const examples = skill.examples.map((example, index) => {
-  // the skill name, highlighted, and any text supplied with it
-  const [name = skill.name, ...words] = example.invocation.split(' ');
-  const label = 'label' in example ? example.label : undefined;
+const isImplicit = skill.kind === 'implicit';
+const hasCases = !isImplicit && skill.examples.length > 1;
+// implicit skills open with their summary, because their description is a trigger list for agents
+const lede = skill.kind === 'implicit' ? skill.summary : skill.description;
+// explicit examples highlight the invoked skill name; implicit examples are plain requests
+const examples =
+  skill.kind === 'explicit'
+    ? skill.examples.map((example, index) => {
+        // the skill name, highlighted, and any text supplied with it
+        const [name = skill.name, ...words] = example.invocation.split(' ');
+        const label = 'label' in example ? example.label : undefined;
 
-  return {
-    copyContext: label ? `${label.toLowerCase()} invocation` : 'invocation',
-    id: `${skill.name}-invocation-${index + 1}`,
-    name,
-    outcome: example.outcome,
-    text: words.length > 0 ? ` ${words.join(' ')}` : '',
-    title: label ?? 'Example',
-  };
-});
+        return {
+          copyContext: label ? `${label.toLowerCase()} invocation` : 'invocation',
+          id: `${skill.name}-invocation-${index + 1}`,
+          name,
+          outcome: example.outcome,
+          text: words.length > 0 ? ` ${words.join(' ')}` : '',
+          title: label ?? 'Example',
+        };
+      })
+    : skill.examples.map((example, index) => ({
+        copyContext: 'request',
+        id: `${skill.name}-request-${index + 1}`,
+        name: undefined,
+        outcome: example.outcome,
+        text: example.request,
+        title: 'Example',
+      }));
 ---
 
 <article class="prose-shell py-12 sm:py-16">
@@ -61,25 +76,48 @@ const examples = skill.examples.map((example, index) => {
   </nav>
 
   <header class="mt-10">
-    <p class="eyebrow">{SKILL_STAGES[skill.stage].label}</p>
+    <SkillIcon
+      icon={skill.icon}
+      size="header"
+    />
+    <p class="eyebrow mt-6">{SKILL_STAGES[skill.stage].label}</p>
     <h1 class="mt-4 font-mono text-4xl font-bold tracking-tight wrap-anywhere sm:text-5xl">
       {skill.name}
     </h1>
-    <p class="lede mt-5">{skill.description}</p>
+    <p
+      class="lede mt-5"
+      data-skill-lede
+    >
+      {lede}
+    </p>
     <dl class="mt-6 flex flex-wrap gap-x-8 gap-y-3 text-sm">
-      <div>
-        <dt class="font-mono text-xs font-bold text-muted uppercase">May change</dt>
-        <dd class="mt-1 font-semibold">{SKILL_ACCESS_LABELS[skill.access]}</dd>
-      </div>
+      {
+        skill.kind === 'explicit' && (
+          <div>
+            <dt class="font-mono text-xs font-bold text-muted uppercase">May change</dt>
+            <dd class="mt-1 font-semibold">{SKILL_ACCESS_LABELS[skill.access]}</dd>
+          </div>
+        )
+      }
       <div>
         <dt class="font-mono text-xs font-bold text-muted uppercase">Usage</dt>
-        <dd class="mt-1">
-          <code
-            class="font-mono font-semibold"
-            data-skill-usage
-            >{`/${skill.name}${skill.argumentHint ? ` ${skill.argumentHint}` : ''}`}</code
-          >
-        </dd>
+        {
+          isImplicit ? (
+            <dd
+              class="mt-1 font-semibold"
+              data-skill-usage
+            >
+              Loads automatically
+            </dd>
+          ) : (
+            <dd class="mt-1">
+              <code
+                class="font-mono font-semibold"
+                data-skill-usage
+              >{`/${skill.name}${skill.argumentHint ? ` ${skill.argumentHint}` : ''}`}</code>
+            </dd>
+          )
+        }
       </div>
     </dl>
   </header>
@@ -110,10 +148,14 @@ const examples = skill.examples.map((example, index) => {
       id="example-heading"
       class="text-2xl font-semibold tracking-tight"
     >
-      {hasCases ? 'Examples' : 'Example'}
+      {isImplicit ? 'When it loads' : hasCases ? 'Examples' : 'Example'}
     </h2>
     <p class="mt-2 text-sm leading-6 text-muted">
-      Invoke the skill by name in your coding agent, followed by any text it should consider.
+      {
+        isImplicit
+          ? 'Your agent loads the skill on its own when a request like this touches its area.'
+          : 'Invoke the skill by name in your coding agent, followed by any text it should consider.'
+      }
       {hasCases && ' Each example shows one supported case.'}
     </p>
     <div class="mt-5 grid gap-4">
@@ -130,14 +172,24 @@ const examples = skill.examples.map((example, index) => {
               >
                 {'>'}
               </span>
-              <code
-                class="min-w-0 wrap-anywhere"
-                id={example.id}
-                data-skill-invocation
-              >
-                <span class="font-bold text-accent-on-primary">{`/${example.name}`}</span>
-                {example.text}
-              </code>
+              {example.name === undefined ? (
+                <code
+                  class="min-w-0 wrap-anywhere"
+                  id={example.id}
+                  data-skill-request
+                >
+                  {example.text}
+                </code>
+              ) : (
+                <code
+                  class="min-w-0 wrap-anywhere"
+                  id={example.id}
+                  data-skill-invocation
+                >
+                  <span class="font-bold text-accent-on-primary">{`/${example.name}`}</span>
+                  {example.text}
+                </code>
+              )}
             </p>
             <p class="mt-3 flex gap-3 text-primary-foreground/70">
               <span
@@ -169,7 +221,11 @@ const examples = skill.examples.map((example, index) => {
       What the agent reads
     </p>
     <p class="mt-2 text-sm leading-6 text-muted">
-      The complete instructions your agent loads when you invoke {skill.name}.
+      {
+        isImplicit
+          ? 'The complete instructions your agent loads when a task touches its area.'
+          : `The complete instructions your agent loads when you invoke ${skill.name}.`
+      }
     </p>
     <div
       class="article-content mt-6 rounded-xl border border-border bg-surface px-5 py-6 text-base shadow-surface sm:px-8 sm:py-8 [&_h2]:mt-10 [&_h2]:pt-6 [&_h2]:text-xl [&_h2:first-child]:mt-0 [&_h2:first-child]:border-t-0 [&_h2:first-child]:pt-0"

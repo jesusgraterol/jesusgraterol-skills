@@ -1,0 +1,101 @@
+---
+import {
+  Bug,
+  CirclePause,
+  Database,
+  FileTerminal,
+  FlaskConical,
+  Hammer,
+  Lightbulb,
+  ListOrdered,
+  Map as MapIcon,
+  MessagesSquare,
+  Scale,
+  SearchCheck,
+  ShieldQuestionMark,
+  Terminal,
+  Upload,
+  Workflow,
+} from '@lucide/astro';
+
+import type {
+  ISkillBrandMark,
+  ISkillIcon,
+  ISkillLucideIcon,
+} from '../../utilities/skill-catalog/index.ts';
+
+import { SKILL_BRAND_MARK_PATHS } from './constants.ts';
+
+interface Props {
+  icon: ISkillIcon;
+  // `card` leads a skill card's top row; `header` opens a skill page
+  size: 'card' | 'header';
+}
+
+// the Lucide component behind each Lucide icon key
+const LUCIDE_ICONS = {
+  bug: Bug,
+  'circle-pause': CirclePause,
+  database: Database,
+  'file-terminal': FileTerminal,
+  'flask-conical': FlaskConical,
+  hammer: Hammer,
+  lightbulb: Lightbulb,
+  'list-ordered': ListOrdered,
+  map: MapIcon,
+  'messages-square': MessagesSquare,
+  scale: Scale,
+  'search-check': SearchCheck,
+  'shield-question-mark': ShieldQuestionMark,
+  terminal: Terminal,
+  upload: Upload,
+  workflow: Workflow,
+} as const satisfies Record<ISkillLucideIcon, typeof Bug>;
+
+// tile classes and the glyph size inside it, shared by Lucide icons and technology marks
+const SIZES = {
+  card: { glyph: 'size-5', pixels: 20, tile: 'size-10 rounded-lg' },
+  header: { glyph: 'size-7', pixels: 28, tile: 'size-14 rounded-xl' },
+} as const;
+
+/** Narrows an icon key to a technology mark. */
+const isBrandMark = (icon: ISkillIcon): icon is ISkillBrandMark =>
+  Object.hasOwn(SKILL_BRAND_MARK_PATHS, icon);
+
+const { icon, size } = Astro.props;
+const sizing = SIZES[size];
+// what draws the icon: a technology mark's path data, or a Lucide component
+const glyph = isBrandMark(icon)
+  ? ({ kind: 'brand', path: SKILL_BRAND_MARK_PATHS[icon] } as const)
+  : ({ kind: 'lucide', Component: LUCIDE_ICONS[icon] } as const);
+---
+
+{/* decorative: the skill's name is always shown with the tile */}
+<span
+  class:list={[
+    'inline-flex shrink-0 items-center justify-center bg-primary text-primary-foreground',
+    sizing.tile,
+  ]}
+  aria-hidden="true"
+  data-skill-icon={icon}
+>
+  {
+    glyph.kind === 'lucide' ? (
+      <glyph.Component
+        class={sizing.glyph}
+        size={sizing.pixels}
+      />
+    ) : (
+      <svg
+        class={sizing.glyph}
+        viewBox="0 0 24 24"
+        width={sizing.pixels}
+        height={sizing.pixels}
+        fill="currentColor"
+        data-skill-brand-mark={icon}
+      >
+        <path d={glyph.path} />
+      </svg>
+    )
+  }
+</span>

@@ -9,15 +9,16 @@ on:
 
 concurrency:
   group: pages-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 jobs:
   verify:
     name: Verify production site
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    permissions:
-      contents: read
     defaults:
       run:
         working-directory: website
@@ -42,16 +43,17 @@ jobs:
         run: npm run check
 
       - name: Upload production artifact
-        if: github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v5
         with:
           path: website/dist
 
   deploy:
     name: Deploy GitHub Pages
-    if: github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main'
     needs: verify
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       id-token: write
       pages: write

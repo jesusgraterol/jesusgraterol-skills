@@ -5,7 +5,13 @@ import { SKILL_CATALOG } from '../site.config.ts';
 
 const SKILL_ROUTES = Object.keys(SKILL_CATALOG).map((name) => `/skills/${name}/`);
 const PUBLIC_ROUTES = ['/', ...SKILL_ROUTES] as const;
-const ACCESSIBILITY_ROUTES = ['/', '/skills/jg-plan/', '/skills/jg-push/', '/404.html'] as const;
+const ACCESSIBILITY_ROUTES = [
+  '/',
+  '/skills/jg-plan/',
+  '/skills/jg-push/',
+  '/skills/jg-postgres/',
+  '/404.html',
+] as const;
 
 test.describe('production website', () => {
   for (const route of PUBLIC_ROUTES) {
@@ -113,7 +119,7 @@ test.describe('production website', () => {
   test('home page lists every skill grouped by stage and links to its page', async ({ page }) => {
     await page.goto('/');
 
-    for (const stage of ['Plan', 'Build', 'Ship', 'Context']) {
+    for (const stage of ['Plan', 'Build', 'Ship', 'Context', 'Implicit']) {
       await expect(
         page.locator('#skills').getByRole('heading', { level: 3, name: stage }),
       ).toBeVisible();
@@ -124,6 +130,19 @@ test.describe('production website', () => {
         'href',
         `/skills/${name}/`,
       );
+    }
+
+    // implicit skills show how they load where explicit skills show what they may change, and a
+    // short summary instead of their agent-facing description
+    for (const [name, catalogEntry] of Object.entries(SKILL_CATALOG)) {
+      if (catalogEntry.kind === 'implicit') {
+        const card = page
+          .locator('[data-skill-card]')
+          .filter({ has: page.getByRole('link', { name, exact: true }) });
+
+        await expect(card).toContainText('Loads on its own');
+        await expect(card.locator('[data-skill-summary]')).toHaveText(catalogEntry.summary);
+      }
     }
   });
 

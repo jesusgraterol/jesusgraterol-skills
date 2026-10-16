@@ -18,6 +18,8 @@ export const SKILL_CATALOG = {
           'Weighs the options against your codebase, recommends a direction, and lists what is still open.',
       },
     ],
+    icon: 'lightbulb',
+    kind: 'explicit',
     order: 1,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that weighs options against your codebase and recommends a direction before you plan.',
@@ -35,6 +37,8 @@ export const SKILL_CATALOG = {
           'Asks about any decision that is yours to make, turns the change you discussed into an implementation-ready plan under coding-agent-planning/, and stops for your approval.',
       },
     ],
+    icon: 'map',
+    kind: 'explicit',
     order: 2,
     searchDescription:
       'An explicit-only agent skill that turns the change you discussed with Claude Code or Codex into an implementation-ready plan you approve.',
@@ -59,6 +63,8 @@ export const SKILL_CATALOG = {
           'Challenges the plan at that path instead of the one in this conversation, with the same verdict, corrections, and decisions.',
       },
     ],
+    icon: 'shield-question-mark',
+    kind: 'explicit',
     order: 3,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that challenges a plan before approval and surfaces material risks, gaps, and decisions.',
@@ -83,6 +89,8 @@ export const SKILL_CATALOG = {
           'Splits the plan at that path instead of the one in this conversation, writing milestones.md beside it.',
       },
     ],
+    icon: 'list-ordered',
+    kind: 'explicit',
     order: 4,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that splits a plan into ordered milestones you can build and review one at a time.',
@@ -100,7 +108,7 @@ export const SKILL_CATALOG = {
           'Builds the next unfinished milestone of the current plan, runs its checks, and stops so you can review and push it.',
       },
       {
-        invocation: 'jg-execute autonomous',
+        invocation: 'jg-execute auto',
         label: 'Autonomous',
         outcome:
           'Builds each remaining milestone, reviews it until clean, and pushes it before starting the next.',
@@ -118,19 +126,21 @@ export const SKILL_CATALOG = {
           'Builds only milestone 2, runs its checks, and stops so you can review and push it.',
       },
       {
-        invocation: `jg-execute autonomous ${EXAMPLE_PLAN_PATH} milestone 3`,
+        invocation: `jg-execute auto ${EXAMPLE_PLAN_PATH} milestone 3`,
         label: 'All options',
         outcome:
           'Builds milestone 3 of the plan at that path, reviews it until clean, pushes it, and stops.',
       },
     ],
+    icon: 'hammer',
+    kind: 'explicit',
     order: 5,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that builds a plan's milestones, supervised by default or autonomously with review and push.",
     searchTitle: 'jg-execute: Build plans supervised or autonomously',
     stage: 'build',
     whenToUse:
-      'Use it once a plan is approved: on its own to build the next milestone and stop, or with autonomous to build, review, and push every remaining milestone.',
+      'Use it once a plan is approved: on its own to build the next milestone and stop, or with auto to build, review, and push every remaining milestone.',
   },
   'jg-debug': {
     access: 'changes-code',
@@ -141,6 +151,8 @@ export const SKILL_CATALOG = {
           'Reproduces the bug, narrows it to one cause, and fixes it with a regression test that failed first.',
       },
     ],
+    icon: 'bug',
+    kind: 'explicit',
     order: 6,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that reproduces a bug, finds its cause, and fixes it with a test that fails first.',
@@ -157,6 +169,8 @@ export const SKILL_CATALOG = {
           'Stops at the next safe point, lists what is done and what is half-finished, and waits until you say continue.',
       },
     ],
+    icon: 'circle-pause',
+    kind: 'explicit',
     order: 7,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that stops the agent at the nearest safe point, reports where things stand, and waits.',
@@ -164,6 +178,24 @@ export const SKILL_CATALOG = {
     stage: 'build',
     whenToUse:
       'Use it when you need to step away or check something mid-task without leaving half-changed files unexplained.',
+  },
+  'jg-command': {
+    access: 'runs-picked-command',
+    examples: [
+      {
+        invocation: 'jg-command find every file over 100 MB here, skipping .git',
+        outcome:
+          'Detects your system and shell, offers a few checked commands with what each does and how risky it is, and runs the one you pick.',
+      },
+    ],
+    icon: 'terminal',
+    kind: 'explicit',
+    order: 8,
+    searchDescription:
+      'An explicit-only agent skill for Claude Code and Codex that turns a plain-language task into checked shell commands you pick from and run.',
+    searchTitle: 'jg-command: Turn a task into shell commands you pick',
+    stage: 'build',
+    whenToUse: 'Use it when you know what you want done in the terminal but not the exact command.',
   },
   'jg-review': {
     access: 'read-only',
@@ -181,7 +213,9 @@ export const SKILL_CATALOG = {
           'Reviews everything the current branch would merge into main and answers Ready to merge into main, Not ready, or Review incomplete.',
       },
     ],
-    order: 8,
+    icon: 'search-check',
+    kind: 'explicit',
+    order: 9,
     searchDescription:
       "An explicit-only agent skill for Claude Code and Codex that reviews a task's changes against its plan, or a branch, and issues a readiness verdict.",
     searchTitle: 'jg-review: Code review for Claude Code and Codex',
@@ -195,16 +229,18 @@ export const SKILL_CATALOG = {
       {
         invocation: 'jg-push',
         outcome:
-          "Commits only this task's files with a signed-off, signed commit and pushes the current branch.",
+          "Commits this task's files, or every change when there is no task, with a signed-off, signed commit and pushes the current branch.",
       },
     ],
-    order: 9,
+    icon: 'upload',
+    kind: 'explicit',
+    order: 10,
     searchDescription:
-      "An explicit-only agent skill for Claude Code and Codex that commits only the current task's files with a signed-off, signed commit and pushes.",
+      "An explicit-only agent skill for Claude Code and Codex that commits the current task's files, or every change without a task, in a signed commit and pushes.",
     searchTitle: 'jg-push: Signed commits and pushes for coding agents',
     stage: 'ship',
     whenToUse:
-      'Use it when a reviewed change is ready to publish, even while other agents work in the same checkout.',
+      "Use it when a reviewed change is ready to publish. In a checkout shared with other agents, run it in the session that made the change, so it commits only that task's files.",
   },
   'jg-feedback': {
     access: 'read-only',
@@ -215,7 +251,9 @@ export const SKILL_CATALOG = {
           'Checks each claim against the code and recommends what to adopt, reject, or adjust.',
       },
     ],
-    order: 10,
+    icon: 'scale',
+    kind: 'explicit',
+    order: 11,
     searchDescription:
       'An explicit-only agent skill for Claude Code and Codex that checks feedback against the evidence and recommends what to adopt, reject, or adjust.',
     searchTitle: 'jg-feedback: Assess review feedback with evidence',
@@ -232,12 +270,212 @@ export const SKILL_CATALOG = {
           'Finds the named Codex or Claude Code session and answers from its latest decisions.',
       },
     ],
-    order: 11,
+    icon: 'messages-square',
+    kind: 'explicit',
+    order: 12,
     searchDescription:
       'An explicit-only agent skill that finds a named Claude Code or Codex session and answers questions from its latest decisions and state.',
     searchTitle: 'jg-session: Read past Claude Code and Codex sessions',
     stage: 'context',
     whenToUse: 'Use it when you need what another session decided without rereading it yourself.',
+  },
+  'jg-frontend': {
+    examples: [
+      {
+        outcome:
+          "Reuses the UI package's components, works from 320 pixels up in both themes, and keeps the form usable by keyboard and screen reader.",
+        request: 'Build a settings page with a profile form and a theme switcher.',
+      },
+    ],
+    icon: 'tailwindcss',
+    kind: 'implicit',
+    order: 13,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps UI work accessible, responsive, themed, and on your design system whenever a task touches it.',
+    searchTitle: 'jg-frontend: Frontend standards for coding agents',
+    stage: 'implicit',
+    summary:
+      'Accessibility, responsive layout, themes, forms, motion, and design-system reuse for Tailwind CSS.',
+    whenToUse:
+      'It loads on its own when a task touches UI, styling, forms, or frontend tests. Call it by name to load it before such a task.',
+  },
+  'jg-react': {
+    examples: [
+      {
+        outcome:
+          'Loads the data through the route or query layer, keeps renders cheap, and tests the table the way a user would use it.',
+        request: 'Add a filterable orders table to the dashboard.',
+      },
+    ],
+    icon: 'react',
+    kind: 'implicit',
+    order: 14,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that applies React 19 APIs, render-performance rules, and testing standards whenever a task touches React.',
+    searchTitle: 'jg-react: React standards for coding agents',
+    stage: 'implicit',
+    summary:
+      'Component organization, render performance, React 19 APIs, and user-focused tests for React.',
+    whenToUse:
+      'It loads on its own when a task touches React components, hooks, state, or tests. Call it by name to load it before such a task.',
+  },
+  'jg-nestjs': {
+    examples: [
+      {
+        outcome:
+          'Validates the ID with a schema, keeps the controller thin, logs through the Nest logger, and tests the module through dependency injection.',
+        request: 'Add an endpoint that archives a project by its ID.',
+      },
+    ],
+    icon: 'nestjs',
+    kind: 'implicit',
+    order: 15,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that applies NestJS module, validation, logging, lifecycle, and test standards whenever a task touches Nest.',
+    searchTitle: 'jg-nestjs: NestJS standards for coding agents',
+    stage: 'implicit',
+    summary: 'Modules, schema validation, configuration, logging, lifecycle, and tests for NestJS.',
+    whenToUse:
+      'It loads on its own when a task touches NestJS modules, controllers, providers, or tests. Call it by name to load it before such a task.',
+  },
+  'jg-postgres': {
+    examples: [
+      {
+        outcome:
+          'Names the new index by the convention, creates it concurrently through the documented migration workflow, and reports the migration it added.',
+        request: 'Add a migration that indexes orders by customer and creation date.',
+      },
+    ],
+    icon: 'database',
+    kind: 'implicit',
+    order: 16,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that applies PostgreSQL naming, constraint, query, and migration standards whenever a task touches SQL.',
+    searchTitle: 'jg-postgres: PostgreSQL standards for coding agents',
+    stage: 'implicit',
+    summary:
+      'Naming, constraints, queries, transactions, indexes, and safe migrations for PostgreSQL.',
+    whenToUse:
+      'It loads on its own when a task touches PostgreSQL schemas, queries, or migrations. Call it by name to load it before such a task.',
+  },
+  'jg-redis': {
+    examples: [
+      {
+        outcome:
+          'Names the key by the convention, sets its expiry in the same write, and keeps the database as the source of truth.',
+        request: "Cache each user's dashboard summary in Redis for five minutes.",
+      },
+    ],
+    icon: 'redis',
+    kind: 'implicit',
+    order: 17,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that applies Redis key, expiry, scanning, and locking standards whenever a task touches Redis.',
+    searchTitle: 'jg-redis: Redis standards for coding agents',
+    stage: 'implicit',
+    summary: 'Key names, expiry, scanning, round trips, data structures, and locks for Redis.',
+    whenToUse:
+      'It loads on its own when a task touches code that uses Redis, such as its keys, caching, locks, or queues. Call it by name to load it before such a task.',
+  },
+  'jg-node': {
+    examples: [
+      {
+        outcome:
+          "Resolves every path from the script's own root, keeps each write inside the output folder, and runs the same way on Windows, macOS, and Linux.",
+        request:
+          'Write a script that copies the generated assets into dist and removes the old build.',
+      },
+    ],
+    icon: 'nodedotjs',
+    kind: 'implicit',
+    order: 18,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps Node.js scripts, CLIs, and filesystem code portable and safe on Windows, macOS, and Linux.',
+    searchTitle: 'jg-node: Portable Node.js scripts for coding agents',
+    stage: 'implicit',
+    summary:
+      'Cross-platform paths, safe filesystem access, processes, and CLIs for Node.js scripts.',
+    whenToUse:
+      'It loads on its own when a task touches Node.js scripts, CLIs, build tooling, or filesystem code. Call it by name to load it before such a task.',
+  },
+  'jg-bash': {
+    examples: [
+      {
+        outcome:
+          "Writes it in POSIX sh so it runs without bash, quotes every variable, fails with clear messages, and execs the app so it gets the container's stop signals.",
+        request:
+          'Write an entrypoint script for the Docker image that waits for Postgres, then starts the app.',
+      },
+    ],
+    icon: 'file-terminal',
+    kind: 'implicit',
+    order: 19,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps bash and sh scripts on Linux safe, consistent, and checked whenever a task touches shell.',
+    searchTitle: 'jg-bash: Bash script standards for coding agents',
+    stage: 'implicit',
+    summary:
+      'Shell choice, script structure, quoting, safety, and verification for bash and sh on Linux.',
+    whenToUse:
+      'It loads on its own when a task touches shell scripts, Dockerfile RUN steps, or CI run steps. Call it by name to load it before such a task.',
+  },
+  'jg-ci': {
+    examples: [
+      {
+        outcome:
+          'Grants read-only permissions, cancels superseded runs, caches dependencies by the lockfile, sets a timeout on every job, and pins any third-party action to a commit SHA.',
+        request: 'Add a GitHub Actions workflow that runs the tests on every pull request.',
+      },
+    ],
+    icon: 'workflow',
+    kind: 'implicit',
+    order: 20,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps GitHub Actions workflows fast, secure, and reusable whenever a task touches CI.',
+    searchTitle: 'jg-ci: GitHub Actions standards for coding agents',
+    stage: 'implicit',
+    summary:
+      'Lean required gates, permissions, timeouts, caching, concurrency, and action pinning for GitHub Actions.',
+    whenToUse:
+      'It loads on its own when a task touches GitHub Actions workflows, including CI and deployment pipelines. Call it by name to load it before such a task.',
+  },
+  'jg-zod': {
+    examples: [
+      {
+        outcome:
+          'Uses a strict object schema with Zod 4 formats, derives the type from it, and returns field errors with z.flattenError.',
+        request: 'Validate the signup request body and return field errors the form can show.',
+      },
+    ],
+    icon: 'zod',
+    kind: 'implicit',
+    order: 21,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that applies Zod 4 schema, strictness, and error standards whenever a task validates data.',
+    searchTitle: 'jg-zod: Zod 4 validation standards for coding agents',
+    stage: 'implicit',
+    summary: 'Strictness, metadata, error handling, formats, and composition for Zod 4 schemas.',
+    whenToUse:
+      'It loads on its own when a task validates data with Zod schemas. Call it by name to load it before such a task.',
+  },
+  'jg-testing': {
+    examples: [
+      {
+        outcome:
+          'Finds elements by role, waits on assertions instead of sleeps, fixes the clock, and runs the new test three times before calling it done.',
+        request: 'Add an end-to-end test for the checkout flow.',
+      },
+    ],
+    icon: 'flask-conical',
+    kind: 'implicit',
+    order: 22,
+    searchDescription:
+      'An implicit agent skill for Claude Code and Codex that keeps Vitest and Playwright tests deterministic and fast whenever a task touches tests.',
+    searchTitle: 'jg-testing: Vitest and Playwright standards for agents',
+    stage: 'implicit',
+    summary: 'Deterministic waits, timeouts, retries, and repeat runs for Vitest and Playwright.',
+    whenToUse:
+      'It loads on its own when a task touches Vitest or Playwright tests. Call it by name to load it before such a task.',
   },
 } as const satisfies Record<string, ISkillCatalogEntry>;
 
@@ -246,6 +484,10 @@ const SKILL_NAMES = Object.keys(SKILL_CATALOG);
 
 // canonical metadata, navigation, and commands for every generated page
 export const SITE_CONFIG = {
+  // Agentic Coding's prompt for refining an existing AGENTS.md
+  agenticCodingRefineUrl: 'https://agenticcoding.jesusgraterol.dev/refine/',
+  // Agentic Coding's neutral AGENTS.md foundation for repositories that have none
+  agenticCodingStartUrl: 'https://agenticcoding.jesusgraterol.dev/start/',
   agenticCodingUrl: 'https://agenticcoding.jesusgraterol.dev/',
   author: {
     name: 'Jesus Graterol',

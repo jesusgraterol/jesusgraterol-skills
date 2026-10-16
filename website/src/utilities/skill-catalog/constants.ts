@@ -1,15 +1,36 @@
-import type { ISkillAccess, ISkillStage } from './types.ts';
+import type { ISkillAccess, ISkillKind, ISkillStage } from './types.ts';
 
-// exact Codex policy every skill ships so it is never invoked implicitly
+// exact Codex policy an explicit skill ships so it is never invoked implicitly
 export const EXPLICIT_ONLY_OPENAI_POLICY = 'policy:\n  allow_implicit_invocation: false\n';
+
+// exact Codex policy an implicit skill ships so the agent may load it on its own
+export const IMPLICIT_OPENAI_POLICY = 'policy:\n  allow_implicit_invocation: true\n';
 
 // stable messages for skill contract violations that must fail the build
 export const SKILL_CATALOG_ERROR_MESSAGES = {
   CatalogMismatch: 'Skill catalog does not match the skill folders',
-  ImplicitInvocationAllowed: 'Skill does not ship the explicit-only Codex policy',
   InvalidSearchMetadata: 'Skill search metadata is outside its limits',
+  InvocationMismatch: 'Skill invocation settings do not match its catalog kind',
+  MissingVersionLine: 'Implicit skill has no version line',
   NameMismatch: 'Skill name does not match its directory',
+  PrefixedSkillReference: 'Skill refers to another skill with a / or $ prefix',
+  SectionLink: 'Skill links to a section of another document',
+  SharedSectionMismatch: 'Skill shared section differs from the other skills of its kind',
 } as const;
+
+// the section each kind of skill copies word for word from the other skills of its kind
+export const SHARED_SECTION_HEADINGS = {
+  explicit: 'Invocation',
+  implicit: 'Application',
+} as const satisfies Record<ISkillKind, string>;
+
+/*
+ * the two lines an implicit skill may change in its shared Application section: the area sentence,
+ * which opens with this text, and the version bullet, which contains the version marker
+ */
+export const APPLICATION_AREA_PREFIX =
+  'The agent loads this skill on its own when a task touches its area.';
+export const APPLICATION_VERSION_MARKER = 'This skill was written for';
 
 // display copy for each workflow stage, in landing-page order
 export const SKILL_STAGES = {
@@ -17,13 +38,15 @@ export const SKILL_STAGES = {
   build: { label: 'Build', summary: 'Turn the approved plan into verified code.' },
   ship: { label: 'Ship', summary: 'Check the finished change, then publish it.' },
   context: { label: 'Context', summary: 'Weigh outside input and earlier sessions.' },
+  implicit: { label: 'Implicit', summary: 'Loaded by your agent when a task touches their stack.' },
 } as const satisfies Record<ISkillStage, { label: string; summary: string }>;
 
-// display labels for what a skill may change
+// display labels for what a skill may change, short enough to fit one line of the narrowest card
 export const SKILL_ACCESS_LABELS = {
   'changes-code': 'Changes code',
-  'changes-code-and-pushes': 'Changes code, pushes when autonomous',
+  'changes-code-and-pushes': 'Changes code, can push',
   'commits-and-pushes': 'Commits and pushes',
   'planning-files': 'Writes planning files',
   'read-only': 'Read-only',
+  'runs-picked-command': 'Runs a picked command',
 } as const satisfies Record<ISkillAccess, string>;

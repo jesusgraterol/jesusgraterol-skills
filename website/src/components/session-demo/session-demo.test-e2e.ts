@@ -11,7 +11,7 @@ test.describe('session demo', () => {
     await expect(demo.locator('[data-conversation-message="you"] code')).toHaveText([
       '/jg-brainstorm',
       '/jg-plan',
-      '/jg-execute autonomous',
+      '/jg-execute auto',
     ]);
     await expect(demo.locator('[data-conversation-message="agent"]')).toHaveCount(3);
   });
@@ -50,7 +50,7 @@ test.describe('session demo', () => {
         - listitem: "Claude Code: Plan saved. Approve it to start."
         - listitem:
           - text: "You:"
-          - code: /jg-execute autonomous
+          - code: /jg-execute auto
         - listitem: "Claude Code: Built, reviewed, and pushed to main."
     `);
   });

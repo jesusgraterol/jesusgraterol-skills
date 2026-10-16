@@ -5,6 +5,7 @@ import Credits from '../components/credits/credits.astro';
 import InstallCommand from '../components/install-command/install-command.astro';
 import SessionDemo from '../components/session-demo/session-demo.astro';
 import SkillCard from '../components/skill-card/skill-card.astro';
+import StandardsSection from '../components/standards-section/standards-section.astro';
 import WorkflowRun from '../components/workflow-run/workflow-run.astro';
 import BaseLayout from '../layouts/base-layout.astro';
 import { SITE_CONFIG } from '../site.config.ts';
@@ -37,7 +38,8 @@ const stages = (Object.keys(SKILL_STAGES) as ISkillStage[]).map((stage) => ({
         </h1>
         <p class="lede mt-7">
           Brainstorm, plan, build, review, and ship changes with the skills professional software
-          developers use on real projects. Each one runs only when you call it.
+          developers use on real projects. Workflow skills run only when you call them. Implicit
+          skills load on their own when a task touches their stack.
         </p>
         <div class="mt-8">
           <InstallCommand
@@ -76,8 +78,8 @@ const stages = (Object.keys(SKILL_STAGES) as ISkillStage[]).map((stage) => ({
         One skill for each step you control.
       </h2>
       <p class="lede mt-5">
-        Each skill states exactly what it may change and defers general engineering standards to
-        your repository's coding instructions.
+        Explicit skills state exactly what they may change. Implicit skills add the stack-specific
+        standards your agent needs on top of your repository's coding instructions.
       </p>
       <div class="mt-12 grid gap-12">
         {
@@ -144,7 +146,7 @@ const stages = (Object.keys(SKILL_STAGES) as ISkillStage[]).map((stage) => ({
           commit them and share the same workflow with your team.
         </p>
         <p class="mt-5 text-sm leading-6 text-muted">
-          Needs Node.js. Explicit-only loading is verified with Claude Code and Codex.
+          Needs Node.js. Explicit-only and implicit loading are verified with Claude Code and Codex.
         </p>
       </div>
       <div class="grid gap-5">
@@ -169,6 +171,8 @@ const stages = (Object.keys(SKILL_STAGES) as ISkillStage[]).map((stage) => ({
       </div>
     </div>
   </section>
+
+  <StandardsSection />
 
   <Credits />
 </BaseLayout>

@@ -8,7 +8,7 @@ const ORDERED_NAMES = Object.entries(SKILL_CATALOG)
   .map(([name]) => name);
 
 test.describe('skill pages', () => {
-  for (const [name, { examples, whenToUse }] of Object.entries(SKILL_CATALOG)) {
+  for (const [name, catalogEntry] of Object.entries(SKILL_CATALOG)) {
     test(`/skills/${name}/ renders its instructions, its examples, and its source`, async ({
       page,
     }) => {
@@ -16,30 +16,68 @@ test.describe('skill pages', () => {
 
       await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
 
+      // the header's icon is the only one on the page and stays out of the accessibility tree
+      const icon = page.locator('[data-skill-icon]');
+
+      await expect(icon).toHaveCount(1);
+      await expect(icon).toHaveAttribute('data-skill-icon', catalogEntry.icon);
+      await expect(icon).toHaveAttribute('aria-hidden', 'true');
+      await expect(
+        icon.locator(
+          `svg.lucide-${catalogEntry.icon}, svg[data-skill-brand-mark="${catalogEntry.icon}"]`,
+        ),
+      ).toHaveCount(1);
+
       const instructions = page.locator('[data-skill-instructions]');
 
-      await expect(
-        instructions.getByRole('heading', { level: 2, name: 'Invocation' }),
-      ).toBeVisible();
-      await expect(instructions.getByRole('heading', { level: 2, name: 'Workflow' })).toBeVisible();
-      await expect(instructions).toContainText(
-        'This skill runs only when the developer invokes it.',
-      );
+      if (catalogEntry.kind === 'explicit') {
+        await expect(
+          instructions.getByRole('heading', { level: 2, name: 'Invocation' }),
+        ).toBeVisible();
+        await expect(
+          instructions.getByRole('heading', { level: 2, name: 'Workflow' }),
+        ).toBeVisible();
+        await expect(instructions).toContainText(
+          'This skill runs only when the developer invokes it.',
+        );
 
-      await expect(page.locator('[data-skill-usage]')).toHaveText(
-        new RegExp(`^/${name}( (\\[|<).+)?$`, 'u'),
-      );
-      // exact text, because the copy buttons copy it verbatim
-      expect(
-        await page
-          .locator('[data-skill-invocation]')
-          .evaluateAll((elements) => elements.map((element) => element.textContent)),
-      ).toEqual(examples.map(({ invocation }) => `/${invocation}`));
-      await expect(page.locator('[data-skill-outcome]')).toHaveText(
-        examples.map(({ outcome }) => outcome),
-      );
+        await expect(page.locator('[data-skill-usage]')).toHaveText(
+          new RegExp(`^/${name}( (\\[|<).+)?$`, 'u'),
+        );
+        // exact text, because the copy buttons copy it verbatim
+        expect(
+          await page
+            .locator('[data-skill-invocation]')
+            .evaluateAll((elements) => elements.map((element) => element.textContent)),
+        ).toEqual(catalogEntry.examples.map(({ invocation }) => `/${invocation}`));
+        await expect(page.locator('[data-skill-outcome]')).toHaveText(
+          catalogEntry.examples.map(({ outcome }) => outcome),
+        );
+      } else {
+        await expect(
+          instructions.getByRole('heading', { level: 2, name: 'Application' }),
+        ).toBeVisible();
+        await expect(instructions).toContainText(
+          'The agent loads this skill on its own when a task touches its area.',
+        );
+
+        await expect(page.locator('[data-skill-usage]')).toHaveText('Loads automatically');
+        // the page opens with the card's summary, not the agent-facing trigger list
+        await expect(page.locator('[data-skill-lede]')).toHaveText(catalogEntry.summary);
+        await expect(page.getByText('May change', { exact: true })).toHaveCount(0);
+        await expect(page.getByRole('heading', { level: 2, name: 'When it loads' })).toBeVisible();
+        // exact text, because the copy buttons copy it verbatim
+        expect(
+          await page
+            .locator('[data-skill-request]')
+            .evaluateAll((elements) => elements.map((element) => element.textContent)),
+        ).toEqual(catalogEntry.examples.map(({ request }) => request));
+        await expect(page.locator('[data-skill-outcome]')).toHaveText(
+          catalogEntry.examples.map(({ outcome }) => outcome),
+        );
+      }
       await expect(page.getByRole('heading', { level: 2, name: 'When to use it' })).toBeVisible();
-      await expect(page.locator('[data-skill-when-to-use]')).toHaveText(whenToUse);
+      await expect(page.locator('[data-skill-when-to-use]')).toHaveText(catalogEntry.whenToUse);
 
       const position = ORDERED_NAMES.indexOf(name);
       const pager = page.getByRole('navigation', { name: 'Previous and next skills' });
@@ -102,7 +140,7 @@ test.describe('skill pages', () => {
 
     await page.goto('/skills/jg-execute/');
     await expect(page.locator('[data-skill-usage]')).toHaveText(
-      '/jg-execute [autonomous] [plan-path] [milestone N]',
+      '/jg-execute [auto] [plan-path] [milestone N]',
     );
   });
 });

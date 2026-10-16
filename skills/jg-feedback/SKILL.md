@@ -1,6 +1,6 @@
 ---
 name: jg-feedback
-description: Independently assess feedback and recommend what to adopt, reject, or adjust. Read-only.
+description: Assess feedback independently and recommend what to adopt, reject, or adjust.
 argument-hint: '[feedback]'
 disable-model-invocation: true
 ---

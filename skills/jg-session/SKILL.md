@@ -1,6 +1,6 @@
 ---
 name: jg-session
-description: Find a named Codex or Claude Code session and answer questions about it. Read-only.
+description: Find a named Claude Code or Codex session and answer questions from its latest decisions.
 argument-hint: '<session-name> [request]'
 disable-model-invocation: true
 ---

@@ -26,7 +26,7 @@ export const buildLlmsText = (skills: readonly ILlmsSkill[]): string => {
     '',
     `> ${SITE_CONFIG.defaultDescription}`,
     '',
-    'Every skill runs only when the developer invokes it by name, for example `/jg-plan`, and defers general engineering standards to the coding instructions of the repository it runs in. Install the skills per project from the repository root.',
+    'Explicit skills run only when the developer invokes them by name, for example `/jg-plan`, and defer general engineering standards to the coding instructions of the repository they run in. Implicit skills load on their own when a task touches their stack, such as PostgreSQL or React, and add the standards for it. Install the skills per project from the repository root.',
     '',
     '## Install',
     '',
@@ -42,6 +42,8 @@ export const buildLlmsText = (skills: readonly ILlmsSkill[]): string => {
     '',
     `- [Source repository](${SITE_CONFIG.repositoryUrl}): The skill folders, this website, and the issue tracker.`,
     `- [Agentic Coding](${SITE_CONFIG.agenticCodingUrl}): The engineering approach these skills put into practice.`,
+    `- [Start an AGENTS.md](${SITE_CONFIG.agenticCodingStartUrl}): A neutral AGENTS.md foundation for repositories without coding instructions.`,
+    `- [Refine an AGENTS.md](${SITE_CONFIG.agenticCodingRefineUrl}): A prompt that refines existing coding instructions without losing project knowledge.`,
     `- [Author](${SITE_CONFIG.author.url}): More work by ${SITE_CONFIG.author.name}.`,
     '',
   ].join('\n');
