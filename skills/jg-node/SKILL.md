@@ -51,4 +51,19 @@ Before finishing a filesystem or script change, run existing Windows and POSIX v
 - When other processes read a file in place, write it atomically: write a temporary file in the same directory, then `rename` it over the target, so a reader never sees a partial file. On Windows, retry the rename on `EPERM` or `EACCES`, which another process holding the file open can cause.
 - Stream large files with `pipeline` from `node:stream/promises` instead of reading them whole. It forwards errors and closes every stream in the chain.
 - Set `process.exitCode = 1` and return instead of calling `process.exit(1)`, so pending output and cleanup can finish.
-- Give network calls and spawned processes a deadline by passing `AbortSignal.timeout(milliseconds)` as their `signal`.
+- Give network calls and spawned processes a deadline by passing `AbortSignal.timeout(milliseconds)` as their `signal`. Combine it with a caller's signal through `AbortSignal.any()`. For one deadline across several retries, use an `AbortController` with a `setTimeout` that you `clearTimeout()` when the work ends.
+- (24.2+) Prefer disposing of a spawned child with `using`, which sends it SIGTERM when the scope ends but doesn't stop the child's own children. Deprecation DEP0209 discourages using `signal` to clean up long-lived resources, so keep `signal` for cancellation and deadlines.
+- Stop a spawned process tree, not only the direct child: on POSIX, spawn it with `detached: true` and signal its group with `process.kill(-child.pid, 'SIGTERM')`, then `'SIGKILL'` after a grace period; on Windows, run `taskkill /pid <pid> /T /F`. Stop the tree before the script exits.
+- Count the bytes of output buffered from a child, and stop the child once they pass a limit.
+- Accept only the exit codes a tool documents; treat any other code as a failure.
+- A wrapper that runs a child forwards SIGINT and SIGTERM to it. After a forwarded signal, it reports failure even when the child exits 0, discards partial stdout, and exits with 128 plus the signal number.
+- Prefer exit code 0 for a clean result, 1 for problems found, and 2 or higher when the check couldn't run. Never report an inconclusive check as passed. Machine-readable output goes alone on stdout, with a `schemaVersion` field.
+- Bound decompression: pass `maxOutputLength` to zlib's buffer methods, count bytes when streaming, and cap the number of archive entries, each entry's size, and the total size as bytes are written, never from sizes the archive declares.
+- Prefer multi-file rewrites that compute every change first, confirm before writing that each file is unchanged since it was read, and on failure restore only the writes they made.
+- (24.0+) Prefer `glob` from `node:fs/promises` over a glob package in new scripts.
+- (24.3+) Prefer running TypeScript scripts directly with `node script.ts`. Node only strips types, so:
+  - keep `tsc --noEmit` for type checking;
+  - set `erasableSyntaxOnly` (TypeScript 5.8+) and `verbatimModuleSyntax`, so the code uses only syntax Node can strip;
+  - import relative files with their `.ts` extension, through `rewriteRelativeImportExtensions` (TypeScript 5.7+), or `allowImportingTsExtensions` with `noEmit`;
+  - use `#` subpath imports from `package.json` instead of tsconfig `paths`, which Node ignores;
+  - keep shipping compiled JavaScript in published packages, because Node doesn't strip types inside `node_modules`.

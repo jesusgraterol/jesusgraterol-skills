@@ -40,10 +40,28 @@ Exception to this skill's precedence: the repository's testing guidelines and es
 - In Vitest, `vi.useFakeTimers()` fakes timers and dates, and `vi.setSystemTime()` sets the date with or without them. When timers are scheduled from promises, advance them with the async variants, such as `vi.advanceTimersByTimeAsync()` or `vi.runAllTimersAsync()`.
 - Stub environment variables and globals with `vi.stubEnv()` and `vi.stubGlobal()`, with `unstubEnvs: true` and `unstubGlobals: true` in the config so each test starts clean. A value assigned directly to `process.env` or a global can't be restored automatically.
 - Playwright's `timezoneId` and `locale` options affect only the browser. Set the `TZ` environment variable for the test runner itself.
-- Turn on reduced motion with `contextOptions: { reducedMotion: 'reduce' }` before asserting on anything that animates. `toHaveScreenshot()` already disables animations and hides the caret.
-- Make per-worker data unique with `testInfo.workerIndex`, and per-test data with `testInfo.testId`. `parallelIndex` is reused when a worker restarts, so it can collide.
+- Reduced-motion emulation, `contextOptions: { reducedMotion: 'reduce' }`, changes only the `prefers-reduced-motion` media query, so animations the page doesn't tie to it still run. Before reading the colors, sizes, or positions of anything that animates, wait for its end state with a retrying assertion, such as `await expect(locator).toHaveCSS('opacity', '1')`. `toHaveScreenshot()` already disables animations and hides the caret.
+- Read measurements that you compare with each other, such as two elements' widths, in one `page.evaluate()` call, so the page can't change between the reads.
+- Make per-worker data unique with `testInfo.workerIndex`, and per-test data with `testInfo.testId`, adding `testInfo.retry` when each attempt needs its own data. `parallelIndex` is reused when a worker restarts, so it can collide.
 - Prefer isolated tests to serial mode. When tests must share setup, put it in a fixture.
 - Inside `test.concurrent`, use the `expect` from the test context, so assertions report against the right test.
+
+## Browser checks
+
+- Check for horizontal overflow on the whole document: `document.documentElement.scrollWidth <= document.documentElement.clientWidth`.
+- Scope `AxeBuilder` to the area under test with `include()`, and assert that `violations` is empty. For WCAG 2.2 AA, pass `withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])`, because each tag holds only the rules added at its own level and version.
+- axe doesn't check that focus is visible, so assert the focus indicator itself, such as its outline, after moving focus with the keyboard.
+- Register `pageerror` and `console` listeners before `page.goto()`, and assert that the page logged no unexpected errors.
+- Prefer `screenshot: 'only-on-failure'` in the config, and take screenshots inside a test only when they are compared or reviewed.
+
+For mobile behavior:
+
+- Emulate phones with device descriptors, such as `devices['Pixel 7']` and `devices['iPhone 15']`. An iPhone descriptor selects WebKit, so add `browserName: 'chromium'` where only Chromium is installed, and never treat a Chromium run as proof of Safari behavior. Set the color scheme with `page.emulateMedia({ colorScheme })`.
+- With `hasTouch`, assert that `matchMedia('(pointer: coarse)').matches` before measuring touch targets with `boundingBox()`.
+- Read the viewport meta tag and the computed font size of fields with `page.evaluate()`.
+- Simulate safe-area insets in Chromium through a CDP session with the experimental `Emulation.setSafeAreaInsetsOverride` command.
+- Approximate the on-screen keyboard by shrinking the viewport height with `page.setViewportSize()`.
+- Check that `page.goBack()` closes the topmost sheet or dialog before it leaves the route.
 
 ## Repeat runs
 
@@ -67,6 +85,14 @@ Use the narrowest scope that covers the slow operation:
 - In Playwright, configure retries for CI only, such as `retries: process.env.CI ? 2 : 0`, with `trace: 'on-first-retry'`, or `'retain-on-failure-and-retries'` (1.59+) to keep a trace of every failed attempt.
 - To fail a CI run that has flaky passes, set `failOnFlakyTests: !!process.env.CI` (1.52+). Add it only when the repository wants that policy.
 - In Vitest, `retry` takes a number, or `{ count, delay, condition }` (4.1+) for retries with a delay or only on matching errors.
+- A test that writes data is retry-safe only when it removes exactly what an earlier attempt left, uses data unique to each attempt, or writes idempotently. Clean up in fixture teardown or `afterEach`, which still run after a timeout. Otherwise turn its retries off with `test.describe.configure({ retries: 0 })` and a comment giving the reason.
+- Set `forbidOnly: !!process.env.CI` in the Playwright config, so a committed `test.only` fails CI. Vitest already does this through `allowOnly`, which defaults to `!process.env.CI`.
+
+## Tags and selection
+
+- In Playwright, tag tests with (1.42+) `{ tag: '@name' }` and select them with `--grep` and `--grep-invert`.
+- In Vitest, (4.1+) declare tags under `test.tags` in the config, attach them with `{ tags: [...] }`, and select tests with `--tags-filter`.
+- Keep runs that find no tests failing: never pass `--passWithNoTests` to Vitest or `--pass-with-no-tests` to Playwright in a required run, so a wrong filter can't pass silently.
 
 ## Vitest specifics
 
