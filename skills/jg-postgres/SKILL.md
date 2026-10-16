@@ -87,7 +87,7 @@ For an `_tx` record, commit the balance mutation and the state that prevents rea
 - Give the pool a `connectionTimeoutMillis`, so a request waiting for a free connection fails instead of hanging, and set `idle_in_transaction_session_timeout`, so a session left open inside a transaction can't hold its locks indefinitely.
 - Set a default `statement_timeout`, with a lower `lock_timeout`, in the pool's connection config, so every session starts with both.
 - node-postgres's `query_timeout` only stops the client from waiting; the server keeps running the query. Set it above the server's `statement_timeout`, and when it fires on a checked-out client, release that client with `release(true)`, so the pool destroys it instead of reusing it.
-- Raise limits for known heavy work only inside its transaction, with `SET LOCAL` or `set_config(…, true)`, never with a plain `SET`, which outlives the transaction on a pooled connection.
+- Raise limits for known heavy work only inside its transaction, with `SET LOCAL` or `set_config(…, true)`, never with a plain `SET` on a pooled connection, where it outlives the transaction. A statement that can't run inside a transaction, such as `CREATE INDEX CONCURRENTLY`, raises them with a plain `SET` on a dedicated migration connection that is closed afterwards.
 - Treat a client-side timeout, or a connection lost during `COMMIT`, as an unknown outcome: read the state back, or rely on idempotency, before retrying.
 - (17+) Set `transaction_timeout` above the per-transaction budgets, as a backstop.
 - Never set `idle_session_timeout` for the roles a pool connects as, because the server then closes idle pooled connections.

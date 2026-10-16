@@ -42,7 +42,7 @@ npx skills update -p jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-exe
 npx skills remove jg-brainstorm jg-plan jg-challenge-plan jg-breakdown jg-execute jg-debug jg-pause jg-command jg-review jg-push jg-feedback jg-session jg-frontend jg-react jg-pwa jg-seo jg-nestjs jg-postgres jg-redis jg-node jg-npm-package jg-monorepo jg-bash jg-docker jg-ci jg-zod jg-testing
 ```
 
-Both commands name the skills, so other skills in the project are left alone.
+Both commands name the skills, so other skills in the project are left alone. Update refreshes only the skills you already have, so rerun the install command to add skills released since you installed.
 
 ## Skills
 
@@ -79,7 +79,7 @@ Both commands name the skills, so other skills in the project are left alone.
 | `jg-monorepo`    | `turbo.json`, `pnpm-workspace.yaml`, workspace dependency ranges, or adding, moving, or removing workspace packages. | Turborepo 2.11, pnpm 12 (pnpm items also hold for pnpm 11)                                           |
 | `jg-bash`        | Shell scripts, container entrypoints, Dockerfile `RUN` steps, CI `run:` steps, or Makefile recipes.                  | Bash 5.3, POSIX `sh`                                                                                 |
 | `jg-docker`      | Compose files, Dockerfiles, image tags, or commands that recreate or remove containers, volumes, or their data.      | Docker Engine 29, Docker Compose 5.6, Dockerfile syntax 1.28                                         |
-| `jg-ci`          | GitHub Actions workflows, reusable workflows, composite actions, or deployment pipelines.                            | GitHub Actions (October 2026)                                                                        |
+| `jg-ci`          | GitHub Actions workflows, reusable workflows, composite actions, or deployment pipelines.                            | GitHub Actions (October 2026), npm 11 and 12, pnpm 10 and 11                                         |
 | `jg-zod`         | Zod schemas, request or response validation, parsing untrusted data, or JSON Schema.                                 | Zod 4.6                                                                                              |
 | `jg-testing`     | Vitest or Playwright tests, test configuration, flaky tests, timeouts, or retries.                                   | Vitest 4.1 and 5.0, Playwright 1.64                                                                  |
 
@@ -158,7 +158,7 @@ Until then, the deploy job fails, or the site is served under a path where its r
 ```
 
 - Every skill directory name matches the `name` in its `SKILL.md` frontmatter.
-- An implicit skill may keep topics that only some tasks need in `references/<topic>.md`, one level deep. Its `SKILL.md` names each file as a code-formatted path, with when to read it, and the website renders the files below the skill's instructions. Explicit skills keep their whole workflow in `SKILL.md`. Every `SKILL.md` and reference file stays within 20,480 bytes, so an agent keeps all of it after compaction.
+- An implicit skill may keep topics that only some tasks need in `references/<topic>.md`, one level deep. Its `SKILL.md` names each file as a code-formatted path, with when to read it, and the website renders the files below the skill's instructions. Explicit skills keep their whole workflow in `SKILL.md`. Every `SKILL.md` and reference file stays within 20,480 bytes, so it stays close to the 5,000 tokens Claude Code re-attaches after compaction.
 - Explicit skills are explicit-only in both agents: their frontmatter sets `disable-model-invocation: true`, and their `agents/openai.yaml` sets `policy.allow_implicit_invocation: false`. Implicit skills omit the flag and set `policy.allow_implicit_invocation: true`. The site catalog's `kind` must match, or the build fails.
 - Every skill is self-contained and never links to sections of a specific `AGENTS.md`. Explicit skills share the rules in their `## Invocation` section. Implicit skills share their `## Application` section, which sets how their rules rank against the repository's coding instructions and conventions. Skills refer to each other by bare name, such as `jg-breakdown`, never with a `/` or `$` prefix. Every skill works on its own: a mention of another skill is only a pointer, and the one runtime dependency is `jg-execute auto`, which reads the `jg-review` and `jg-push` `SKILL.md` files from the neighboring folders.
 - Creating, writing, checking, maintaining, renaming, and removing a skill follow [`docs/skill-guidelines.md`](docs/skill-guidelines.md), which lists every place to update.

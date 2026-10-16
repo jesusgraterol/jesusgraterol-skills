@@ -150,6 +150,32 @@ test.describe('skill pages', () => {
     }
   });
 
+  test('shows code blocks in their dark colors once the dark theme is on', async ({ page }) => {
+    await page.goto('/skills/jg-ci/');
+    const codeBlock = page.locator('[data-skill-instructions] pre').first();
+
+    await page.getByRole('button', { name: 'Use dark theme' }).first().click();
+    await expect(page.locator('html')).toHaveClass(/dark/u);
+
+    // resolves the dark colors Shiki stores in custom properties into the rgb form computed styles report
+    const darkColors = await codeBlock.evaluate((element) => {
+      const styles = getComputedStyle(element);
+      const probe = document.createElement('span');
+
+      probe.style.backgroundColor = styles.getPropertyValue('--shiki-dark-bg');
+      probe.style.color = styles.getPropertyValue('--shiki-dark');
+      document.body.append(probe);
+      const resolved = getComputedStyle(probe);
+      const colors = { background: resolved.backgroundColor, text: resolved.color };
+      probe.remove();
+
+      return colors;
+    });
+
+    await expect(codeBlock).toHaveCSS('background-color', darkColors.background);
+    await expect(codeBlock).toHaveCSS('color', darkColors.text);
+  });
+
   test('labels one example per supported case, each with its own copy button', async ({ page }) => {
     await page.goto('/skills/jg-execute/');
     await expect(page.getByRole('heading', { level: 2, name: 'Examples' })).toBeVisible();

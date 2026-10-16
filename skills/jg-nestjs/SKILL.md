@@ -119,9 +119,9 @@ class MyService {
 
 ## Scheduled jobs
 
-- `@Interval()` runs on `setInterval`: its first run comes one interval after startup, runs can overlap, and `@nestjs/schedule` clears it only in `beforeApplicationShutdown`. Keep the guards inside the method: skip a run while the previous one is active, and start no run once shutdown begins. Await the active run in `onModuleDestroy`. For `@Cron()`, (`@nestjs/schedule` 5.0.1+) `waitForCompletion: true` skips ticks while a run is active.
+- `@Interval()` runs on `setInterval`: its first run comes one interval after startup, runs can overlap, and `@nestjs/schedule` clears it only in `beforeApplicationShutdown`. Keep the guards inside the method: skip a run while the previous one is active, and start no run once shutdown begins. Await the active run in `onModuleDestroy`, and close the pools and clients a job uses in `beforeApplicationShutdown`, which runs after every module's `onModuleDestroy`, so a run never loses its connection partway. For `@Cron()`, (`@nestjs/schedule` 5.0.1+) `waitForCompletion: true` skips ticks while a run is active.
 - Bound each run to a batch of the oldest due rows, and isolate failures between its stages, so one failing stage doesn't stop the others.
-- `@nestjs/schedule` runs its jobs in every replica. Run each job in one designated process, or behind a lock shared by all replicas. For the lock, propose the official `@nestjs/locks` (0.0.3, pre-1.0) with a shared store, rather than adding it; its default in-memory store doesn't coordinate replicas.
+- `@nestjs/schedule` runs its jobs in every replica. Run each job in one designated process, or behind a lock shared by all replicas. For the lock, propose the official `@nestjs/locks` (0.0.3, pre-1.0) with a shared store, rather than adding it; its default in-memory store doesn't coordinate replicas. Keep each run safe to overlap anyway, because a lock can expire mid-run, for example by claiming rows as jg-postgres describes.
 
 ## NestJS test module lifecycle
 

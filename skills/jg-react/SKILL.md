@@ -108,7 +108,7 @@ For non-obvious performance tradeoffs, prioritize correctness/readability and th
 - (19+) Pass `ref` as a regular prop instead of wrapping a component in `forwardRef`.
 - (19+) Render a context with `<SomeContext value={…}>` instead of `<SomeContext.Provider value={…}>`.
 - Prefer loading data through the router's loaders or the project's established query layer, where the project has one, over fetching inside `useEffect`.
-- (19+) Where the project has no established form system, prefer `<form action={…}>` with `useActionState` and `useFormStatus` for submissions, and `useOptimistic` for optimistic updates.
+- (19+) Where the project has no established form system, prefer `<form action={…}>` with `useActionState` and `useFormStatus` for submissions, and `useOptimistic` for optimistic updates. React resets a form's uncontrolled fields after its action finishes, even when the action returns errors through `useActionState`, so keep the user's input after a failed submission by returning the submitted values and rendering them as `defaultValue`, or by using controlled fields.
 - (19.2+) Move non-reactive logic that an effect calls into `useEffectEvent` instead of leaving dependencies out of the array. It needs `eslint-plugin-react-hooks` 6.1 or later, so the linter does not add the event to the dependencies.
 - (19.2+) Keep the state of hidden UI, such as inactive tabs, with `<Activity mode="hidden">` instead of unmounting it or hiding it while its effects keep running.
 - (19+) Pass async functions to `startTransition` for non-urgent updates that wait on work, and wrap state updates that follow an `await` in another `startTransition`.
@@ -124,7 +124,7 @@ For non-obvious performance tradeoffs, prioritize correctness/readability and th
 - Build in-app paths through shared functions that encode each dynamic segment, never by joining strings. React Router 7's `generatePath` encodes `:param` values but inserts a splat value as-is, so encode each segment of a splat yourself.
 - A route guard on a session that resolves asynchronously handles four states: while resolving it shows a loading state and never redirects; signed out redirects with `replace` and a same-origin return path; signed in renders the route; and a failed check offers Retry and Sign out.
 - On in-app navigations, prefer moving focus to the new page's `h1`, rendered with `tabIndex={-1}` and focused with `preventScroll`, and starting the new page at the top, while Back and Forward restore the previous scroll position. Prefer the router's scroll restoration, such as `<ScrollRestoration>`, over custom code.
-- Each route sets a unique, descriptive document title, for example by rendering (19+) `<title>` in the route component or through the route's `meta` export.
+- Each route sets a unique, descriptive document title, for example by rendering (19+) `<title>` in the route component or through the route's `meta` export. On public, indexable pages, the title and other head tags follow jg-seo.
 
 ## React testing
 

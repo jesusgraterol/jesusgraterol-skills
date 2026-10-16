@@ -39,6 +39,7 @@ The agent loads this skill on its own when a task touches its area. This skill's
 ## Dockerfiles
 
 - Use multi-stage builds, with a runtime stage that holds only production dependencies and build output.
+- Build images for workspace apps from a pruned workspace, as jg-monorepo describes.
 - Copy dependency manifests and install them before copying sources, and use cache mounts, such as `RUN --mount=type=cache,target=/root/.npm`, for package caches.
 - Keep a reviewed `.dockerignore`, so secrets, `.git`, and local build output never enter the build context.
 - Prefer a non-root `USER` in the runtime stage.
@@ -60,7 +61,6 @@ The agent loads this skill on its own when a task touches its area. This skill's
 ## When the numbers justify it
 
 - Pinning images by digest, at the cost of updating them by hand or with a bot.
-- Building images from a pruned workspace with `turbo prune` or `pnpm deploy`, as jg-monorepo describes.
 - Distroless runtime images, at the cost of having no shell for debugging.
 
 ## Verification

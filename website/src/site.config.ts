@@ -343,7 +343,7 @@ export const SKILL_CATALOG = {
     examples: [
       {
         outcome:
-          'Gives every post one canonical URL, real lastmod dates, Article structured data, and a social preview, and checks the sitemap in the build.',
+          'Gives every post one canonical URL, real lastmod dates, structured data, and a social preview, and checks the sitemap in the build.',
         request:
           'Add a blog section to the marketing site with sitemap entries and article previews.',
       },
@@ -536,7 +536,7 @@ export const SKILL_CATALOG = {
     searchTitle: 'jg-ci: GitHub Actions standards for coding agents',
     stage: 'implicit',
     summary:
-      'Lean required gates, permissions, timeouts, caching, concurrency, and action pinning for GitHub Actions.',
+      'Required gates, permissions, timeouts, caching, concurrency, and action pinning for GitHub Actions.',
     whenToUse:
       'It loads on its own when a task touches GitHub Actions workflows, including CI and deployment pipelines. Call it by name to load it before such a task.',
   },
@@ -563,7 +563,7 @@ export const SKILL_CATALOG = {
     examples: [
       {
         outcome:
-          'Finds elements by role, waits on assertions instead of sleeps, fixes the clock, and runs the new test three times before calling it done.',
+          'Finds elements by role, waits on assertions instead of sleeps, fixes the clock, and repeats new tests when your instructions require it.',
         request: 'Add an end-to-end test for the checkout flow.',
       },
     ],

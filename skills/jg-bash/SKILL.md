@@ -121,7 +121,7 @@ These rules apply to all shell code.
 - Download with `curl -fsSL --retry 3`, and verify a published checksum or signature before using the file. Never pipe a download into a shell.
 - Setup and provisioning scripts must be safe to run again: use `mkdir -p` and `ln -sfn`, and check before appending to a file.
 - Prefer `flock` for scheduled jobs that must not overlap.
-- Container entrypoints must `exec` the final process, so it runs as PID 1 and receives the container's stop signals.
+- Container entrypoints must `exec` the final process, so it replaces the shell and receives the container's stop signals directly.
 
 ## Shell inside other files
 

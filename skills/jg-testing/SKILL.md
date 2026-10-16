@@ -61,7 +61,7 @@ For mobile behavior:
 - Read the viewport meta tag and the computed font size of fields with `page.evaluate()`.
 - Simulate safe-area insets in Chromium through a CDP session with the experimental `Emulation.setSafeAreaInsetsOverride` command.
 - Approximate the on-screen keyboard by shrinking the viewport height with `page.setViewportSize()`.
-- Check that `page.goBack()` closes the topmost sheet or dialog before it leaves the route.
+- Check that the system back action closes the topmost sheet or dialog before it leaves the route: press Escape for one that closes on close requests, and call `page.goBack()` for one backed by a history entry.
 
 ## Repeat runs
 
